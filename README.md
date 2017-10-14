@@ -1,0 +1,2 @@
+# SUSEManager
+SUSE Manager Tools
