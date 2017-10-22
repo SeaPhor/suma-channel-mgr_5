@@ -121,7 +121,7 @@ function chk_creds
 		source $MYCREDFIL
 	else
 		echo ""
-		echo -e "\n\tYou need a LOCAL CREDENTIALS FILE!!!\n\tThe default is ~/bin/.creds.sh --\n\tCreate that file, or edit this script to remove the chk_creds funtion call\n\tfrom the case statement sections and pass your credentials\n\tdirectly in the clone/promote functions [NOT RECOMMENDED!!!]\n\tThe creds.sh file should look like the following--\nMY_ADMIN='suma-admin-username'\nMY_CREDS='suma-admin-password'\nEMAILG='email-or-group,additional-email-or-group' [Separated by commas and NO spaces]\n"
+		echo -e "\n\tYou need a LOCAL CREDENTIALS FILE!!!\n\tThe default is ~/bin/.creds.sh --\n\tCreate that file, or edit this script to remove the chk_creds funtion call\n\tfrom the Case Statement sections and pass your credentials\n\tdirectly in the clone/promote functions [NOT RECOMMENDED!!!]\n\tThe creds.sh file should look like the following--\nMY_ADMIN='suma-admin-username'\nMY_CREDS='suma-admin-password'\nEMAILG='email-or-group,additional-email-or-group' [Separated by commas and NO spaces]\n"
 		echo ""
 		echo -e "\n\n... You don't seem to have a credentials file, do you want to do that now?\n\t[y/n]\n"
 		read SETNOW
