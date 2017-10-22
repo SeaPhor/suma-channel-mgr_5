@@ -19,6 +19,7 @@
 	SYNCLOG=~/reposync.log
 	TDATE=`date +%Y-%m-%d`
 	RDATE=`date +%Y%m%d`
+	LDATE=`date +%d-%b-%Y`
 	HOSTA=`hostname`
 	INITRUN=false
 	TMPLATDIR=/srv/www/htdocs/pub/bootstrap
@@ -26,6 +27,11 @@
 	touch /tmp/tmp.sumatmp
 	EMAILMSGZ=/tmp/tmp.sumatmp
 	echo "Running $PROGNAME $1 Initial Process for $RDATE $2" > $EMAILMSGZ
+###	Cleanup logs
+	if [[ "`find /root/reposync.log -size +1M`" != "" ]]; then
+		mv $SYNCLOG /root/reposync_$LDATE-log.log
+	fi
+	find /root/reposync_*-log.log -mtime +90 -exec rm {} \;
 #
 #####################################################################
 #####                   GNU/GPL Info                                
@@ -637,7 +643,8 @@ exit $?
 #         - to always have the 'Latest_Stable'		#
 #         Completed and tested recommended PATH		#
 ##      Promoted script to release 4.1.4-14             #
-#         ?? Month 201?					#
+#         22? October 2017				#
+#         Added Cleanup logs to archive and remove +90	#
 #                                                       #
 #########################################################
 #
