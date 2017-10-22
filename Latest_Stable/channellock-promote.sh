@@ -5,12 +5,27 @@
 #####################################################################
 #
 #####################################################################
-#####   Setting Script Details
+#####   Setting Script Variables
 #####################################################################
 #
-        SCRIPT_RELEASE="4.1.4-12"
-        SCRIPT_RELEASE_DATE="16 October 2017"
+        SCRIPT_RELEASE="4.1.4-13"
+        SCRIPT_RELEASE_DATE="22 October 2017"
         PROGNAME=$(basename $0)
+	REPOPATH=~/SUSEManager
+	LTSTSTAB=$REPOPATH/Latest_Stable
+	PROGPATH=~/bin
+	BADPATH=false
+	MYCREDFIL=$PROGPATH/.creds.sh
+	SYNCLOG=~/reposync.log
+	TDATE=`date +%Y-%m-%d`
+	RDATE=`date +%Y%m%d`
+	HOSTA=`hostname`
+	INITRUN=false
+	TMPLATDIR=/srv/www/htdocs/pub/bootstrap
+	TMPLATFIL=/srv/www/htdocs/pub/bootstrap/template.sh
+	touch /tmp/tmp.sumatmp
+	EMAILMSGZ=/tmp/tmp.sumatmp
+	echo "Running $PROGNAME $1 Initial Process for $RDATE $2" > $EMAILMSGZ
 #
 #####################################################################
 #####                   GNU/GPL Info                                
@@ -52,6 +67,23 @@ function error_exit
 ###
 [[ "$UID" == "0" ]] && : || error_exit
 #
+###	BEGIN 4.1.4-13 need for making symlink NOT static
+if [[ ! -L $PROGPATH/$PROGNAME ]]; then
+	BADPATH=true
+	echo "Script PATH Not Recommended" >> $EMAILMSGZ
+fi
+function chk_path
+{
+	if [[ ! -L $PROGPATH/$PROGNAME ]]; then
+		BADPATH=true
+		echo -e "\n\n\t#################################################################\n\t# This process is designed to always have the latest release\t#\n\t# It is recommended that your cloned repo be at ~/SUSEManager\t#\n\t# And that you create a sym-link to the Latest, as in so:\t#\n\t# 'cd ~/bin' and create a sym-link to:\t\t\t\t#\n\t# $LTSTSTAB \t\t\t\t#\n\t# ln -s channellock-promote.sh \\ \t\t\t\t#\n\t# $LTSTSTAB/channellock-promote.sh\t#\n\t#################################################################\n\n"
+		sleep 15
+		echo ""
+	fi
+}
+#	chk_path
+###	END 4.1.4-13 need for making symlink NOT static
+#
 #####################################################################
 #####   Adjusted for portability, check for required spacewalk-utils
 #####################################################################
@@ -68,6 +100,7 @@ function chk_sutils
 			exit $?
 		else
 			zypper in -y spacewalk-utils
+			echo "Installed spacewalk-utils" >> $EMAILMSGZ
 		fi
 	fi
 }
@@ -78,13 +111,12 @@ function chk_sutils
 #
 function chk_creds
 {
-	PROGPATH=~/bin
-	MYCREDFIL=$PROGPATH/.creds.sh
 	if [[ -f $MYCREDFIL ]]; then
 		source $MYCREDFIL
-  		SYNCLOG=~/reposync.log
 	else
+		echo ""
 		echo -e "\n\tYou need a LOCAL CREDENTIALS FILE!!!\n\tThe default is ~/bin/.creds.sh --\n\tCreate that file, or edit this script to remove the chk_creds funtion call\n\tfrom the case statement sections and pass your credentials\n\tdirectly in the clone/promote functions [NOT RECOMMENDED!!!]\n\tThe creds.sh file should look like the following--\nMY_ADMIN='suma-admin-username'\nMY_CREDS='suma-admin-password'\nEMAILG='email-or-group,additional-email-or-group' [Separated by commas and NO spaces]\n"
+		echo ""
 		echo -e "\n\n... You don't seem to have a credentials file, do you want to do that now?\n\t[y/n]\n"
 		read SETNOW
 		if [[ "`echo $SETNOW`" == "n" ]]; then
@@ -107,33 +139,18 @@ function chk_creds
 			echo $my_mail >> $MYCREDFIL
 			chmod 700 $MYCREDFIL
 			source $MYCREDFIL
-			SYNCLOG=~/reposync.log
 			echo -e "\n\tYour new credentials file has been successfully created...\n\tIf you mis-typed or need to change the password, \n\tit can be found at $MYCREDFIL\n"
-		fi
-		if [[ ! -f $PROGPATH/$PROGNAME ]]; then
-			cp $PWD/$PROGNAME $PROGPATH/.
+			echo "Credentials file created" >> $EMAILMSGZ
 		fi
 	fi
 }
 #
-#	Log Variable
-	SYNCLOG=~/reposync.log
-#
 #####################################################################
-#####   Setting Options & Script Variables
+#####   Setting Options
 #####################################################################
 #
 	USAGE="\n\tThis process requires 1 (one) parameter -- [a|b|d|n|p|h|g|s]\nInitially, these MUST be run in the following order-\n\t$PROGNAME -b\n\t$PROGNAME -d\n\t$PROGNAME -p\nOptions\n###\t[-b]\tBase-Pool\tClones the SUSE base pool trees to 'dev' channels\n###\t[-d]\tPromote-dev\tPromotes the 'dev' channel to the 'test' channel\n###\t[-n]\tNon-Prod\tDoes both -b and -d\n###\t[-p]\tProduction\t Promotes 'test' to 'Prod'\n###\t[-a]\tALL\t\tDoes all the Options\n###\t[-h]\tHelp\t\tPrints this list and exits\n###\t[-g]\tGPL\t\tPrints the GPL info and exits\n###\t[-r]\tRelease\t\tPrints the Current Release Version and exits\n\n\tThis Clone/Promote process requires the SUMA Admin account username\n\tand password to be issued, for security and portability purposes this\n\trequires a local credentials file [Default = /root/bin/.creds.sh], this file is \n\t'sourced' for the user/pass required VARIABLES and has the following\n\tstructure with NO empty lines or white-space--\nMY_ADMIN='suma-admin-username'\nMY_CREDS='suma-admin-password'\nEMAILG=email-or-group,additional-email-or-group [Separated by commas and NO spaces]\n\n\tThis file can also be used to add Custom function calls to\n\tadd custom repositories and packages.\n\nType 'q' to exit\n"
 
-  TDATE=`date +%Y-%m-%d`
-  RDATE=`date +%Y%m%d`
-  HOSTA=`hostname`
-  INITRUN=false
-  TMPLATDIR=/srv/www/htdocs/pub/bootstrap
-  TMPLATFIL=/srv/www/htdocs/pub/bootstrap/template.sh
-  touch /tmp/tmp.sumatmp
-  EMAILMSGZ=/tmp/tmp.sumatmp
-  echo "Running $PROGNAME $1 Initial Process for $RDATE $2" > $EMAILMSGZ
 #
 #####################################################################
 ###	Begin logging
@@ -405,9 +422,9 @@ sleep 5
 #
 case "$1" in
 "-a")
-  chk_sutils 2>&1 >> $EMAILMSGZ
-  chk_creds 2>&1 >> $EMAILMSGZ
-  no_opts 2>&1 >> $EMAILMSGZ
+  chk_sutils
+  chk_creds
+  no_opts
   susetrees_clone 2>&1 >> $EMAILMSGZ
   promote_dev 2>&1 >> $EMAILMSGZ
   promote_test 2>&1 >> $EMAILMSGZ
@@ -432,9 +449,9 @@ case "$1" in
   promote_dev 2>&1 >> $EMAILMSGZ
   ;;
 "-b")
-  chk_sutils 2>&1 >> $EMAILMSGZ
-  chk_creds 2>&1 >> $EMAILMSGZ
-  no_opts 2>&1 >> $EMAILMSGZ
+  chk_sutils
+  chk_creds
+  no_opts
   susetrees_clone 2>&1 >> $EMAILMSGZ
   ;;
 #
@@ -466,9 +483,16 @@ esac
 echo -e "\n\tThe following Failure/s occured:\n" >> $EMAILMSGZ
 grep -i 'error' $EMAILMSGZ >> $EMAILMSGZ
 if $INITRUN; then
-	echo -e "\n\tThank you for using the $PROGNAME script, Release $SCRIPT_RELEASE\n\tThis will require maually adding Child Channels to your Activation Keys in the WebUI\n" >> $EMAILMSGZ
+	echo -e "\n\tThank you for using the $PROGNAME script, Release $SCRIPT_RELEASE\n\tThis will require maually adding Child Channels to your Activation Keys in the WebUI\n"
 	tail -n 12 $SYNCLOG
+	if $BADPATH; then
+		chk_path
+	fi
+	echo -e "\n\tThe log for this process can be found at $SYNCLOG\n"
 else
+	if $BADPATH; then
+		chk_path
+	fi
 	echo -e "\n\tThank you for using the $PROGNAME script, Release $SCRIPT_RELEASE\n"
 fi
 snd_mail
@@ -602,6 +626,18 @@ exit $?
 #         10 October 2017 - General cleanup unused code	#
 #         Moved changelog to bottom of script		#
 #         16 October 2017 - Move Sript Details to top	#
+##      Promoted script to release 4.1.4-13             #
+#         22 October 2017				#
+#         Need to NOT use a static file moved to ~/bin/	#
+#         It needs to be a symlink to githup Latest	#
+#         Have not begun yet, just recognized the need	#
+#         - Adding echo to suggest how this should be	#
+#         - structured in the PATH to be sym in ~/bin/	#
+#         - to ~/SUSEManager/Latest_Stable/$PROGNAME	#
+#         - to always have the 'Latest_Stable'		#
+#         Completed and tested recommended PATH		#
+##      Promoted script to release 4.1.4-14             #
+#         ?? Month 201?					#
 #                                                       #
 #########################################################
 #
