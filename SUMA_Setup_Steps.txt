@@ -39,10 +39,13 @@ More SUSE Manager Configuration in The WebUI
 - Create & configure System Groups
 - NOT USED - Clone channels in WebUI
 - NOT USED - Clone channels in CLI w/spacecmd
-- Clone & Promote SUSE Channel Trees w/ MyScript
-- Create Local repo/s & channel/s
-- - Create any additional repositories for custom rpms, packages, or external repos
-- - - Create Channel/s for additional repositories, with 'Parrent' being the dev channel and named so
+- If using my LifeCycle Patch Management script-
+- - 'zypper in git'
+- - See "- Registration - MyScript" below
+- - - Clone & Promote SUSE Channel Trees w/ MyScript
+- - - - Create Local repo/s & channel/s
+- - - - - Create any additional repositories for custom rpms, packages, or external repos
+- - - - - Create Channel/s for additional repositories, with 'Parrent' being the dev channel and named so
 - Create & configure activation key/s ['creation' not used if MyScript]
 - - Edit Activation keys to include 'Configuration File Deployment', All child channels needed including the custom created channel/s for repositories.
 
