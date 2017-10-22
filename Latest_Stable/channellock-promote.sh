@@ -430,22 +430,22 @@ case "$1" in
   promote_test 2>&1 >> $EMAILMSGZ
   ;;
 "-n")
-  chk_sutils 2>&1 >> $EMAILMSGZ
-  chk_creds 2>&1 >> $EMAILMSGZ
-  no_opts 2>&1 >> $EMAILMSGZ
+  chk_sutils
+  chk_creds
+  no_opts
   susetrees_clone 2>&1 >> $EMAILMSGZ
   promote_dev 2>&1 >> $EMAILMSGZ
   ;;
 "-p")
-  chk_sutils 2>&1 >> $EMAILMSGZ
-  chk_creds 2>&1 >> $EMAILMSGZ
-  no_opts 2>&1 >> $EMAILMSGZ
+  chk_sutils
+  chk_creds
+  no_opts
   promote_test 2>&1 >> $EMAILMSGZ
   ;;
 "-d")
-  chk_sutils 2>&1 >> $EMAILMSGZ
-  chk_creds 2>&1 >> $EMAILMSGZ
-  no_opts 2>&1 >> $EMAILMSGZ
+  chk_sutils
+  chk_creds
+  no_opts
   promote_dev 2>&1 >> $EMAILMSGZ
   ;;
 "-b")
