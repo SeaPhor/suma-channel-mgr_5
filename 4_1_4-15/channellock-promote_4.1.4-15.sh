@@ -31,7 +31,7 @@
 	if [[ "`find /root/reposync.log -size +1M`" != "" ]]; then
 		mv $SYNCLOG /root/reposync_$LDATE-log.log
 	fi
-	find /root/reposync_*-log.log -mtime +90 -exec rm {} \;
+	find /root/reposync_*-log.log -mtime +90 -exec rm {} \; 2>/dev/null
 ### Colors ###
 	RED='\e[0;31m'
 	LTRED='\e[1;31m'
@@ -669,6 +669,7 @@ exit $?
 #         No functionality changes so making 14 Latest	#
 ##      Promoted script to release 4.1.4-15             #
 #         23 October 2017				#
+#         Sent error output for 'find' to /dev/null	#
 #                                                       #
 #########################################################
 #
