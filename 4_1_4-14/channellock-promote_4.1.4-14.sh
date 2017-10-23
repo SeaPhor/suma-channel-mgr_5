@@ -32,6 +32,24 @@
 		mv $SYNCLOG /root/reposync_$LDATE-log.log
 	fi
 	find /root/reposync_*-log.log -mtime +90 -exec rm {} \;
+### Colors ###
+	RED='\e[0;31m'
+	LTRED='\e[1;31m'
+	BLUE='\e[0;34m'
+	LTBLUE='\e[1;34m'
+	GREEN='\e[0;32m'
+	LTGREEN='\e[1;32m'
+	ORANGE='\e[0;33m'
+	YELLOW='\e[1;33m'
+	CYAN='\e[0;36m'
+	LTCYAN='\e[1;36m'
+	PURPLE='\e[0;35m'
+	LTPURPLE='\e[1;35m'
+	GRAY='\e[1;30m'
+	LTGRAY='\e[0;37m'
+	WHITE='\e[1;37m'
+	NC='\e[0m'
+##############
 #
 #####################################################################
 #####                   GNU/GPL Info                                
@@ -39,7 +57,7 @@
 #
 function gpl_info
 {
-echo -e "\n
+echo -e "\n${BLUE}
 ####c4#############################################################################
 ###                                                                             ###
 ##                      GNU/GPL Info                                             ##
@@ -58,7 +76,7 @@ echo -e "\n
 ##    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the              ##
 ##    GNU General Public License for more details.                               ##
 ###                                                                             ###
-####w#################################b######################################c#####\n"
+####w#################################b######################################c#####${NC}\n"
 }
 #
 #####################################################################
@@ -67,7 +85,7 @@ echo -e "\n
 #
 function error_exit
 {
-	echo "${PROGNAME}: ${1:-"you are not root, please run as root"}" >&2
+	echo -e "${LTRED} ${PROGNAME}: ${1:-"you are not root, please run as root"}${NC}" >&2
 	exit 1
 }
 ###
@@ -76,13 +94,13 @@ function error_exit
 ###	BEGIN 4.1.4-13 need for making symlink NOT static
 if [[ ! -L $PROGPATH/$PROGNAME ]]; then
 	BADPATH=true
-	echo "Script PATH Not Recommended" >> $EMAILMSGZ
+	echo -e "${ORANGE}Script PATH Not Recommended${NC}" >> $EMAILMSGZ
 fi
 function chk_path
 {
 	if [[ ! -L $PROGPATH/$PROGNAME ]]; then
 		BADPATH=true
-		echo -e "\n\n\t#################################################################\n\t# This process is designed to always have the latest release\t#\n\t# It is recommended that your cloned repo be at ~/SUSEManager\t#\n\t# And that you create a sym-link to the Latest, as in so:\t#\n\t# 'cd ~/bin' and create a sym-link to:\t\t\t\t#\n\t# $LTSTSTAB \t\t\t\t#\n\t# ln -s channellock-promote.sh \\ \t\t\t\t#\n\t# $LTSTSTAB/channellock-promote.sh\t#\n\t#################################################################\n\n"
+		echo -e "${LTCYAN}\n\n\t#################################################################\n\t# This process is designed to always have the latest release\t#\n\t# It is recommended that your cloned repo be at ~/SUSEManager\t#\n\t# And that you create a sym-link to the Latest, as in so:\t#\n\t# 'cd ~/bin' and create a sym-link to:\t\t\t\t#\n\t# $LTSTSTAB \t\t\t\t#\n\t# ln -s channellock-promote.sh \\ \t\t\t\t#\n\t# $LTSTSTAB/channellock-promote.sh\t#\n\t#################################################################\n\n${NC}"
 		sleep 15
 		echo ""
 	fi
@@ -99,10 +117,10 @@ function chk_sutils
 #
 	if [[ "`rpm -qa | grep spacewalk-utils`" == "" ]]; then
 		zypper se spacewalk-utils
-		echo -e "\n\tThis process requires the 'spacewalk-utils' package and is not installed...\n\tWould you like to install it now?\n\t[y/n]\n"
+		echo -e "${LTCYAN}\n\tThis process requires the 'spacewalk-utils' package and is not installed...${NC}\n\t${LTCYAN}Would you like to install it now?\n\t[y/n]\n${NC}"
 		read INSTCHOICE
 		if [[ "`echo $INSTCHOICE`" == "n" ]]; then
-			echo -e "\nexiting...\n"
+			echo -e "${LTRED}\nexiting...\n${NC}"
 			exit $?
 		else
 			zypper in -y spacewalk-utils
@@ -121,9 +139,9 @@ function chk_creds
 		source $MYCREDFIL
 	else
 		echo ""
-		echo -e "\n\tYou need a LOCAL CREDENTIALS FILE!!!\n\tThe default is ~/bin/.creds.sh --\n\tCreate that file, or edit this script to remove the chk_creds funtion call\n\tfrom the Case Statement sections and pass your credentials\n\tdirectly in the clone/promote functions [NOT RECOMMENDED!!!]\n\tThe creds.sh file should look like the following--\nMY_ADMIN='suma-admin-username'\nMY_CREDS='suma-admin-password'\nEMAILG='email-or-group,additional-email-or-group' [Separated by commas and NO spaces]\n"
+		echo -e "${ORANGE}\n\tYou need a LOCAL CREDENTIALS FILE!!!\n\tThe default is ~/bin/.creds.sh --\n\tCreate that file, or edit this script to remove the chk_creds funtion call\n\tfrom the Case Statement sections and pass your credentials\n\tdirectly in the clone/promote functions${NC} ${LTRED}[NOT RECOMMENDED!!!]${NC}\n\t${ORANGE}The creds.sh file should look like the following--${NC}\n${CYAN}MY_ADMIN='suma-admin-username'\nMY_CREDS='suma-admin-password'\nEMAILG='email-or-group,additional-email-or-group' [Separated by commas and NO spaces]\n${NC}"
 		echo ""
-		echo -e "\n\n... You don't seem to have a credentials file, do you want to do that now?\n\t[y/n]\n"
+		echo -e "${ORANGE}\n\n... You don't seem to have a credentials file,${NC} ${CYAN}do you want to do that now?${NC}\n\t${CYAN}[${NC}${GREEN}y${NC}${CYAN}/${NC}${LTRED}n${NC}${CYAN}]${NC}\n"
 		read SETNOW
 		if [[ "`echo $SETNOW`" == "n" ]]; then
         		echo -e "$USAGE" | less
@@ -463,7 +481,7 @@ case "$1" in
 #
 "-h")
   echo -e "$USAGE" | less
-  echo -e "$USAGE"
+  echo -e "${LTCYAN}$USAGE${NC}"
   exit $?
   ;;
 #
@@ -479,7 +497,7 @@ case "$1" in
   ;;
 #
 *)
-  echo -e "$USAGE" | less
+  echo -e "${LTCYAN}$USAGE${NC}" | less
   exit $?
   ;;
 esac
