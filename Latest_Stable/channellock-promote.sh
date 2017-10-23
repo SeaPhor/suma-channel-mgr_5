@@ -8,9 +8,9 @@
 #####   Setting Script Variables
 #####################################################################
 #
-        SCRIPT_RELEASE="4.1.4-13"
-        SCRIPT_RELEASE_DATE="22 October 2017"
-        PROGNAME=$(basename $0)
+    SCRIPT_RELEASE="4.1.4-14"
+    SCRIPT_RELEASE_DATE="23 October 2017"
+    PROGNAME=$(basename $0)
 	REPOPATH=~/SUSEManager
 	LTSTSTAB=$REPOPATH/Latest_Stable
 	PROGPATH=~/bin
@@ -19,6 +19,7 @@
 	SYNCLOG=~/reposync.log
 	TDATE=`date +%Y-%m-%d`
 	RDATE=`date +%Y%m%d`
+	LDATE=`date +%d-%b-%Y`
 	HOSTA=`hostname`
 	INITRUN=false
 	TMPLATDIR=/srv/www/htdocs/pub/bootstrap
@@ -26,6 +27,29 @@
 	touch /tmp/tmp.sumatmp
 	EMAILMSGZ=/tmp/tmp.sumatmp
 	echo "Running $PROGNAME $1 Initial Process for $RDATE $2" > $EMAILMSGZ
+###	Cleanup logs
+	if [[ "`find /root/reposync.log -size +1M`" != "" ]]; then
+		mv $SYNCLOG /root/reposync_$LDATE-log.log
+	fi
+	find /root/reposync_*-log.log -mtime +90 -exec rm {} \;
+### Colors ###
+	RED='\e[0;31m'
+	LTRED='\e[1;31m'
+	BLUE='\e[0;34m'
+	LTBLUE='\e[1;34m'
+	GREEN='\e[0;32m'
+	LTGREEN='\e[1;32m'
+	ORANGE='\e[0;33m'
+	YELLOW='\e[1;33m'
+	CYAN='\e[0;36m'
+	LTCYAN='\e[1;36m'
+	PURPLE='\e[0;35m'
+	LTPURPLE='\e[1;35m'
+	GRAY='\e[1;30m'
+	LTGRAY='\e[0;37m'
+	WHITE='\e[1;37m'
+	NC='\e[0m'
+##############
 #
 #####################################################################
 #####                   GNU/GPL Info                                
@@ -33,7 +57,7 @@
 #
 function gpl_info
 {
-echo -e "\n
+echo -e "\n${BLUE}
 ####c4#############################################################################
 ###                                                                             ###
 ##                      GNU/GPL Info                                             ##
@@ -52,7 +76,7 @@ echo -e "\n
 ##    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the              ##
 ##    GNU General Public License for more details.                               ##
 ###                                                                             ###
-####w#################################b######################################c#####\n"
+####w#################################b######################################c#####${NC}\n"
 }
 #
 #####################################################################
@@ -61,7 +85,7 @@ echo -e "\n
 #
 function error_exit
 {
-	echo "${PROGNAME}: ${1:-"you are not root, please run as root"}" >&2
+	echo -e "${LTRED} ${PROGNAME}: ${1:-"you are not root, please run as root"}${NC}" >&2
 	exit 1
 }
 ###
@@ -70,13 +94,13 @@ function error_exit
 ###	BEGIN 4.1.4-13 need for making symlink NOT static
 if [[ ! -L $PROGPATH/$PROGNAME ]]; then
 	BADPATH=true
-	echo "Script PATH Not Recommended" >> $EMAILMSGZ
+	echo -e "${ORANGE}Script PATH Not Recommended${NC}" >> $EMAILMSGZ
 fi
 function chk_path
 {
 	if [[ ! -L $PROGPATH/$PROGNAME ]]; then
 		BADPATH=true
-		echo -e "\n\n\t#################################################################\n\t# This process is designed to always have the latest release\t#\n\t# It is recommended that your cloned repo be at ~/SUSEManager\t#\n\t# And that you create a sym-link to the Latest, as in so:\t#\n\t# 'cd ~/bin' and create a sym-link to:\t\t\t\t#\n\t# $LTSTSTAB \t\t\t\t#\n\t# ln -s channellock-promote.sh \\ \t\t\t\t#\n\t# $LTSTSTAB/channellock-promote.sh\t#\n\t#################################################################\n\n"
+		echo -e "${LTCYAN}\n\n\t#################################################################\n\t# This process is designed to always have the latest release\t#\n\t# It is recommended that your cloned repo be at ~/SUSEManager\t#\n\t# And that you create a sym-link to the Latest, as in so:\t#\n\t# 'cd ~/bin' and create a sym-link to:\t\t\t\t#\n\t# $LTSTSTAB \t\t\t\t#\n\t# ln -s channellock-promote.sh \\ \t\t\t\t#\n\t# $LTSTSTAB/channellock-promote.sh\t#\n\t#################################################################\n\n${NC}"
 		sleep 15
 		echo ""
 	fi
@@ -93,10 +117,10 @@ function chk_sutils
 #
 	if [[ "`rpm -qa | grep spacewalk-utils`" == "" ]]; then
 		zypper se spacewalk-utils
-		echo -e "\n\tThis process requires the 'spacewalk-utils' package and is not installed...\n\tWould you like to install it now?\n\t[y/n]\n"
+		echo -e "${LTCYAN}\n\tThis process requires the 'spacewalk-utils' package and is not installed...${NC}\n\t${LTCYAN}Would you like to install it now?\n\t[y/n]\n${NC}"
 		read INSTCHOICE
 		if [[ "`echo $INSTCHOICE`" == "n" ]]; then
-			echo -e "\nexiting...\n"
+			echo -e "${LTRED}\nexiting...\n${NC}"
 			exit $?
 		else
 			zypper in -y spacewalk-utils
@@ -115,22 +139,22 @@ function chk_creds
 		source $MYCREDFIL
 	else
 		echo ""
-		echo -e "\n\tYou need a LOCAL CREDENTIALS FILE!!!\n\tThe default is ~/bin/.creds.sh --\n\tCreate that file, or edit this script to remove the chk_creds funtion call\n\tfrom the case statement sections and pass your credentials\n\tdirectly in the clone/promote functions [NOT RECOMMENDED!!!]\n\tThe creds.sh file should look like the following--\nMY_ADMIN='suma-admin-username'\nMY_CREDS='suma-admin-password'\nEMAILG='email-or-group,additional-email-or-group' [Separated by commas and NO spaces]\n"
+		echo -e "${ORANGE}\n\tYou need a LOCAL CREDENTIALS FILE!!!\n\tThe default is ~/bin/.creds.sh --\n\tCreate that file, or edit this script to remove the chk_creds funtion call\n\tfrom the Case Statement sections and pass your credentials\n\tdirectly in the clone/promote functions${NC} ${LTRED}[NOT RECOMMENDED!!!]${NC}\n\t${ORANGE}The creds.sh file should look like the following--${NC}\n${CYAN}MY_ADMIN='suma-admin-username'\nMY_CREDS='suma-admin-password'\nEMAILG='email-or-group,additional-email-or-group' [Separated by commas and NO spaces]\n${NC}"
 		echo ""
-		echo -e "\n\n... You don't seem to have a credentials file, do you want to do that now?\n\t[y/n]\n"
+		echo -e "${ORANGE}\n\n... You don't seem to have a credentials file,${NC} ${CYAN}do you want to do that now?${NC}\n\t${CYAN}[${NC}${GREEN}y${NC}${CYAN}/${NC}${LTRED}n${NC}${CYAN}]${NC}\n"
 		read SETNOW
-		if [[ "`echo $SETNOW`" == "n" ]]; then
+		if [[ "`echo $SETNOW`" != "y" ]]; then
         		echo -e "$USAGE" | less
 		        exit $?
 		fi
 		if [[ "`echo $SETNOW`" == "y" ]]; then
-			echo -e "\nType the username of the SUMA Administrator\n"
+			echo -e "\n${PURPLE}Type the username of the SUMA Administrator${NC}\n"
 			read MYADMIN
 			my_user="MY_ADMIN='$MYADMIN'"
-			echo -e "\nType the password for $MYADMIN\n"
+			echo -e "\n${PURPLE}Type the password for${NC}${CYAN} $MYADMIN${NC}\n"
 		        read -s MYPASS
 			my_pass="MY_CREDS='$MYPASS'"
-			echo -e "\nType the emailaddress for notifications\n"
+			echo -e "\n${PURPLE}Type the emailaddress for notifications${NC}\n"
 			read MYMAIL
 			my_mail="EMAILG='$MYMAIL'"
 			touch $MYCREDFIL
@@ -139,7 +163,7 @@ function chk_creds
 			echo $my_mail >> $MYCREDFIL
 			chmod 700 $MYCREDFIL
 			source $MYCREDFIL
-			echo -e "\n\tYour new credentials file has been successfully created...\n\tIf you mis-typed or need to change the password, \n\tit can be found at $MYCREDFIL\n"
+			echo -e "\n\t${CYAN}Your new credentials file has been successfully created...\n\tIf you mis-typed or need to change the password, \n\tit can be found at $MYCREDFIL${NC}\n"
 			echo "Credentials file created" >> $EMAILMSGZ
 		fi
 	fi
@@ -149,7 +173,7 @@ function chk_creds
 #####   Setting Options
 #####################################################################
 #
-	USAGE="\n\tThis process requires 1 (one) parameter -- [a|b|d|n|p|h|g|s]\nInitially, these MUST be run in the following order-\n\t$PROGNAME -b\n\t$PROGNAME -d\n\t$PROGNAME -p\nOptions\n###\t[-b]\tBase-Pool\tClones the SUSE base pool trees to 'dev' channels\n###\t[-d]\tPromote-dev\tPromotes the 'dev' channel to the 'test' channel\n###\t[-n]\tNon-Prod\tDoes both -b and -d\n###\t[-p]\tProduction\t Promotes 'test' to 'Prod'\n###\t[-a]\tALL\t\tDoes all the Options\n###\t[-h]\tHelp\t\tPrints this list and exits\n###\t[-g]\tGPL\t\tPrints the GPL info and exits\n###\t[-r]\tRelease\t\tPrints the Current Release Version and exits\n\n\tThis Clone/Promote process requires the SUMA Admin account username\n\tand password to be issued, for security and portability purposes this\n\trequires a local credentials file [Default = /root/bin/.creds.sh], this file is \n\t'sourced' for the user/pass required VARIABLES and has the following\n\tstructure with NO empty lines or white-space--\nMY_ADMIN='suma-admin-username'\nMY_CREDS='suma-admin-password'\nEMAILG=email-or-group,additional-email-or-group [Separated by commas and NO spaces]\n\n\tThis file can also be used to add Custom function calls to\n\tadd custom repositories and packages.\n\nType 'q' to exit\n"
+	USAGE="\n\t${CYAN}This process requires 1 (one) parameter -- [a|b|d|n|p|h|g|s]\nInitially, these MUST be run in the following order-\n\t$PROGNAME -b\n\t$PROGNAME -d\n\t$PROGNAME -p\nOptions\n###\t[-b]\tBase-Pool\tClones the SUSE base pool trees to 'dev' channels\n###\t[-d]\tPromote-dev\tPromotes the 'dev' channel to the 'test' channel\n###\t[-n]\tNon-Prod\tDoes both -b and -d\n###\t[-p]\tProduction\t Promotes 'test' to 'Prod'\n###\t[-a]\tALL\t\tDoes all the Options\n###\t[-h]\tHelp\t\tPrints this list and exits\n###\t[-g]\tGPL\t\tPrints the GPL info and exits\n###\t[-r]\tRelease\t\tPrints the Current Release Version and exits\n\n\tThis Clone/Promote process requires the SUMA Admin account username\n\tand password to be issued, for security and portability purposes this\n\trequires a local credentials file [Default = /root/bin/.creds.sh], this file is \n\t'sourced' for the user/pass required VARIABLES and has the following\n\tstructure with NO empty lines or white-space--\nMY_ADMIN='suma-admin-username'\nMY_CREDS='suma-admin-password'\nEMAILG=email-or-group,additional-email-or-group [Separated by commas and NO spaces]\n\n\tThis file can also be used to add Custom function calls to\n\tadd custom repositories and packages.\n\nType 'q' to exit${NC}\n"
 
 #
 #####################################################################
@@ -194,7 +218,7 @@ fi
 function snd_mail
 {
         SUBJECT="$HOSTA -- sync-channels script $RDATE"
-        FROMA=smgadmin@$HOST
+        FROMA=$MY_ADMIN@$HOST
         /usr/bin/mailx -s "$SUBJECT" "$EMAILG" -f $FROMA < $EMAILMSGZ
 }
 #
@@ -226,7 +250,7 @@ done
 function promote_dev
 {
 if [[ "`grep 'dev' $MY_CHANLIST`" == "" ]]; then
-	echo -e "$USAGE\n\n\tThe '-b' Option MUST be run before any other\n\tthen the '-d'\n\tand then the -p\n"
+	echo -e "$USAGE\n\n\t${RED}The '-b' Option MUST be run before any other\n\tthen the '-d'\n\tand then the -p${NC}\n"
 	exit $?
 fi
 for d in `grep 'dev' $MY_CHANLIST`; do
@@ -246,11 +270,11 @@ done
 function promote_test
 {
 if [[ "`grep 'dev' $MY_CHANLIST`" == "" ]]; then
-	echo -e "$USAGE\n\n\tThe '-b' Option MUST be run before any other\n\tthen the '-d'\n\tand then the -p\n"
+	echo -e "$USAGE\n\n\t${RED}The '-b' Option MUST be run before any other\n\tthen the '-d'\n\tand then the -p${NC}\n"
 	exit $?
 else
 	if [[ "`grep 'test' $MY_CHANLIST`" == "" ]]; then
-        	echo -e "$USAGE\n\n\tThe '-d' Option MUST be run before using the '-p'"
+        	echo -e "$USAGE\n\n\t${RED}The '-d' Option MUST be run before using the '-p'${NC}"
 	        exit $?
 	fi
 
@@ -276,41 +300,41 @@ done
 function dis_claimer
 {
 clear
-echo -e "
+echo -e "${RED}
 \n\t\t\t\t\t\t\t=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 \t\t\t\t\t\t\t=\tLet Me Be Perfectly Clear       =
 \t\t\t\t\t\t\t=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=\n
-"
+${NC}"
 sleep 1
 clear
-echo -e "
+echo -e "${RED}
 \n\t\t\t\t\t\t=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 \t\t\t\t\t\t=\tLet Me Be Perfectly Clear       =
 \t\t\t\t\t\t=\tI do NOT claim to be a coder    =
 \t\t\t\t\t\t=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=\n
-"
+${NC}"
 sleep 2
 clear
-echo -e "
+echo -e "${RED}
 \n\t\t\t\t\t=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 \t\t\t\t\t=\tLet Me Be Perfectly Clear       =
 \t\t\t\t\t=\tI do NOT claim to be a coder    =
 \t\t\t\t\t=\tI know my code is UGLY and      =
 \t\t\t\t\t=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=\n
-"
+${NC}"
 sleep 2
 clear
-echo -e "
+echo -e "${RED}
 \n\t\t\t\t=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 \t\t\t\t=\tLet Me Be Perfectly Clear       =
 \t\t\t\t=\tI do NOT claim to be a coder    =
 \t\t\t\t=\tI know my code is UGLY and      =
 \t\t\t\t=\tSloppy, BUT, it WORKS as        =
 \t\t\t\t=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=\n
-"
+${NC}"
 sleep 2
 clear
-echo -e "
+echo -e "${RED}
 \n\t\t\t=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 \t\t\t=\tLet Me Be Perfectly Clear       =
 \t\t\t=\tI do NOT claim to be a coder    =
@@ -318,10 +342,10 @@ echo -e "
 \t\t\t=\tSloppy, BUT, it WORKS as        =
 \t\t\t=\tIntended! I know most of you    =
 \t\t\t=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=\n
-"
+${NC}"
 sleep 2
 clear
-echo -e "
+echo -e "${RED}
 \n\t\t=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 \t\t=\tLet Me Be Perfectly Clear       =
 \t\t=\tI do NOT claim to be a coder    =
@@ -330,7 +354,20 @@ echo -e "
 \t\t=\tIntended! I know most of you    =
 \t\t=\tThat examine it could write     =
 \t\t=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=\n
-"
+${NC}"
+sleep 2
+clear
+echo -e "${RED}
+\n\t=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+\t=\tLet Me Be Perfectly Clear       =
+\t=\tI do NOT claim to be a coder    =
+\t=\tI know my code is UGLY and      =
+\t=\tSloppy, BUT, it WORKS as        =
+\t=\tIntended! I know most of you    =
+\t=\tThat examine it could write     =
+\t=\tIt better and more efficient.   =
+\t=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=\n
+${NC}"
 sleep 2
 clear
 echo -e "
@@ -344,19 +381,6 @@ echo -e "
 \t=\tIt better and more efficient.   =
 \t=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=\n
 "
-sleep 2
-clear
-echo -e "
-\n\t=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-\t=\tLet Me Be Perfectly Clear       =
-\t=\tI do NOT claim to be a coder    =
-\t=\tI know my code is UGLY and      =
-\t=\tSloppy, BUT, it WORKS as        =
-\t=\tIntended! I know most of you    =
-\t=\tThat examine it could write     =
-\t=\tIt better and more efficient.   =
-\t=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=\n
-"
 sleep .5
 clear
 sleep .5
@@ -402,7 +426,7 @@ echo -e "
 sleep .5
 clear
 sleep .5
-echo -e "
+echo -e "${CYAN}
 \n\t=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 \t=\tLet Me Be Perfectly Clear       =
 \t=\tI do NOT claim to be a coder    =
@@ -412,7 +436,7 @@ echo -e "
 \t=\tThat examine it could write     =
 \t=\tIt better and more efficient.   =
 \t=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=\n
-"
+${NC}"
 sleep 5
 }
 #
@@ -468,7 +492,7 @@ case "$1" in
   ;;
 #
 "-r")
-  echo -e "The $PROGNAME version release is $SCRIPT_RELEASE"
+  echo -e "${CYAN}The $PROGNAME version release is $SCRIPT_RELEASE${NC}"
   exit $?
   ;;
 #
@@ -483,17 +507,17 @@ esac
 echo -e "\n\tThe following Failure/s occured:\n" >> $EMAILMSGZ
 grep -i 'error' $EMAILMSGZ >> $EMAILMSGZ
 if $INITRUN; then
-	echo -e "\n\tThank you for using the $PROGNAME script, Release $SCRIPT_RELEASE\n\tThis will require maually adding Child Channels to your Activation Keys in the WebUI\n"
+	echo -e "\n\t${LTBLUE}Thank you for using the $PROGNAME script, Release $SCRIPT_RELEASE\n\tThis will require maually adding Child Channels to your Activation Keys in the WebUI${NC}\n"
 	tail -n 12 $SYNCLOG
 	if $BADPATH; then
 		chk_path
 	fi
-	echo -e "\n\tThe log for this process can be found at $SYNCLOG\n"
+	echo -e "\n\t${LTBLUE}The log for this process can be found at $SYNCLOG${NC}\n"
 else
 	if $BADPATH; then
 		chk_path
 	fi
-	echo -e "\n\tThank you for using the $PROGNAME script, Release $SCRIPT_RELEASE\n"
+	echo -e "\n\t${LTBLUE}Thank you for using the $PROGNAME script, Release $SCRIPT_RELEASE${NC}\n"
 fi
 snd_mail
 echo "" >> $SYNCLOG
@@ -637,7 +661,14 @@ exit $?
 #         - to always have the 'Latest_Stable'		#
 #         Completed and tested recommended PATH		#
 ##      Promoted script to release 4.1.4-14             #
-#         ?? Month 201?					#
+#         22 October 2017				#
+#         Added Cleanup logs to archive and remove +90	#
+#         23 October 2017 found another call to local	#
+#         admin user and replaces with variable		#
+#         Added colors to variables and echos to user	#
+#         No functionality changes so making 14 Latest	#
+##      Promoted script to release 4.1.4-15             #
+#         23 October 2017				#
 #                                                       #
 #########################################################
 #
