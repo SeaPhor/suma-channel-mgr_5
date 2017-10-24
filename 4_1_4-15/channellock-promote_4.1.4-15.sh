@@ -8,9 +8,9 @@
 #####   Setting Script Variables
 #####################################################################
 #
-    SCRIPT_RELEASE="4.1.4-14"
-    SCRIPT_RELEASE_DATE="23 October 2017"
-    PROGNAME=$(basename $0)
+	SCRIPT_RELEASE="4.1.4-15"
+	SCRIPT_RELEASE_DATE="23 October 2017"
+	PROGNAME=$(basename $0)
 	REPOPATH=~/SUSEManager
 	LTSTSTAB=$REPOPATH/Latest_Stable
 	PROGPATH=~/bin
@@ -32,7 +32,7 @@
 		mv $SYNCLOG /root/reposync_$LDATE-log.log
 	fi
 	find /root/reposync_*-log.log -mtime +90 -exec rm {} \; 2>/dev/null
-### Colors ###
+### Colors ###################
 	RED='\e[0;31m'
 	LTRED='\e[1;31m'
 	BLUE='\e[0;34m'
@@ -49,7 +49,7 @@
 	LTGRAY='\e[0;37m'
 	WHITE='\e[1;37m'
 	NC='\e[0m'
-##############
+##############################
 #
 #####################################################################
 #####                   GNU/GPL Info                                
