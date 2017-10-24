@@ -8,9 +8,9 @@
 #####   Setting Script Variables
 #####################################################################
 #
-    SCRIPT_RELEASE="4.1.4-14"
-    SCRIPT_RELEASE_DATE="23 October 2017"
-    PROGNAME=$(basename $0)
+	SCRIPT_RELEASE="4.1.4-15"
+	SCRIPT_RELEASE_DATE="24 October 2017"
+	PROGNAME=$(basename $0)
 	REPOPATH=~/SUSEManager
 	LTSTSTAB=$REPOPATH/Latest_Stable
 	PROGPATH=~/bin
@@ -31,8 +31,8 @@
 	if [[ "`find /root/reposync.log -size +1M`" != "" ]]; then
 		mv $SYNCLOG /root/reposync_$LDATE-log.log
 	fi
-	find /root/reposync_*-log.log -mtime +90 -exec rm {} \;
-### Colors ###
+	find /root/reposync_*-log.log -mtime +90 -exec rm {} \; 2>/dev/null
+### Colors ###################
 	RED='\e[0;31m'
 	LTRED='\e[1;31m'
 	BLUE='\e[0;34m'
@@ -49,7 +49,7 @@
 	LTGRAY='\e[0;37m'
 	WHITE='\e[1;37m'
 	NC='\e[0m'
-##############
+##############################
 #
 #####################################################################
 #####                   GNU/GPL Info                                
@@ -100,7 +100,7 @@ function chk_path
 {
 	if [[ ! -L $PROGPATH/$PROGNAME ]]; then
 		BADPATH=true
-		echo -e "${LTCYAN}\n\n\t#################################################################\n\t# This process is designed to always have the latest release\t#\n\t# It is recommended that your cloned repo be at ~/SUSEManager\t#\n\t# And that you create a sym-link to the Latest, as in so:\t#\n\t# 'cd ~/bin' and create a sym-link to:\t\t\t\t#\n\t# $LTSTSTAB \t\t\t\t#\n\t# ln -s channellock-promote.sh \\ \t\t\t\t#\n\t# $LTSTSTAB/channellock-promote.sh\t#\n\t#################################################################\n\n${NC}"
+		echo -e "${LTCYAN}\n\n\t#################################################################\n\t# This process is designed to always have the latest release\t#\n\t# It is recommended that your cloned repo be at ~/SUSEManager\t#\n\t# And that you create a sym-link to the Latest, as in so:\t#\n\t# 'cd ~/bin' and create a sym-link to:\t\t\t\t#\n\t# $LTSTSTAB \t\t\t\t#\n\t# ln -s $LTSTSTAB/channellock-promote.sh \\\#\n\t# channellock-promote.sh\t\t\t\t\t#\n\t#################################################################\n\n${NC}"
 		sleep 15
 		echo ""
 	fi
@@ -669,6 +669,12 @@ exit $?
 #         No functionality changes so making 14 Latest	#
 ##      Promoted script to release 4.1.4-15             #
 #         23 October 2017				#
+#         Sent error output for 'find' to /dev/null	#
+#         24 October 2017, fixed syntax error for the 	#
+#         sym-link creation command recommendation	#
+#         Promoting to Latest for syntax error		#
+##      Promoted script to release 4.1.4-16             #
+#         24 October 2017				#
 #                                                       #
 #########################################################
 #

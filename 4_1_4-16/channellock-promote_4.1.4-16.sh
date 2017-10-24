@@ -8,7 +8,7 @@
 #####   Setting Script Variables
 #####################################################################
 #
-	SCRIPT_RELEASE="4.1.4-15"
+	SCRIPT_RELEASE="4.1.4-16"
 	SCRIPT_RELEASE_DATE="24 October 2017"
 	PROGNAME=$(basename $0)
 	REPOPATH=~/SUSEManager
