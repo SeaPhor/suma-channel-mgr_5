@@ -57,7 +57,7 @@
 #
 function gpl_info
 {
-echo -e "\n${BLUE}
+echo -e "\n${LTCYAN}
 ####c4#############################################################################
 ###                                                                             ###
 ##                      GNU/GPL Info                                             ##
@@ -541,9 +541,9 @@ exit $?
 #####   Objective- 6. Convert all lines to comprehensive variables
 #####			to make it portable for any SUMA Server
 #####   		Added 'source' for suma-admin credentials
-#####   All Objectives Completed--
+#####   All Objectives Completed-- (except... 42...)
 #####   
-#####           IT Linux 
+#####           Shawn Miller
 #####   
 #####################################################################
 #
