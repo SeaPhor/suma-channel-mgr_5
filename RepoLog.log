@@ -1,0 +1,6 @@
+	Repo Changelog started at Latest_Stable release 4_1_4-15 - 25 Oct 2017
+25 Oct 2017
+	Created 'Archive' directory and moved all except the previous, current, 
+	and next releases to 'Archive/.'. 
+	Started a Change-Log [RepoLog.log] for the repository changes to be documented.
+
