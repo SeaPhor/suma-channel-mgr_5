@@ -8,8 +8,8 @@
 #####   Setting Script Variables
 #####################################################################
 #
-	SCRIPT_RELEASE="4.1.4-16"
-	SCRIPT_RELEASE_DATE="24 October 2017"
+	SCRIPT_RELEASE="4.1.4-17"
+	SCRIPT_RELEASE_DATE="27 October 2017"
 	PROGNAME=$(basename $0)
 	REPOPATH=~/SUSEManager
 	LTSTSTAB=$REPOPATH/Latest_Stable
@@ -57,7 +57,7 @@
 #
 function gpl_info
 {
-echo -e "\n${LTCYAN}
+printf "\n${LTCYAN}
 ####c4#############################################################################
 ###                                                                             ###
 ##                      GNU/GPL Info                                             ##
@@ -85,7 +85,7 @@ echo -e "\n${LTCYAN}
 #
 function error_exit
 {
-	echo -e "${LTRED} ${PROGNAME}: ${1:-"you are not root, please run as root"}${NC}" >&2
+	printf "${LTRED} ${PROGNAME}: ${1:-"you are not root, please run as root"}${NC}" >&2
 	exit 1
 }
 ###
@@ -94,13 +94,13 @@ function error_exit
 ###	BEGIN 4.1.4-13 need for making symlink NOT static
 if [[ ! -L $PROGPATH/$PROGNAME ]]; then
 	BADPATH=true
-	echo -e "${ORANGE}Script PATH Not Recommended${NC}" >> $EMAILMSGZ
+	printf "${ORANGE}Script PATH Not Recommended${NC}" >> $EMAILMSGZ
 fi
 function chk_path
 {
 	if [[ ! -L $PROGPATH/$PROGNAME ]]; then
 		BADPATH=true
-		echo -e "${LTCYAN}\n\n\t#################################################################\n\t# This process is designed to always have the latest release\t#\n\t# It is recommended that your cloned repo be at ~/SUSEManager\t#\n\t# And that you create a sym-link to the Latest, as in so:\t#\n\t# 'cd ~/bin' and create a sym-link to:\t\t\t\t#\n\t# $LTSTSTAB \t\t\t\t#\n\t# ln -s $LTSTSTAB/channellock-promote.sh \\\#\n\t# channellock-promote.sh\t\t\t\t\t#\n\t#################################################################\n\n${NC}"
+		printf "${LTCYAN}\n\n\t#################################################################\n\t# This process is designed to always have the latest release\t#\n\t# It is recommended that your cloned repo be at ~/SUSEManager\t#\n\t# And that you create a sym-link to the Latest, as in so:\t#\n\t# 'cd ~/bin' and create a sym-link to:\t\t\t\t#\n\t# $LTSTSTAB \t\t\t\t#\n\t# ln -s $LTSTSTAB/channellock-promote.sh \\\#\n\t# channellock-promote.sh\t\t\t\t\t#\n\t#################################################################\n\n${NC}"
 		sleep 15
 		echo ""
 	fi
@@ -117,10 +117,10 @@ function chk_sutils
 #
 	if [[ "`rpm -qa | grep spacewalk-utils`" == "" ]]; then
 		zypper se spacewalk-utils
-		echo -e "${LTCYAN}\n\tThis process requires the 'spacewalk-utils' package and is not installed...${NC}\n\t${LTCYAN}Would you like to install it now?\n\t[y/n]\n${NC}"
+		printf "${LTCYAN}\n\tThis process requires the 'spacewalk-utils' package and is not installed...${NC}\n\t${LTCYAN}Would you like to install it now?\n\t[y/n]\n${NC}"
 		read INSTCHOICE
 		if [[ "`echo $INSTCHOICE`" == "n" ]]; then
-			echo -e "${LTRED}\nexiting...\n${NC}"
+			printf "${LTRED}\nexiting...\n${NC}"
 			exit $?
 		else
 			zypper in -y spacewalk-utils
@@ -139,22 +139,22 @@ function chk_creds
 		source $MYCREDFIL
 	else
 		echo ""
-		echo -e "${ORANGE}\n\tYou need a LOCAL CREDENTIALS FILE!!!\n\tThe default is ~/bin/.creds.sh --\n\tCreate that file, or edit this script to remove the chk_creds funtion call\n\tfrom the Case Statement sections and pass your credentials\n\tdirectly in the clone/promote functions${NC} ${LTRED}[NOT RECOMMENDED!!!]${NC}\n\t${ORANGE}The creds.sh file should look like the following--${NC}\n${CYAN}MY_ADMIN='suma-admin-username'\nMY_CREDS='suma-admin-password'\nEMAILG='email-or-group,additional-email-or-group' [Separated by commas and NO spaces]\n${NC}"
+		printf "${ORANGE}\n\tYou need a LOCAL CREDENTIALS FILE!!!\n\tThe default is ~/bin/.creds.sh --\n\tCreate that file, or edit this script to remove the chk_creds funtion call\n\tfrom the Case Statement sections and pass your credentials\n\tdirectly in the clone/promote functions${NC} ${LTRED}[NOT RECOMMENDED!!!]${NC}\n\t${ORANGE}The creds.sh file should look like the following--${NC}\n${CYAN}MY_ADMIN='suma-admin-username'\nMY_CREDS='suma-admin-password'\nEMAILG='email-or-group,additional-email-or-group' [Separated by commas and NO spaces]\n${NC}"
 		echo ""
-		echo -e "${ORANGE}\n\n... You don't seem to have a credentials file,${NC} ${CYAN}do you want to do that now?${NC}\n\t${CYAN}[${NC}${GREEN}y${NC}${CYAN}/${NC}${LTRED}n${NC}${CYAN}]${NC}\n"
+		printf "${ORANGE}\n\n... You don't seem to have a credentials file,${NC} ${CYAN}do you want to do that now?${NC}\n\t${CYAN}[${NC}${GREEN}y${NC}${CYAN}/${NC}${LTRED}n${NC}${CYAN}]${NC}\n"
 		read SETNOW
 		if [[ "`echo $SETNOW`" != "y" ]]; then
-        		echo -e "$USAGE" | less
+        		printf "$USAGE" | less
 		        exit $?
 		fi
 		if [[ "`echo $SETNOW`" == "y" ]]; then
-			echo -e "\n${PURPLE}Type the username of the SUMA Administrator${NC}\n"
+			printf "\n${PURPLE}Type the username of the SUMA Administrator${NC}\n"
 			read MYADMIN
 			my_user="MY_ADMIN='$MYADMIN'"
-			echo -e "\n${PURPLE}Type the password for${NC}${CYAN} $MYADMIN${NC}\n"
+			printf "\n${PURPLE}Type the password for${NC}${CYAN} $MYADMIN${NC}\n"
 		        read -s MYPASS
 			my_pass="MY_CREDS='$MYPASS'"
-			echo -e "\n${PURPLE}Type the emailaddress for notifications${NC}\n"
+			printf "\n${PURPLE}Type the emailaddress for notifications${NC}\n"
 			read MYMAIL
 			my_mail="EMAILG='$MYMAIL'"
 			touch $MYCREDFIL
@@ -163,7 +163,7 @@ function chk_creds
 			echo $my_mail >> $MYCREDFIL
 			chmod 700 $MYCREDFIL
 			source $MYCREDFIL
-			echo -e "\n\t${CYAN}Your new credentials file has been successfully created...\n\tIf you mis-typed or need to change the password, \n\tit can be found at $MYCREDFIL${NC}\n"
+			printf "\n\t${CYAN}Your new credentials file has been successfully created...\n\tIf you mis-typed or need to change the password, \n\tit can be found at $MYCREDFIL${NC}\n"
 			echo "Credentials file created" >> $EMAILMSGZ
 		fi
 	fi
@@ -180,7 +180,7 @@ function chk_creds
 ###	Begin logging
 #####################################################################
 #
-echo -e "\n#########################################################\n#\n#    $TDATE -- Executing $PROGNAME Script\n#\n#########################################################\n" >> $EMAILMSGZ
+printf "\n#########################################################\n#\n#    $TDATE -- Executing $PROGNAME Script\n#\n#########################################################\n" >> $EMAILMSGZ
 #
 #####################################################################
 #####   Setting Functions
@@ -250,7 +250,7 @@ done
 function promote_dev
 {
 if [[ "`grep 'dev' $MY_CHANLIST`" == "" ]]; then
-	echo -e "$USAGE\n\n\t${RED}The '-b' Option MUST be run before any other\n\tthen the '-d'\n\tand then the -p${NC}\n"
+	printf "$USAGE\n\n\t${RED}The '-b' Option MUST be run before any other\n\tthen the '-d'\n\tand then the -p${NC}\n"
 	exit $?
 fi
 for d in `grep 'dev' $MY_CHANLIST`; do
@@ -270,11 +270,11 @@ done
 function promote_test
 {
 if [[ "`grep 'dev' $MY_CHANLIST`" == "" ]]; then
-	echo -e "$USAGE\n\n\t${RED}The '-b' Option MUST be run before any other\n\tthen the '-d'\n\tand then the -p${NC}\n"
+	printf "$USAGE\n\n\t${RED}The '-b' Option MUST be run before any other\n\tthen the '-d'\n\tand then the -p${NC}\n"
 	exit $?
 else
 	if [[ "`grep 'test' $MY_CHANLIST`" == "" ]]; then
-        	echo -e "$USAGE\n\n\t${RED}The '-d' Option MUST be run before using the '-p'${NC}"
+        	printf "$USAGE\n\n\t${RED}The '-d' Option MUST be run before using the '-p'${NC}"
 	        exit $?
 	fi
 
@@ -300,14 +300,14 @@ done
 function dis_claimer
 {
 clear
-echo -e "${RED}
+printf "${RED}
 \n\t\t\t\t\t\t\t=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 \t\t\t\t\t\t\t=\tLet Me Be Perfectly Clear       =
 \t\t\t\t\t\t\t=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=\n
 ${NC}"
 sleep 1
 clear
-echo -e "${RED}
+printf "${RED}
 \n\t\t\t\t\t\t=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 \t\t\t\t\t\t=\tLet Me Be Perfectly Clear       =
 \t\t\t\t\t\t=\tI do NOT claim to be a coder    =
@@ -315,7 +315,7 @@ echo -e "${RED}
 ${NC}"
 sleep 2
 clear
-echo -e "${RED}
+printf "${RED}
 \n\t\t\t\t\t=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 \t\t\t\t\t=\tLet Me Be Perfectly Clear       =
 \t\t\t\t\t=\tI do NOT claim to be a coder    =
@@ -324,7 +324,7 @@ echo -e "${RED}
 ${NC}"
 sleep 2
 clear
-echo -e "${RED}
+printf "${RED}
 \n\t\t\t\t=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 \t\t\t\t=\tLet Me Be Perfectly Clear       =
 \t\t\t\t=\tI do NOT claim to be a coder    =
@@ -334,7 +334,7 @@ echo -e "${RED}
 ${NC}"
 sleep 2
 clear
-echo -e "${RED}
+printf "${RED}
 \n\t\t\t=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 \t\t\t=\tLet Me Be Perfectly Clear       =
 \t\t\t=\tI do NOT claim to be a coder    =
@@ -345,7 +345,7 @@ echo -e "${RED}
 ${NC}"
 sleep 2
 clear
-echo -e "${RED}
+printf "${RED}
 \n\t\t=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 \t\t=\tLet Me Be Perfectly Clear       =
 \t\t=\tI do NOT claim to be a coder    =
@@ -357,7 +357,7 @@ echo -e "${RED}
 ${NC}"
 sleep 2
 clear
-echo -e "${RED}
+printf "${RED}
 \n\t=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 \t=\tLet Me Be Perfectly Clear       =
 \t=\tI do NOT claim to be a coder    =
@@ -370,7 +370,7 @@ echo -e "${RED}
 ${NC}"
 sleep 2
 clear
-echo -e "
+printf "
 \n\t=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 \t=\tLet Me Be Perfectly Clear       =
 \t=\tI do NOT claim to be a coder    =
@@ -384,7 +384,7 @@ echo -e "
 sleep .5
 clear
 sleep .5
-echo -e "
+printf "
 \n\t=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 \t=\tLet Me Be Perfectly Clear       =
 \t=\tI do NOT claim to be a coder    =
@@ -398,7 +398,7 @@ echo -e "
 sleep .5
 clear
 sleep .5
-echo -e "
+printf "
 \n\t=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 \t=\tLet Me Be Perfectly Clear       =
 \t=\tI do NOT claim to be a coder    =
@@ -412,7 +412,7 @@ echo -e "
 sleep .5
 clear
 sleep .5
-echo -e "
+printf "
 \n\t=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 \t=\tLet Me Be Perfectly Clear       =
 \t=\tI do NOT claim to be a coder    =
@@ -426,7 +426,7 @@ echo -e "
 sleep .5
 clear
 sleep .5
-echo -e "${CYAN}
+printf "${CYAN}
 \n\t=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 \t=\tLet Me Be Perfectly Clear       =
 \t=\tI do NOT claim to be a coder    =
@@ -480,8 +480,8 @@ case "$1" in
   ;;
 #
 "-h")
-  echo -e "$USAGE" | less
-  echo -e "$USAGE"
+  printf "$USAGE" | less
+  printf "$USAGE"
   exit $?
   ;;
 #
@@ -492,32 +492,32 @@ case "$1" in
   ;;
 #
 "-r")
-  echo -e "${CYAN}The $PROGNAME version release is $SCRIPT_RELEASE${NC}"
+  printf "${CYAN}The $PROGNAME version release is $SCRIPT_RELEASE${NC}"
   exit $?
   ;;
 #
 *)
-  echo -e "$USAGE" | less
+  printf "$USAGE" | less
   exit $?
   ;;
 esac
 #####################################################################
 ###     Email & Finalize Log
 #####################################################################
-echo -e "\n\tThe following Failure/s occured:\n" >> $EMAILMSGZ
+printf "\n\tThe following Failure/s occured:\n" >> $EMAILMSGZ
 grep -i 'error' $EMAILMSGZ >> $EMAILMSGZ
 if $INITRUN; then
-	echo -e "\n\t${LTBLUE}Thank you for using the $PROGNAME script, Release $SCRIPT_RELEASE\n\tThis will require maually adding Child Channels to your Activation Keys in the WebUI${NC}\n"
+	printf "\n\t${LTBLUE}Thank you for using the $PROGNAME script, Release $SCRIPT_RELEASE\n\tThis will require maually adding Child Channels to your Activation Keys in the WebUI${NC}\n"
 	tail -n 12 $SYNCLOG
 	if $BADPATH; then
 		chk_path
 	fi
-	echo -e "\n\t${LTBLUE}The log for this process can be found at $SYNCLOG${NC}\n"
+	printf "\n\t${LTBLUE}The log for this process can be found at $SYNCLOG${NC}\n"
 else
 	if $BADPATH; then
 		chk_path
 	fi
-	echo -e "\n\t${LTBLUE}Thank you for using the $PROGNAME script, Release $SCRIPT_RELEASE${NC}\n"
+	printf "\n\t${LTBLUE}Thank you for using the $PROGNAME script, Release $SCRIPT_RELEASE${NC}\n"
 fi
 snd_mail
 echo "" >> $SYNCLOG
@@ -674,7 +674,15 @@ exit $?
 #         sym-link creation command recommendation	#
 #         Promoting to Latest for syntax error		#
 ##      Promoted script to release 4.1.4-16             #
-#         24 October 2017				#
+#         25 October 2017				#
+#         Copied the 4_1_4-16 to 4_1_4-16_test to test	#
+#	  changing ALL code 'printf' statements to 	#
+#	  'printf' statements as per recommendations 	#
+#	  from 'real' coders 8|				#
+#         27 October 2017 = Tested and works, 		#
+#	  Promoting to Latest				#
+##      Promoted script to release 4.1.4-17             #
+#         27 October 2017				#
 #                                                       #
 #########################################################
 #

@@ -9,7 +9,7 @@
 #####################################################################
 #
 	SCRIPT_RELEASE="4.1.4-16"
-	SCRIPT_RELEASE_DATE="27 October 2017"
+	SCRIPT_RELEASE_DATE="24 October 2017"
 	PROGNAME=$(basename $0)
 	REPOPATH=~/SUSEManager
 	LTSTSTAB=$REPOPATH/Latest_Stable
@@ -674,13 +674,7 @@ exit $?
 #         sym-link creation command recommendation	#
 #         Promoting to Latest for syntax error		#
 ##      Promoted script to release 4.1.4-16             #
-#         25 October 2017				#
-#         Copied the 4_1_4-16 to 4_1_4-16_test to test	#
-#	  changing ALL code 'printf' statements to 	#
-#	  'printf' statements as per recommendations 	#
-#	  from 'real' coders 8|				#
-#         27 October 2017 = Tested and works, 		#
-#	  Promoting to Latest				#
+#         24 October 2017				#
 #                                                       #
 #########################################################
 #
