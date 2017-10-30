@@ -492,7 +492,7 @@ case "$1" in
   ;;
 #
 "-r")
-  printf "${CYAN}The $PROGNAME version release is $SCRIPT_RELEASE${NC}"
+  printf "${CYAN}The $PROGNAME version release is $SCRIPT_RELEASE${NC}\n"
   exit $?
   ;;
 #

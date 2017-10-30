@@ -30,6 +30,7 @@
 ###	Cleanup logs
 	if [[ "`find /root/reposync.log -size +1M`" != "" ]]; then
 		mv $SYNCLOG /root/reposync_$LDATE-log.log
+		touch $SYNCLOG
 	fi
 	find /root/reposync_*-log.log -mtime +90 -exec rm {} \; 2>/dev/null
 ### Colors ###################
@@ -492,7 +493,7 @@ case "$1" in
   ;;
 #
 "-r")
-  printf "${CYAN}The $PROGNAME version release is $SCRIPT_RELEASE${NC}"
+  printf "${CYAN}The $PROGNAME version release is $SCRIPT_RELEASE${NC}\n"
   exit $?
   ;;
 #
