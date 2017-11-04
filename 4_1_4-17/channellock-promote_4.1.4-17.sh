@@ -644,7 +644,7 @@ exit $?
 #         Fixed the log output of the script name	#
 #         Edited un-needed statements in initrun state	#
 #         Seeing an issue in 10 that tries to duplicate	#
-#         the 'test' activtion key, can't find issue yet#
+#         the test activation key, can't find issue yet	#
 #         Found the issue, dup'd the dev code and fixed	#
 #         Promoting to 12 to push 11 to Latest for this	#
 #         Issue is a big issue and wastes run time	#
@@ -693,6 +693,7 @@ exit $?
 #         Changed the date format for the log, and 	#
 #         the time [mainly for my testing purposes]	#
 #         Added Release Date to the -r Option		#
+#         Fix typo in changelog- activtion > activation	#
 #                                                       #
 #########################################################
 # END OF CHANGELOG
