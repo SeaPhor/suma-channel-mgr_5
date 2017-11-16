@@ -28,7 +28,7 @@
 	EMAILMSGZ=/tmp/tmp.sumatmp
 	echo "Running $PROGNAME $1 Initial Process for $RDATE $2" > $EMAILMSGZ
 ###	Cleanup logs
-	if [[ "`find /root/reposync.log -size +1M`" != "" ]]; then
+	if [[ "`find /root/reposync.log -size +1M 2>/dev/null`" != "" ]]; then
 		mv $SYNCLOG /root/reposync_$LDATE-log.log
 		touch $SYNCLOG
 	fi
