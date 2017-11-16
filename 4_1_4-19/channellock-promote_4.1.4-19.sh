@@ -84,7 +84,8 @@ function chk_path
 {
 	if [[ ! -L $PROGPATH/$PROGNAME ]]; then
 		BADPATH=true
-		printf "$(tput setaf 4)\n\n\t#################################################################\n\t# This process is designed to always have the latest release\t#\n\t# It is recommended that your cloned repo be at ~/SUSEManager\t#\n\t# And that you create a sym-link to the Latest, as in so:\t#\n\t# 'cd ~/bin' and create a sym-link to:\t\t\t\t#\n\t# $LTSTSTAB \t\t\t\t#\n\t# ln -s $LTSTSTAB/channellock-promote.sh \\\#\n\t# channellock-promote.sh\t\t\t\t\t#\n\t#################################################################\n\n$(tput sgr0)"
+#	Adding check for ignoring the script path message
+		printf "$(tput setaf 4)\n\n\t#################################################################\n\t# This process is designed to always have the latest release\t#\n\t# It is recommended that your cloned repo be at ~/SUSEManager\t#\n\t# And that you create a sym-link to the Latest, as in so:\t#\n\t# 'cd ~/bin' and create a sym-link to:\t\t\t\t#\n\t# $LTSTSTAB \t\t\t\t#\n\t# ln -s $LTSTSTAB/channellock-promote.sh \\\#\n\t# channellock-promote.sh\t\t\t\t\t#\n\t#################################################################\n\tAdd [ignore] to the end of your command to not see this notice\n\n$(tput sgr0)"
 		sleep 15
 		echo ""
 	fi
@@ -497,12 +498,18 @@ if $INITRUN; then
 	printf "\n\t$(tput setaf 4)Thank you for using the $PROGNAME script, Release $SCRIPT_RELEASE\n\tThis will require maually adding Child Channels to your Activation Keys in the WebUI$(tput sgr0)\n"
 	tail -n 12 $SYNCLOG
 	if $BADPATH; then
-		chk_path
+#	Adding check for ignoring the script path message
+		if [[ "`echo $2`" != "ignore" ]]; then
+			chk_path
+		fi
 	fi
 	printf "\n\t$(tput setaf 4)The log for this process can be found at $SYNCLOG$(tput sgr0)\n"
 else
 	if $BADPATH; then
-		chk_path
+#	Adding check for ignoring the script path message
+		if [[ "`echo $2`" != "ignore" ]]; then
+			chk_path
+		fi
 	fi
 	printf "\n\t$(tput setaf 4)Thank you for using the $PROGNAME script, Release $SCRIPT_RELEASE$(tput sgr0)\n"
 fi
@@ -691,7 +698,8 @@ exit $?
 #         to disable/enable RHEL, Promote to apply	#
 ##      Promoted script to release 4.1.4-19		#
 #         16 November 2017-				#
-#         						#
+#         Adding check for ignoring the script path 	#
+#         message					#
 #                                                       #
 #########################################################
 # END OF CHANGELOG
