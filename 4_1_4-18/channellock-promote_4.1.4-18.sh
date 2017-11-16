@@ -8,8 +8,8 @@
 #####   Setting Script Variables
 #####################################################################
 #
-	SCRIPT_RELEASE="4.1.4-15"
-	SCRIPT_RELEASE_DATE="24 October 2017"
+	SCRIPT_RELEASE="4.1.4-18"
+	SCRIPT_RELEASE_DATE="??15 November 2017"
 	PROGNAME=$(basename $0)
 	REPOPATH=~/SUSEManager
 	LTSTSTAB=$REPOPATH/Latest_Stable
@@ -20,6 +20,7 @@
 	TDATE=`date +%Y-%m-%d`
 	RDATE=`date +%Y%m%d`
 	LDATE=`date +%d-%b-%Y`
+	MDATE=`date +%H:%M`
 	HOSTA=`hostname`
 	INITRUN=false
 	TMPLATDIR=/srv/www/htdocs/pub/bootstrap
@@ -30,26 +31,9 @@
 ###	Cleanup logs
 	if [[ "`find /root/reposync.log -size +1M`" != "" ]]; then
 		mv $SYNCLOG /root/reposync_$LDATE-log.log
+		touch $SYNCLOG
 	fi
 	find /root/reposync_*-log.log -mtime +90 -exec rm {} \; 2>/dev/null
-### Colors ###################
-	RED='\e[0;31m'
-	LTRED='\e[1;31m'
-	BLUE='\e[0;34m'
-	LTBLUE='\e[1;34m'
-	GREEN='\e[0;32m'
-	LTGREEN='\e[1;32m'
-	ORANGE='\e[0;33m'
-	YELLOW='\e[1;33m'
-	CYAN='\e[0;36m'
-	LTCYAN='\e[1;36m'
-	PURPLE='\e[0;35m'
-	LTPURPLE='\e[1;35m'
-	GRAY='\e[1;30m'
-	LTGRAY='\e[0;37m'
-	WHITE='\e[1;37m'
-	NC='\e[0m'
-##############################
 #
 #####################################################################
 #####                   GNU/GPL Info                                
@@ -57,7 +41,7 @@
 #
 function gpl_info
 {
-echo -e "\n${BLUE}
+printf "\n$(tput setaf 14)
 ####c4#############################################################################
 ###                                                                             ###
 ##                      GNU/GPL Info                                             ##
@@ -76,7 +60,7 @@ echo -e "\n${BLUE}
 ##    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the              ##
 ##    GNU General Public License for more details.                               ##
 ###                                                                             ###
-####w#################################b######################################c#####${NC}\n"
+####w#################################b######################################c#####$(tput sgr0)\n"
 }
 #
 #####################################################################
@@ -85,7 +69,7 @@ echo -e "\n${BLUE}
 #
 function error_exit
 {
-	echo -e "${LTRED} ${PROGNAME}: ${1:-"you are not root, please run as root"}${NC}" >&2
+	printf "$(tput setaf 9) ${PROGNAME}: ${1:-"you are not root, please run as root"}$(tput sgr0)" >&2
 	exit 1
 }
 ###
@@ -94,18 +78,17 @@ function error_exit
 ###	BEGIN 4.1.4-13 need for making symlink NOT static
 if [[ ! -L $PROGPATH/$PROGNAME ]]; then
 	BADPATH=true
-	echo -e "${ORANGE}Script PATH Not Recommended${NC}" >> $EMAILMSGZ
+	printf "$(tput setaf 3)Script PATH Not Recommended$(tput sgr0)" >> $EMAILMSGZ
 fi
 function chk_path
 {
 	if [[ ! -L $PROGPATH/$PROGNAME ]]; then
 		BADPATH=true
-		echo -e "${LTCYAN}\n\n\t#################################################################\n\t# This process is designed to always have the latest release\t#\n\t# It is recommended that your cloned repo be at ~/SUSEManager\t#\n\t# And that you create a sym-link to the Latest, as in so:\t#\n\t# 'cd ~/bin' and create a sym-link to:\t\t\t\t#\n\t# $LTSTSTAB \t\t\t\t#\n\t# ln -s $LTSTSTAB/channellock-promote.sh \\\#\n\t# channellock-promote.sh\t\t\t\t\t#\n\t#################################################################\n\n${NC}"
+		printf "$(tput setaf 4)\n\n\t#################################################################\n\t# This process is designed to always have the latest release\t#\n\t# It is recommended that your cloned repo be at ~/SUSEManager\t#\n\t# And that you create a sym-link to the Latest, as in so:\t#\n\t# 'cd ~/bin' and create a sym-link to:\t\t\t\t#\n\t# $LTSTSTAB \t\t\t\t#\n\t# ln -s $LTSTSTAB/channellock-promote.sh \\\#\n\t# channellock-promote.sh\t\t\t\t\t#\n\t#################################################################\n\n$(tput sgr0)"
 		sleep 15
 		echo ""
 	fi
 }
-#	chk_path
 ###	END 4.1.4-13 need for making symlink NOT static
 #
 #####################################################################
@@ -117,14 +100,14 @@ function chk_sutils
 #
 	if [[ "`rpm -qa | grep spacewalk-utils`" == "" ]]; then
 		zypper se spacewalk-utils
-		echo -e "${LTCYAN}\n\tThis process requires the 'spacewalk-utils' package and is not installed...${NC}\n\t${LTCYAN}Would you like to install it now?\n\t[y/n]\n${NC}"
+		printf "$(tput setaf 14)\n\tThis process requires the 'spacewalk-utils' package and is not installed...$(tput sgr0)\n\t$(tput setaf 3)Would you like to install it now?\n\t[y/n]\n$(tput sgr0)"
 		read INSTCHOICE
 		if [[ "`echo $INSTCHOICE`" == "n" ]]; then
-			echo -e "${LTRED}\nexiting...\n${NC}"
+			printf "$(tput setaf 1)\nexiting...\n$(tput sgr0)"
 			exit $?
 		else
 			zypper in -y spacewalk-utils
-			echo "Installed spacewalk-utils" >> $EMAILMSGZ
+			printf "$(tput setaf 14)Installed spacewalk-utils$(tput sgr0)" >> $EMAILMSGZ
 		fi
 	fi
 }
@@ -139,22 +122,22 @@ function chk_creds
 		source $MYCREDFIL
 	else
 		echo ""
-		echo -e "${ORANGE}\n\tYou need a LOCAL CREDENTIALS FILE!!!\n\tThe default is ~/bin/.creds.sh --\n\tCreate that file, or edit this script to remove the chk_creds funtion call\n\tfrom the Case Statement sections and pass your credentials\n\tdirectly in the clone/promote functions${NC} ${LTRED}[NOT RECOMMENDED!!!]${NC}\n\t${ORANGE}The creds.sh file should look like the following--${NC}\n${CYAN}MY_ADMIN='suma-admin-username'\nMY_CREDS='suma-admin-password'\nEMAILG='email-or-group,additional-email-or-group' [Separated by commas and NO spaces]\n${NC}"
+		printf "$(tput setaf 3)\n\tYou need a LOCAL CREDENTIALS FILE!!!\n\tThe default is ~/bin/.creds.sh --\n\tCreate that file, or edit this script to remove the chk_creds funtion call\n\tfrom the Case Statement sections and pass your credentials\n\tdirectly in the clone/promote functions$(tput sgr0) $(tput setaf 1)[NOT RECOMMENDED!!!]$(tput sgr0)\n\t$(tput setaf 3)The creds.sh file should look like the following--$(tput sgr0)\n$(tput setaf 14)MY_ADMIN='suma-admin-username'\nMY_CREDS='suma-admin-password'\nEMAILG='email-or-group,additional-email-or-group' [Separated by commas and NO spaces]\n$(tput sgr0)"
 		echo ""
-		echo -e "${ORANGE}\n\n... You don't seem to have a credentials file,${NC} ${CYAN}do you want to do that now?${NC}\n\t${CYAN}[${NC}${GREEN}y${NC}${CYAN}/${NC}${LTRED}n${NC}${CYAN}]${NC}\n"
+		printf "$(tput setaf 3)\n\n... You don't seem to have a credentials file,$(tput sgr0) $(tput setaf 4)do you want to do that now?$(tput sgr0)\n\t$(tput setaf 14)$(tput sgr0)[${GREEN}y$(tput sgr0)$(tput setaf 14)/$(tput sgr0)$(tput setaf 9)n$(tput sgr0)]\n"
 		read SETNOW
 		if [[ "`echo $SETNOW`" != "y" ]]; then
-        		echo -e "$USAGE" | less
+        		printf "$USAGE"
 		        exit $?
 		fi
 		if [[ "`echo $SETNOW`" == "y" ]]; then
-			echo -e "\n${PURPLE}Type the username of the SUMA Administrator${NC}\n"
+			printf "\n$(tput setaf 5)Type the username of the SUMA Administrator$(tput sgr0)\n"
 			read MYADMIN
 			my_user="MY_ADMIN='$MYADMIN'"
-			echo -e "\n${PURPLE}Type the password for${NC}${CYAN} $MYADMIN${NC}\n"
+			printf "\n$(tput setaf 5)Type the password for$(tput sgr0)$(tput setaf 14)$MYADMIN$(tput sgr0)\n"
 		        read -s MYPASS
 			my_pass="MY_CREDS='$MYPASS'"
-			echo -e "\n${PURPLE}Type the emailaddress for notifications${NC}\n"
+			printf "\n$(tput setaf 5)Type the emailaddress for notifications$(tput sgr0)\n"
 			read MYMAIL
 			my_mail="EMAILG='$MYMAIL'"
 			touch $MYCREDFIL
@@ -163,7 +146,7 @@ function chk_creds
 			echo $my_mail >> $MYCREDFIL
 			chmod 700 $MYCREDFIL
 			source $MYCREDFIL
-			echo -e "\n\t${CYAN}Your new credentials file has been successfully created...\n\tIf you mis-typed or need to change the password, \n\tit can be found at $MYCREDFIL${NC}\n"
+			printf "\n\t$(tput setaf 14)Your new credentials file has been successfully created...\n\tIf you mis-typed or need to change the password, \n\tit can be found at $MYCREDFIL$(tput sgr0)\n"
 			echo "Credentials file created" >> $EMAILMSGZ
 		fi
 	fi
@@ -173,14 +156,14 @@ function chk_creds
 #####   Setting Options
 #####################################################################
 #
-	USAGE="\n\t${CYAN}This process requires 1 (one) parameter -- [a|b|d|n|p|h|g|s]\nInitially, these MUST be run in the following order-\n\t$PROGNAME -b\n\t$PROGNAME -d\n\t$PROGNAME -p\nOptions\n###\t[-b]\tBase-Pool\tClones the SUSE base pool trees to 'dev' channels\n###\t[-d]\tPromote-dev\tPromotes the 'dev' channel to the 'test' channel\n###\t[-n]\tNon-Prod\tDoes both -b and -d\n###\t[-p]\tProduction\t Promotes 'test' to 'Prod'\n###\t[-a]\tALL\t\tDoes all the Options\n###\t[-h]\tHelp\t\tPrints this list and exits\n###\t[-g]\tGPL\t\tPrints the GPL info and exits\n###\t[-r]\tRelease\t\tPrints the Current Release Version and exits\n\n\tThis Clone/Promote process requires the SUMA Admin account username\n\tand password to be issued, for security and portability purposes this\n\trequires a local credentials file [Default = /root/bin/.creds.sh], this file is \n\t'sourced' for the user/pass required VARIABLES and has the following\n\tstructure with NO empty lines or white-space--\nMY_ADMIN='suma-admin-username'\nMY_CREDS='suma-admin-password'\nEMAILG=email-or-group,additional-email-or-group [Separated by commas and NO spaces]\n\n\tThis file can also be used to add Custom function calls to\n\tadd custom repositories and packages.\n\nType 'q' to exit${NC}\n"
+	USAGE="\n\t$(tput setaf 14)This process requires 1 (one) parameter -- [a|b|d|n|p|h|g|s]\nInitially, these MUST be run in the following order-\n\t$PROGNAME -b\n\t$PROGNAME -d\n\t$PROGNAME -p\nOptions\n###\t[-b]\tBase-Pool\tClones the SUSE base pool trees to 'dev' channels\n###\t[-d]\tPromote-dev\tPromotes the 'dev' channel to the 'test' channel\n###\t[-n]\tNon-Prod\tDoes both -b and -d\n###\t[-p]\tProduction\t Promotes 'test' to 'Prod'\n###\t[-a]\tALL\t\tDoes all the Options\n###\t[-h]\tHelp\t\tPrints this list and exits\n###\t[-g]\tGPL\t\tPrints the GPL info and exits\n###\t[-r]\tRelease\t\tPrints the Current Release Version and exits\n\n\tThis Clone/Promote process requires the SUMA Admin account username\n\tand password to be issued, for security and portability purposes this\n\trequires a local credentials file [Default = /root/bin/.creds.sh], this file is \n\t'sourced' for the user/pass required VARIABLES and has the following\n\tstructure with NO empty lines or white-space--\nMY_ADMIN='suma-admin-username'\nMY_CREDS='suma-admin-password'\nEMAILG=email-or-group,additional-email-or-group [Separated by commas and NO spaces]\n\n\tThis file can also be used to add Custom function calls to\n\tadd custom repositories and packages.\n$(tput sgr0)\n"
 
 #
 #####################################################################
 ###	Begin logging
 #####################################################################
 #
-echo -e "\n#########################################################\n#\n#    $TDATE -- Executing $PROGNAME Script\n#\n#########################################################\n" >> $EMAILMSGZ
+printf "\n#########################################################\n#\n# $LDATE $MDATE -- Executing $PROGNAME Script\n#\n#########################################################\n" >> $EMAILMSGZ
 #
 #####################################################################
 #####   Setting Functions
@@ -189,6 +172,9 @@ echo -e "\n#########################################################\n#\n#    $T
 function no_opts
 {
 spacecmd -u $MY_ADMIN -p $MY_CREDS softwarechannel_listbasechannels | grep ^sle > /tmp/mybaselist.sumatmp
+#	Optional- Un-Comment to enable RHEL
+#spacecmd -u $MY_ADMIN -p $MY_CREDS softwarechannel_listbasechannels | grep ^rhe >> /tmp/mybaselist.sumatmp
+#	END - Optional- Un-Comment to enable RHEL
 	MY_BASELIST=/tmp/mybaselist.sumatmp
 spacecmd -u $MY_ADMIN -p $MY_CREDS softwarechannel_listbasechannels | grep -v ^sle | grep -v ^suse | grep -v ^rhe > /tmp/mychanlist.sumatmp
 	MY_CHANLIST=/tmp/mychanlist.sumatmp
@@ -204,7 +190,8 @@ else
 fi
 mgr-sync -s refresh 2>&1 >> $EMAILMSGZ
 for i in `cat $MY_BASELIST`; do
-	spacewalk-repo-sync --channel $i
+	#spacewalk-repo-sync --channel $i
+	/usr/bin/python -u /usr/bin/spacewalk-repo-sync --channel $i --type yum --non-interactive
 done
 #####################################################################
 #####	Check for bootstrap repo/s - this will only create the 
@@ -250,7 +237,7 @@ done
 function promote_dev
 {
 if [[ "`grep 'dev' $MY_CHANLIST`" == "" ]]; then
-	echo -e "$USAGE\n\n\t${RED}The '-b' Option MUST be run before any other\n\tthen the '-d'\n\tand then the -p${NC}\n"
+	printf "$USAGE\n\n\t$(tput setaf 9)The '-b' Option MUST be run before any other\n\tthen the '-d'\n\tand then the -p$(tput sgr0)\n"
 	exit $?
 fi
 for d in `grep 'dev' $MY_CHANLIST`; do
@@ -270,11 +257,11 @@ done
 function promote_test
 {
 if [[ "`grep 'dev' $MY_CHANLIST`" == "" ]]; then
-	echo -e "$USAGE\n\n\t${RED}The '-b' Option MUST be run before any other\n\tthen the '-d'\n\tand then the -p${NC}\n"
+	printf "$USAGE\n\n\t$(tput setaf 9)The '-b' Option MUST be run before any other\n\tthen the '-d'\n\tand then the -p$(tput sgr0)\n"
 	exit $?
 else
 	if [[ "`grep 'test' $MY_CHANLIST`" == "" ]]; then
-        	echo -e "$USAGE\n\n\t${RED}The '-d' Option MUST be run before using the '-p'${NC}"
+        	printf "$USAGE\n\n\t$(tput setaf 9)The '-d' Option MUST be run before using the '-p'$(tput sgr0)"
 	        exit $?
 	fi
 
@@ -300,41 +287,41 @@ done
 function dis_claimer
 {
 clear
-echo -e "${RED}
+printf "$(tput setaf 9)
 \n\t\t\t\t\t\t\t=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 \t\t\t\t\t\t\t=\tLet Me Be Perfectly Clear       =
 \t\t\t\t\t\t\t=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=\n
-${NC}"
+$(tput sgr0)"
 sleep 1
 clear
-echo -e "${RED}
+printf "$(tput setaf 9)
 \n\t\t\t\t\t\t=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 \t\t\t\t\t\t=\tLet Me Be Perfectly Clear       =
 \t\t\t\t\t\t=\tI do NOT claim to be a coder    =
 \t\t\t\t\t\t=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=\n
-${NC}"
+$(tput sgr0)"
 sleep 2
 clear
-echo -e "${RED}
+printf "$(tput setaf 9)
 \n\t\t\t\t\t=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 \t\t\t\t\t=\tLet Me Be Perfectly Clear       =
 \t\t\t\t\t=\tI do NOT claim to be a coder    =
 \t\t\t\t\t=\tI know my code is UGLY and      =
 \t\t\t\t\t=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=\n
-${NC}"
+$(tput sgr0)"
 sleep 2
 clear
-echo -e "${RED}
+printf "$(tput setaf 9)
 \n\t\t\t\t=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 \t\t\t\t=\tLet Me Be Perfectly Clear       =
 \t\t\t\t=\tI do NOT claim to be a coder    =
 \t\t\t\t=\tI know my code is UGLY and      =
 \t\t\t\t=\tSloppy, BUT, it WORKS as        =
 \t\t\t\t=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=\n
-${NC}"
+$(tput sgr0)"
 sleep 2
 clear
-echo -e "${RED}
+printf "$(tput setaf 9)
 \n\t\t\t=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 \t\t\t=\tLet Me Be Perfectly Clear       =
 \t\t\t=\tI do NOT claim to be a coder    =
@@ -342,10 +329,10 @@ echo -e "${RED}
 \t\t\t=\tSloppy, BUT, it WORKS as        =
 \t\t\t=\tIntended! I know most of you    =
 \t\t\t=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=\n
-${NC}"
+$(tput sgr0)"
 sleep 2
 clear
-echo -e "${RED}
+printf "$(tput setaf 9)
 \n\t\t=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 \t\t=\tLet Me Be Perfectly Clear       =
 \t\t=\tI do NOT claim to be a coder    =
@@ -354,10 +341,10 @@ echo -e "${RED}
 \t\t=\tIntended! I know most of you    =
 \t\t=\tThat examine it could write     =
 \t\t=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=\n
-${NC}"
+$(tput sgr0)"
 sleep 2
 clear
-echo -e "${RED}
+printf "$(tput setaf 9)
 \n\t=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 \t=\tLet Me Be Perfectly Clear       =
 \t=\tI do NOT claim to be a coder    =
@@ -367,10 +354,10 @@ echo -e "${RED}
 \t=\tThat examine it could write     =
 \t=\tIt better and more efficient.   =
 \t=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=\n
-${NC}"
+$(tput sgr0)"
 sleep 2
 clear
-echo -e "
+printf "
 \n\t=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 \t=\tLet Me Be Perfectly Clear       =
 \t=\tI do NOT claim to be a coder    =
@@ -384,7 +371,7 @@ echo -e "
 sleep .5
 clear
 sleep .5
-echo -e "
+printf "
 \n\t=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 \t=\tLet Me Be Perfectly Clear       =
 \t=\tI do NOT claim to be a coder    =
@@ -398,7 +385,7 @@ echo -e "
 sleep .5
 clear
 sleep .5
-echo -e "
+printf "
 \n\t=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 \t=\tLet Me Be Perfectly Clear       =
 \t=\tI do NOT claim to be a coder    =
@@ -412,7 +399,7 @@ echo -e "
 sleep .5
 clear
 sleep .5
-echo -e "
+printf "
 \n\t=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 \t=\tLet Me Be Perfectly Clear       =
 \t=\tI do NOT claim to be a coder    =
@@ -426,7 +413,7 @@ echo -e "
 sleep .5
 clear
 sleep .5
-echo -e "${CYAN}
+printf "$(tput setaf 14)
 \n\t=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 \t=\tLet Me Be Perfectly Clear       =
 \t=\tI do NOT claim to be a coder    =
@@ -436,7 +423,7 @@ echo -e "${CYAN}
 \t=\tThat examine it could write     =
 \t=\tIt better and more efficient.   =
 \t=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=\n
-${NC}"
+$(tput sgr0)"
 sleep 5
 }
 #
@@ -480,8 +467,8 @@ case "$1" in
   ;;
 #
 "-h")
-  echo -e "$USAGE" | less
-  echo -e "$USAGE"
+  printf "$USAGE" 
+  printf "$USAGE"
   exit $?
   ;;
 #
@@ -492,32 +479,32 @@ case "$1" in
   ;;
 #
 "-r")
-  echo -e "${CYAN}The $PROGNAME version release is $SCRIPT_RELEASE${NC}"
+  printf "$(tput setaf 3)The $PROGNAME version is $SCRIPT_RELEASE -\n\treleased on $SCRIPT_RELEASE_DATE $(tput sgr0)\n"
   exit $?
   ;;
 #
 *)
-  echo -e "$USAGE" | less
+  printf "$USAGE"
   exit $?
   ;;
 esac
 #####################################################################
 ###     Email & Finalize Log
 #####################################################################
-echo -e "\n\tThe following Failure/s occured:\n" >> $EMAILMSGZ
+printf "\n\tThe following Failure/s occured:\n" >> $EMAILMSGZ
 grep -i 'error' $EMAILMSGZ >> $EMAILMSGZ
 if $INITRUN; then
-	echo -e "\n\t${LTBLUE}Thank you for using the $PROGNAME script, Release $SCRIPT_RELEASE\n\tThis will require maually adding Child Channels to your Activation Keys in the WebUI${NC}\n"
+	printf "\n\t$(tput setaf 4)Thank you for using the $PROGNAME script, Release $SCRIPT_RELEASE\n\tThis will require maually adding Child Channels to your Activation Keys in the WebUI$(tput sgr0)\n"
 	tail -n 12 $SYNCLOG
 	if $BADPATH; then
 		chk_path
 	fi
-	echo -e "\n\t${LTBLUE}The log for this process can be found at $SYNCLOG${NC}\n"
+	printf "\n\t$(tput setaf 4)The log for this process can be found at $SYNCLOG$(tput sgr0)\n"
 else
 	if $BADPATH; then
 		chk_path
 	fi
-	echo -e "\n\t${LTBLUE}Thank you for using the $PROGNAME script, Release $SCRIPT_RELEASE${NC}\n"
+	printf "\n\t$(tput setaf 4)Thank you for using the $PROGNAME script, Release $SCRIPT_RELEASE$(tput sgr0)\n"
 fi
 snd_mail
 echo "" >> $SYNCLOG
@@ -541,9 +528,9 @@ exit $?
 #####   Objective- 6. Convert all lines to comprehensive variables
 #####			to make it portable for any SUMA Server
 #####   		Added 'source' for suma-admin credentials
-#####   All Objectives Completed--
+#####   All Objectives Completed-- (except... 42...)
 #####   
-#####           IT Linux 
+#####           Shawn Miller
 #####   
 #####################################################################
 #
@@ -641,7 +628,7 @@ exit $?
 #         Fixed the log output of the script name	#
 #         Edited un-needed statements in initrun state	#
 #         Seeing an issue in 10 that tries to duplicate	#
-#         the 'test' activtion key, can't find issue yet#
+#         the test activation key, can't find issue yet	#
 #         Found the issue, dup'd the dev code and fixed	#
 #         Promoting to 12 to push 11 to Latest for this	#
 #         Issue is a big issue and wastes run time	#
@@ -674,7 +661,32 @@ exit $?
 #         sym-link creation command recommendation	#
 #         Promoting to Latest for syntax error		#
 ##      Promoted script to release 4.1.4-16             #
-#         24 October 2017				#
+#         25 October 2017				#
+#         Copied the 4_1_4-16 to 4_1_4-16_test to test	#
+#	  changing ALL code 'printf' statements to 	#
+#	  'printf' statements as per recommendations 	#
+#	  from 'real' coders 8|				#
+#         27 October 2017 = Tested and works, 		#
+#	  Promoting to Latest				#
+##      Promoted script to release 4.1.4-17             #
+#         27 October 2017				#
+#         04 November 2017- changed spacewalk-repo-sync	#
+#         command to cleaner output to display - 	#
+#	  /usr/bin/python -u /usr/bin/spacewalk-repo- \	#
+#	  sync --channel $i --type yum --non-interactive#
+#         Changed the date format for the log, and 	#
+#         the time [mainly for my testing purposes]	#
+#         Added Release Date to the -r Option		#
+#         Fix typo in changelog- activtion > activation	#
+##      Promoted script to release 4.1.4-18		#
+#         04 November 2017-				#
+#         Added 'Optional- Un-Comment to enable RHEL'	#
+#         15 Nov 2017-					#
+#         Began changing the color variables to 	#
+#         standard tput/setaf instead of custom 	#
+#         declared variables and escaped characters	#
+#         -Completed need to test full functionality	#
+#         						#
 #                                                       #
 #########################################################
-#
+# END OF CHANGELOG

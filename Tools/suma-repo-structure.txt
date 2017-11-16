@@ -1,0 +1,28 @@
+/root/bin/
+├── Archive
+└── channellock-promote.sh -> /root/SUSEManager/Latest_Stable/channellock-promote.sh
+
+/root/SUSEManager/
+├── 4_1_4-16
+│   └── channellock-promote_4.1.4-16.sh
+├── 4_1_4-17
+│   └── channellock-promote_4.1.4-17.sh
+├── 4_1_4-18
+│   └── channellock-promote_4.1.4-18.sh
+├── Archive
+│   ├── 4_1_4-12
+│   ├── 4_1_4-13
+│   ├── 4_1_4-14
+│   └── 4_1_4-16_test
+├── LICENSE
+├── Latest_Stable
+│   └── channellock-promote.sh
+├── README.md
+├── RepoLog.log
+└── Tools
+    ├── ColorVars.sh
+    ├── SUMA_Setup_Steps.txt
+    ├── example_credentials_file.sh
+    └── suma-repo-structure.txt
+
+10 directories, 11 files

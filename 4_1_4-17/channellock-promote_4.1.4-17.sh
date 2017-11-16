@@ -9,7 +9,7 @@
 #####################################################################
 #
 	SCRIPT_RELEASE="4.1.4-17"
-	SCRIPT_RELEASE_DATE="27 October 2017"
+	SCRIPT_RELEASE_DATE="04 November 2017"
 	PROGNAME=$(basename $0)
 	REPOPATH=~/SUSEManager
 	LTSTSTAB=$REPOPATH/Latest_Stable
@@ -20,6 +20,7 @@
 	TDATE=`date +%Y-%m-%d`
 	RDATE=`date +%Y%m%d`
 	LDATE=`date +%d-%b-%Y`
+	MDATE=`date +%H:%M`
 	HOSTA=`hostname`
 	INITRUN=false
 	TMPLATDIR=/srv/www/htdocs/pub/bootstrap
@@ -181,7 +182,7 @@ function chk_creds
 ###	Begin logging
 #####################################################################
 #
-printf "\n#########################################################\n#\n#    $TDATE -- Executing $PROGNAME Script\n#\n#########################################################\n" >> $EMAILMSGZ
+printf "\n#########################################################\n#\n# $LDATE $MDATE -- Executing $PROGNAME Script\n#\n#########################################################\n" >> $EMAILMSGZ
 #
 #####################################################################
 #####   Setting Functions
@@ -205,7 +206,8 @@ else
 fi
 mgr-sync -s refresh 2>&1 >> $EMAILMSGZ
 for i in `cat $MY_BASELIST`; do
-	spacewalk-repo-sync --channel $i
+	#spacewalk-repo-sync --channel $i
+	/usr/bin/python -u /usr/bin/spacewalk-repo-sync --channel $i --type yum --non-interactive
 done
 #####################################################################
 #####	Check for bootstrap repo/s - this will only create the 
@@ -493,7 +495,7 @@ case "$1" in
   ;;
 #
 "-r")
-  printf "${CYAN}The $PROGNAME version release is $SCRIPT_RELEASE${NC}\n"
+  printf "${CYAN}The $PROGNAME version is $SCRIPT_RELEASE -\n\treleased on $SCRIPT_RELEASE_DATE ${NC}\n"
   exit $?
   ;;
 #
@@ -642,7 +644,7 @@ exit $?
 #         Fixed the log output of the script name	#
 #         Edited un-needed statements in initrun state	#
 #         Seeing an issue in 10 that tries to duplicate	#
-#         the 'test' activtion key, can't find issue yet#
+#         the test activation key, can't find issue yet	#
 #         Found the issue, dup'd the dev code and fixed	#
 #         Promoting to 12 to push 11 to Latest for this	#
 #         Issue is a big issue and wastes run time	#
@@ -684,6 +686,14 @@ exit $?
 #	  Promoting to Latest				#
 ##      Promoted script to release 4.1.4-17             #
 #         27 October 2017				#
+#         04 November 2017- changed spacewalk-repo-sync	#
+#         command to cleaner output to display - 	#
+#	  /usr/bin/python -u /usr/bin/spacewalk-repo- \	#
+#	  sync --channel $i --type yum --non-interactive#
+#         Changed the date format for the log, and 	#
+#         the time [mainly for my testing purposes]	#
+#         Added Release Date to the -r Option		#
+#         Fix typo in changelog- activtion > activation	#
 #                                                       #
 #########################################################
-#
+# END OF CHANGELOG
