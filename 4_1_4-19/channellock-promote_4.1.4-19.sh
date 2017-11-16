@@ -8,8 +8,8 @@
 #####   Setting Script Variables
 #####################################################################
 #
-	SCRIPT_RELEASE="4.1.4-18"
-	SCRIPT_RELEASE_DATE="16 November 2017"
+	SCRIPT_RELEASE="4.1.4-19"
+	SCRIPT_RELEASE_DATE="?? ??? 201?"
 	PROGNAME=$(basename $0)
 	REPOPATH=~/SUSEManager
 	LTSTSTAB=$REPOPATH/Latest_Stable
