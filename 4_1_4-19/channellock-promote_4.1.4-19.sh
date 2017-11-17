@@ -511,7 +511,7 @@ else
 			chk_path
 		fi
 	fi
-	printf "\n\t$(tput setaf 4)Thank you for using the $PROGNAME script, Release $SCRIPT_RELEASE$(tput sgr0)\n"
+	printf "\n\t$(tput setaf 14)Thank you for using the $PROGNAME script, Release $SCRIPT_RELEASE$(tput sgr0)\n"
 fi
 snd_mail
 echo "" >> $SYNCLOG
