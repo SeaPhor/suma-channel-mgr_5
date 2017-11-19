@@ -2,6 +2,11 @@
 [Items in [] are informational only, Or reference a script Option]
 [Items in <> are environmental or specific to a variable]
 
+VM-Setup [I use VirtualBox]
+- HDD => 250GB [Mine, need at least 125GB]
+- RAM => 8GB [Minimum]
+- CPU => 2/2 [4 cores]
+
 Install SLES12-SP2
 - SUSE Manager Registration - Register using SUMA Registration Code
 - Add-On Modules - Select SUSE Manager 3 Server Module Add-On
@@ -18,7 +23,8 @@ Initial System Configuration
 - - Routing - Set IP of Default Gateway IP Address & Interface (eth0)
 - - OK
 - Verify Network/Internet connectivity
-- Patch (if needed) and reboot (if needed)
+- Patch [if needed] and reboot [if needed] 
+- - [I shutdown to get out of the Vbox console and start it with ‘VboxManage startvm <vmname> --type headless’ and then ssh to it from my box]
 - Set FQDN & alias in /etc/hosts
 - Yast2 ntp-client => configure NTP to Local/Public NTP-Server
 - - Run ntpdate -u <ntp-server-fqdn>
