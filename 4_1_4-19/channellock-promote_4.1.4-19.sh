@@ -70,6 +70,7 @@ printf "\n$(tput setaf 14)
 function error_exit
 {
 	printf "$(tput setaf 9) ${PROGNAME}: ${1:-"you are not root, please run as root"}$(tput sgr0)" >&2
+    echo ""
 	exit 1
 }
 ###
