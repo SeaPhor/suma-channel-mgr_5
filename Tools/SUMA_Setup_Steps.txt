@@ -12,7 +12,7 @@ Install SLES12-SP2 [Configure during DVD/ISO installation]
 - Add-On Modules - Select SUSE Manager 3 Server Module Add-On
 - Add-On Modules - Select Adv. System Management Module Add-On
 - Add-On Modules - Select Web & Scripting Module Add-On
-- Add-On Modules - Partitioning - Select Edit Proposed and UN-Check Separate /home
+- Partitioning - Select Edit Proposed and UN-Check Separate /home
 - Software - Select GCC-C++
 - Firewall - Enable SSH
 
