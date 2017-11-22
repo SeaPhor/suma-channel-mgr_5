@@ -7,7 +7,7 @@ VM-Setup [I use VirtualBox]
 - RAM => 8GB [Minimum]
 - CPU => 2/2 [4 cores]
 
-Install SLES12-SP2 [Configure during DVD/ISO installation]
+Install SLES12-SP3 [Configure during DVD/ISO installation]
 - SUSE Manager Registration - Register using SUMA Registration Code
 - Add-On Modules - Select SUSE Manager 3 Server Module Add-On
 - Add-On Modules - Select Adv. System Management Module Add-On
@@ -38,25 +38,26 @@ Initial SUSE Manager Configuration
 - Create Admin User
 - SCC Channel Config
 - - Admin => Setup Wizard => SUSE Products => Select the "+" to the right of the Product/s
-- - - (This will take quite some time to sync with SCC Channels/Repos)
+- - - [This will take quite some time to sync with SCC Channels/Repos]
 
 More SUSE Manager Configuration in The WebUI
-- Create Additional Users & Roles
-- Create & configure System Groups
+- Create Additional Users & Roles [as needed]
+- Create & configure System Groups [as needed]
 - NOT USED - Clone channels in WebUI
 - NOT USED - Clone channels in CLI w/spacecmd
 - If using my LifeCycle Patch Management script-
-- - 'zypper in git'
+- - 'zypper in git' [This may require adding additional suse repository]
+- - - ‘zypper ar https://download.opensuse.org/repositories/devel:/tools:/scm/SLE_12_SP3/ git’
 - - See "- Registration - MyScript" below
 - - - Clone & Promote SUSE Channel Trees w/ MyScript
 - - - - Create Local repo/s & channel/s
 - - - - - Create any additional repositories for custom rpms, packages, or external repos
-- - - - - Create Channel/s for additional repositories, with 'Parrent' being the dev channel and named so
+- - - - - Create Channel/s for additional repositories, with 'Parent' being the dev channel and named so
 - Create & configure activation key/s ['creation' not used if MyScript]
 - - Edit Activation keys to include 'Configuration File Deployment', All child channels needed including the custom created channel/s for repositories.
 
-- Registration - Salt Minion
-- - Create bootstrap repository/s [not used if MyScript]
+- Registration - Salt Minion [EDITING- will add the commands]
+- - Create bootstrap repository/s 
 - - Add repo created above to the client-
 - - - EXAMPLE => zypper ar -f http://newsuma3.woodbeeco.com/pub/repositories/sle/12/3/bootstrap bootstraprepo
 - - - zypper in salt-minion
@@ -81,7 +82,7 @@ More SUSE Manager Configuration in The WebUI
 - - - - chmod +x newname-bootstrap.sh
 - - - - sh newname-bootstrap.sh
 
-- Registration - MyScript
+- Registration – MyScript [EDITING- will add the commands]
 - - Download MyScript with 'git clone https://github.com/seaphor-wbc/SUSEManager.git' (may need to make it executable) 
 - - - 'ln -s ~/SUSEManager/Latest_Stable/channellock-promote.sh ~/bin/channellock-promote.sh
 - - channellock-promote.sh # to see options and required parameters
