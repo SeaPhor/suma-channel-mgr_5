@@ -39,6 +39,7 @@ Initial SUSE Manager Configuration
 - SCC Channel Config
 - - Admin => Setup Wizard => SUSE Products => Select the "+" to the right of the Product/s
 - - - [This will take quite some time to sync with SCC Channels/Repos]
+- - - - [Follow progress- # tailf /var/log/rhn/rhn_taskomatic_daemon.log]
 
 More SUSE Manager Configuration in The WebUI
 - Create Additional Users & Roles [as needed]
