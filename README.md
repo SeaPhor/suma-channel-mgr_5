@@ -1,7 +1,7 @@
 # suma3
 
 Lifecycle-Management
-- According to "SUSE Manager Best Practices" and "Advanced Patch Lifecycle Management with SUSE Manager" ... "SUSE provided channels should NEVER be assigned to managed systems. One reason is that you do not have control over when the content is updated and made available." [Chapter 5-1 of the Administration guide for SUSE Manager and is also in the 2 titles mentioned above.]
+- According to "SUSE Manager Best Practices" and "Advanced Patch Lifecycle Management with SUSE Manager" [By Jeff Price, SUSE] ... "SUSE provided channels should NEVER be assigned to managed systems. One reason is that you do not have control over when the content is updated and made available." [Chapter 5-1 of the Administration guide for SUSE Manager and is also in the 2 titles mentioned above.]
 - - EXAMPLE => Patch Non-Production one week/month to test the patches prior to implementing to Production, and then patch the Production the following week/month => packages will be different and test in Non-Production will be invalid.
 
 - There are 2 ways to accomplish this, 
