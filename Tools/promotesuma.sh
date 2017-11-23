@@ -24,6 +24,7 @@ if [[ -a ~/.githubrepo ]]; then
   cd $WRKDIR
   git add *
   git commit -a -m "$CPFIL is now Latest_Stable - Promoted to 4.1.4-$NEWREV on $REVDATE"
-  git push origin master
+  git push https://$MYUSER:$MYPASS@github.com/seaphor-wbc/SUSEManager.git
+#  git push origin master
 fi
 exit 0
