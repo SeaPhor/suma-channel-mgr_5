@@ -136,7 +136,7 @@ function chk_creds
 			printf "\n$(tput setaf 5)Type the username of the SUMA Administrator$(tput sgr0)\n"
 			read MYADMIN
 			my_user="MY_ADMIN='$MYADMIN'"
-			printf "\n$(tput setaf 5)Type the password for$(tput sgr0)$(tput setaf 14)$MYADMIN$(tput sgr0)\n"
+			printf "\n$(tput setaf 5)Type the password for $(tput sgr0)$(tput setaf 14)$MYADMIN$(tput sgr0)\n"
 		        read -s MYPASS
 			my_pass="MY_CREDS='$MYPASS'"
 			printf "\n$(tput setaf 5)Type the emailaddress for notifications$(tput sgr0)\n"
@@ -497,6 +497,7 @@ printf "\n\tThe following Failure/s occured:\n" >> $EMAILMSGZ
 grep -i 'error' $EMAILMSGZ >> $EMAILMSGZ
 if $INITRUN; then
 	printf "\n\t$(tput setaf 4)Thank you for using the $PROGNAME script, Release $SCRIPT_RELEASE\n\tThis will require maually adding Child Channels to your Activation Keys in the WebUI$(tput sgr0)\n"
+	printf "$(tput setaf 3)Your activation keys are `spacecmd activationkey_list`$(tput sgr0)"
 	tail -n 12 $SYNCLOG
 	if $BADPATH; then
 #	Adding check for ignoring the script path message
@@ -701,6 +702,8 @@ exit $?
 #         16 November 2017-				#
 #         Adding check for ignoring the script path 	#
 #         message					#
+#         Added a space between 'for' & admin-name	#
+#         Added printout of Activation keys if created	#
 #                                                       #
 #########################################################
 # END OF CHANGELOG
