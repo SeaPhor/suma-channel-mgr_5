@@ -4,5 +4,9 @@
 	and next releases to 'Archive/.'. 
 	Started a Change-Log [RepoLog.log] for the repository changes to be documented.
 	Copied the 4_1_4-16 to 4_1_4-16_test to test changing ALL code 'echo -e' 
-	statements to 'printf' statements as per recommendations from 'real' coders 8| 
+statements to 'printf' statements as per recommendations from 'real' coders 8| 
+2017 ?? Nov
+	Fixed all in test, promoted 16 to 17, 17 to 18, and 18 to 19- didn't update this log well so read the chanelog in the latest release for dates and details
+2017 23 Nov
+	4.1.4-19 - Adding check for ignoring the script path message, Added a space between 'for' & admin-name, Added printout of Activation keys if created 
 
