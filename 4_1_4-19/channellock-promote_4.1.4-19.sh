@@ -64,6 +64,30 @@ printf "\n$(tput setaf 14)
 }
 #
 #####################################################################
+#####	Setting color variables
+#####################################################################
+#
+BLACK=`tput setaf 0`
+RED=`tput setaf 1`
+GREEN=`tput setaf 2`
+YELLOW=`tput setaf 3`
+BLUE=`tput setaf 4`
+MAGENTA=`tput setaf 5`
+CYAN=`tput setaf 6`
+WHITE=`tput setaf 7`
+LTBLK=`tput setaf 8`
+LTRED=`tput setaf 9`
+LTGRN=`tput setaf 10`   
+LTYLLW=`tput setaf 11`   
+LTBLU=`tput setaf 12`   
+LTMAG=`tput setaf 13`   
+LTCYN=`tput setaf 14`   
+LTWHT=`tput setaf 15`   
+
+BOLD=`tput bold`
+RESET=`tput sgr0`
+#
+#####################################################################
 #####	Checking for root, setting error exit
 #####################################################################
 #
@@ -158,8 +182,7 @@ function chk_creds
 #####   Setting Options
 #####################################################################
 #
-	USAGE="\n\t$(tput setaf 14)This process requires 1 (one) parameter -- [a|b|d|n|p|h|g|s]\nInitially, these MUST be run in the following order-\n\t$PROGNAME -b\n\t$PROGNAME -d\n\t$PROGNAME -p\nOptions\n###\t[-b]\tBase-Pool\tClones the SUSE base pool trees to 'dev' channels\n###\t[-d]\tPromote-dev\tPromotes the 'dev' channel to the 'test' channel\n###\t[-n]\tNon-Prod\tDoes both -b and -d\n###\t[-p]\tProduction\t Promotes 'test' to 'Prod'\n###\t[-a]\tALL\t\tDoes all the Options\n###\t[-h]\tHelp\t\tPrints this list and exits\n###\t[-g]\tGPL\t\tPrints the GPL info and exits\n###\t[-r]\tRelease\t\tPrints the Current Release Version and exits\n\n\tThis Clone/Promote process requires the SUMA Admin account username\n\tand password to be issued, for security and portability purposes this\n\trequires a local credentials file [Default = /root/bin/.creds.sh], this file is \n\t'sourced' for the user/pass required VARIABLES and has the following\n\tstructure with NO empty lines or white-space--\nMY_ADMIN='suma-admin-username'\nMY_CREDS='suma-admin-password'\nEMAILG=email-or-group,additional-email-or-group [Separated by commas and NO spaces]\n\n\tThis file can also be used to add Custom function calls to\n\tadd custom repositories and packages.\n$(tput sgr0)\n"
-
+	USAGE="\n\t$YELLOW This process requires 1 (one) parameter -- [a|b|d|n|p|h|g|s]\nInitially, these MUST be run in the following order-$RESET\n\t$LTCYN $PROGNAME -b\n\t $PROGNAME -d\n\t $PROGNAME -p$RESET\n$YELLOW Options\n  [-b]\tBase-Pool$RESET\t$LTCYN Clones the SUSE base pool trees to 'dev' channels$RESET\n$YELLOW  [-d]\tPromote-dev$RESET\t$LTCYN Promotes the 'dev' channel to the 'test' channel$RESET\n$YELLOW  [-n]\tNon-Prod$RESET\t$LTCYN Does both -b and -d$RESET\n$YELLOW  [-p]\tProduction\t$LTCYN Promotes 'test' to 'Prod'$RESET\n$YELLOW  [-a]\tALL$RESET\t\t$LTCYN Does all the Options$RESET\n$YELLOW  [-h]\tHelp$RESET\t\t$LTCYN Prints this list and exits$RESET\n$YELLOW  [-g]\tGPL$RESET\t\t$LTCYN Prints the GPL info and exits$RESET\n$YELLOW  [-r]\tRelease$RESET\t\t$LTCYN Prints the Current Release Version and exits$RESET\n\n\t$LTMAG This Clone/Promote process requires the SUMA Admin account username\n\tand password to be issued, for security and portability purposes this\n\trequires a local credentials file [Default = /root/bin/.creds.sh], this file is \n\t'sourced' for the user/pass required VARIABLES and has the following\n\tstructure with NO empty lines or white-space--$RESET\n$LTCYN MY_ADMIN='suma-admin-username'\n MY_CREDS='suma-admin-password'\n EMAILG=email-or-group,additional-email-or-group$RESET $LTRED [Separated by commas and NO spaces]$RESET\n\n\t$YELLOW This file can also be used to add Custom function calls to\n\tadd custom repositories and packages.$RESET\n\n"
 #
 #####################################################################
 ###	Begin logging
@@ -704,6 +727,9 @@ exit $?
 #         message					#
 #         Added a space between 'for' & admin-name	#
 #         Added printout of Activation keys if created	#
+#         12 December 2017-				#
+#         Added Color Variables and changed the 'USAGE' #
+#         Options colors, no real code impact           #
 #                                                       #
 #########################################################
 # END OF CHANGELOG
