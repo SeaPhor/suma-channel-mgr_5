@@ -7,6 +7,9 @@ VM-Setup [I use VirtualBox]
 - RAM => 8GB [Minimum]
 - CPU => 2/2 [4 cores]
 
+Get 60 Day Free trial ISO & Registration Code
+- https://www.suse.com/products/suse-manager/download/
+
 Install SLES12-SP3 [Configure during DVD/ISO installation]
 - SUSE Manager Registration - Register using SUMA Registration Code
 - Add-On Modules - Select SUSE Manager 3 Server Module Add-On
