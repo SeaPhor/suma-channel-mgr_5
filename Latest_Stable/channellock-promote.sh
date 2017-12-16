@@ -8,8 +8,8 @@
 #####   Setting Script Variables
 #####################################################################
 #
-	SCRIPT_RELEASE="4.1.4-18"
-	SCRIPT_RELEASE_DATE="16 November 2017"
+	SCRIPT_RELEASE="4.1.4-19"
+	SCRIPT_RELEASE_DATE="16 December 2017"
 	PROGNAME=$(basename $0)
 	REPOPATH=~/SUSEManager
 	LTSTSTAB=$REPOPATH/Latest_Stable
@@ -64,12 +64,37 @@ printf "\n$(tput setaf 14)
 }
 #
 #####################################################################
+#####	Setting color variables
+#####################################################################
+#
+BLACK=`tput setaf 0`
+RED=`tput setaf 1`
+GREEN=`tput setaf 2`
+YELLOW=`tput setaf 3`
+BLUE=`tput setaf 4`
+MAGENTA=`tput setaf 5`
+CYAN=`tput setaf 6`
+WHITE=`tput setaf 7`
+LTBLK=`tput setaf 8`
+LTRED=`tput setaf 9`
+LTGRN=`tput setaf 10`   
+LTYLLW=`tput setaf 11`   
+LTBLU=`tput setaf 12`   
+LTMAG=`tput setaf 13`   
+LTCYN=`tput setaf 14`   
+LTWHT=`tput setaf 15`   
+
+BOLD=`tput bold`
+RESET=`tput sgr0`
+#
+#####################################################################
 #####	Checking for root, setting error exit
 #####################################################################
 #
 function error_exit
 {
 	printf "$(tput setaf 9) ${PROGNAME}: ${1:-"you are not root, please run as root"}$(tput sgr0)" >&2
+    echo ""
 	exit 1
 }
 ###
@@ -84,7 +109,8 @@ function chk_path
 {
 	if [[ ! -L $PROGPATH/$PROGNAME ]]; then
 		BADPATH=true
-		printf "$(tput setaf 4)\n\n\t#################################################################\n\t# This process is designed to always have the latest release\t#\n\t# It is recommended that your cloned repo be at ~/SUSEManager\t#\n\t# And that you create a sym-link to the Latest, as in so:\t#\n\t# 'cd ~/bin' and create a sym-link to:\t\t\t\t#\n\t# $LTSTSTAB \t\t\t\t#\n\t# ln -s $LTSTSTAB/channellock-promote.sh \\\#\n\t# channellock-promote.sh\t\t\t\t\t#\n\t#################################################################\n\n$(tput sgr0)"
+#	Adding check for ignoring the script path message
+		printf "$(tput setaf 4)\n\n\t#################################################################\n\t# This process is designed to always have the latest release\t#\n\t# It is recommended that your cloned repo be at ~/SUSEManager\t#\n\t# And that you create a sym-link to the Latest, as in so:\t#\n\t# 'cd ~/bin' and create a sym-link to:\t\t\t\t#\n\t# $LTSTSTAB \t\t\t\t#\n\t# ln -s $LTSTSTAB/channellock-promote.sh \\\#\n\t# channellock-promote.sh\t\t\t\t\t#\n\t#################################################################\n\tAdd [ignore] to the end of your command to not see this notice\n\n$(tput sgr0)"
 		sleep 15
 		echo ""
 	fi
@@ -134,7 +160,7 @@ function chk_creds
 			printf "\n$(tput setaf 5)Type the username of the SUMA Administrator$(tput sgr0)\n"
 			read MYADMIN
 			my_user="MY_ADMIN='$MYADMIN'"
-			printf "\n$(tput setaf 5)Type the password for$(tput sgr0)$(tput setaf 14)$MYADMIN$(tput sgr0)\n"
+			printf "\n$(tput setaf 5)Type the password for $(tput sgr0)$(tput setaf 14)$MYADMIN$(tput sgr0)\n"
 		        read -s MYPASS
 			my_pass="MY_CREDS='$MYPASS'"
 			printf "\n$(tput setaf 5)Type the emailaddress for notifications$(tput sgr0)\n"
@@ -156,8 +182,7 @@ function chk_creds
 #####   Setting Options
 #####################################################################
 #
-	USAGE="\n\t$(tput setaf 14)This process requires 1 (one) parameter -- [a|b|d|n|p|h|g|s]\nInitially, these MUST be run in the following order-\n\t$PROGNAME -b\n\t$PROGNAME -d\n\t$PROGNAME -p\nOptions\n###\t[-b]\tBase-Pool\tClones the SUSE base pool trees to 'dev' channels\n###\t[-d]\tPromote-dev\tPromotes the 'dev' channel to the 'test' channel\n###\t[-n]\tNon-Prod\tDoes both -b and -d\n###\t[-p]\tProduction\t Promotes 'test' to 'Prod'\n###\t[-a]\tALL\t\tDoes all the Options\n###\t[-h]\tHelp\t\tPrints this list and exits\n###\t[-g]\tGPL\t\tPrints the GPL info and exits\n###\t[-r]\tRelease\t\tPrints the Current Release Version and exits\n\n\tThis Clone/Promote process requires the SUMA Admin account username\n\tand password to be issued, for security and portability purposes this\n\trequires a local credentials file [Default = /root/bin/.creds.sh], this file is \n\t'sourced' for the user/pass required VARIABLES and has the following\n\tstructure with NO empty lines or white-space--\nMY_ADMIN='suma-admin-username'\nMY_CREDS='suma-admin-password'\nEMAILG=email-or-group,additional-email-or-group [Separated by commas and NO spaces]\n\n\tThis file can also be used to add Custom function calls to\n\tadd custom repositories and packages.\n$(tput sgr0)\n"
-
+	USAGE="\n\t$YELLOW This process requires 1 (one) parameter -- [a|b|d|n|p|h|g|s]\nInitially, these MUST be run in the following order-$RESET\n\t$LTCYN $PROGNAME -b\n\t $PROGNAME -d\n\t $PROGNAME -p$RESET\n$YELLOW Options\n  [-b]\tBase-Pool$RESET\t$LTCYN Clones the SUSE base pool trees to 'dev' channels$RESET\n$YELLOW  [-d]\tPromote-dev$RESET\t$LTCYN Promotes the 'dev' channel to the 'test' channel$RESET\n$YELLOW  [-n]\tNon-Prod$RESET\t$LTCYN Does both -b and -d$RESET\n$YELLOW  [-p]\tProduction\t$LTCYN Promotes 'test' to 'Prod'$RESET\n$YELLOW  [-a]\tALL$RESET\t\t$LTCYN Does all the Options$RESET\n$YELLOW  [-h]\tHelp$RESET\t\t$LTCYN Prints this list and exits$RESET\n$YELLOW  [-g]\tGPL$RESET\t\t$LTCYN Prints the GPL info and exits$RESET\n$YELLOW  [-r]\tRelease$RESET\t\t$LTCYN Prints the Current Release Version and exits$RESET\n\n\t$LTMAG This Clone/Promote process requires the SUMA Admin account username\n\tand password to be issued, for security and portability purposes this\n\trequires a local credentials file [Default = /root/bin/.creds.sh], this file is \n\t'sourced' for the user/pass required VARIABLES and has the following\n\tstructure with NO empty lines or white-space--$RESET\n$LTCYN MY_ADMIN='suma-admin-username'\n MY_CREDS='suma-admin-password'\n EMAILG=email-or-group,additional-email-or-group$RESET $LTRED [Separated by commas and NO spaces]$RESET\n\n\t$YELLOW This file can also be used to add Custom function calls to\n\tadd custom repositories and packages.$RESET\n\n"
 #
 #####################################################################
 ###	Begin logging
@@ -495,16 +520,23 @@ printf "\n\tThe following Failure/s occured:\n" >> $EMAILMSGZ
 grep -i 'error' $EMAILMSGZ >> $EMAILMSGZ
 if $INITRUN; then
 	printf "\n\t$(tput setaf 4)Thank you for using the $PROGNAME script, Release $SCRIPT_RELEASE\n\tThis will require maually adding Child Channels to your Activation Keys in the WebUI$(tput sgr0)\n"
+	printf "$(tput setaf 3)Your activation keys are `spacecmd activationkey_list`$(tput sgr0)"
 	tail -n 12 $SYNCLOG
 	if $BADPATH; then
-		chk_path
+#	Adding check for ignoring the script path message
+		if [[ "`echo $2`" != "ignore" ]]; then
+			chk_path
+		fi
 	fi
 	printf "\n\t$(tput setaf 4)The log for this process can be found at $SYNCLOG$(tput sgr0)\n"
 else
 	if $BADPATH; then
-		chk_path
+#	Adding check for ignoring the script path message
+		if [[ "`echo $2`" != "ignore" ]]; then
+			chk_path
+		fi
 	fi
-	printf "\n\t$(tput setaf 4)Thank you for using the $PROGNAME script, Release $SCRIPT_RELEASE$(tput sgr0)\n"
+	printf "\n\t$(tput setaf 14)Thank you for using the $PROGNAME script, Release $SCRIPT_RELEASE$(tput sgr0)\n"
 fi
 snd_mail
 echo "" >> $SYNCLOG
@@ -691,7 +723,13 @@ exit $?
 #         to disable/enable RHEL, Promote to apply	#
 ##      Promoted script to release 4.1.4-19		#
 #         16 November 2017-				#
-#         						#
+#         Adding check for ignoring the script path 	#
+#         message					#
+#         Added a space between 'for' & admin-name	#
+#         Added printout of Activation keys if created	#
+#         12 December 2017-				#
+#         Added Color Variables and changed the 'USAGE' #
+#         Options colors, no real code impact           #
 #                                                       #
 #########################################################
 # END OF CHANGELOG

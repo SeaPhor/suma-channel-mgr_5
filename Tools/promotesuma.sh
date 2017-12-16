@@ -1,6 +1,7 @@
 #!/bin/bash
 # Set working directory and refresh repository
-WRKDIR=/home/smiller/MyNewRepos/GitHub/SUSEManager
+#WRKDIR=/home/smiller/MyNewRepos/GitHub/SUSEManager
+WRKDIR=~/SUSEManager
 cd $WRKDIR
 git pull origin master
 #
