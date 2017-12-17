@@ -735,6 +735,9 @@ exit $?
 #         Removed the '-n' option from the Usage to	#
 #         simplify the options, I never used it anyway	#
 #         Also found a typo in parms- s/s/r		#
+##      Promoted script to release 4.1.4-21		#
+#         16 December 2017-				#
+#         For fixing issues found in 16			#
 #                                                       #
 #########################################################
 # END OF CHANGELOG
