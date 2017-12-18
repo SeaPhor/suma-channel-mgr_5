@@ -1,10 +1,11 @@
-#	Common Extra & External Packages (Based on SLES12-SP3)
+#	Common Extra & External Packages
 SM/OS/Non	|	Main Packages		Repo URL
 ----------------|-------------------------------|-------------------------------------------------------
 SUSEManager	|	nodejs, npm		| SLE-Module-Web-Scripting12-Updates
 SUSEManager	|	nginx			| SUSE-PackageHub-12-SP3
 SUSEManager	|	puppet			| SLE-Module-Adv-Systems-Management12-Updates
-OpenSUSE	|	nmon (utilities) 	| https://download.opensuse.org/repositories/utilities/SLE_12_SP3_Backports
-OpenSUSE	|	nmon-11.4 (utilities)	| https://download.opensuse.org/repositories/utilities/SLE_11_SP4/
+OpenSUSE	|	nmon SLES12 (utilities)	| https://download.opensuse.org/repositories/utilities/SLE_12_SP3_Backports
+OpenSUSE	|	nmon SLES11 (utilities)	| https://download.opensuse.org/repositories/utilities/SLE_11_SP4/
+OpenSUSE	|	nmon RHEL7 (utilities)	| https://download.opensuse.org/repositories/utilities/RHEL_7/
 
 
