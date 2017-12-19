@@ -111,7 +111,9 @@ function chk_path
 	if [[ ! -L $PROGPATH/$PROGNAME ]]; then
 		BADPATH=true
 #	Adding check for ignoring the script path message
-		printf "$(tput setaf 4)\n\n\t#################################################################\n\t# This process is designed to always have the latest release\t#\n\t# It is recommended that your cloned repo be at ~/SUSEManager\t#\n\t# And that you create a sym-link to the Latest, as in so:\t#\n\t# 'cd ~/bin' and create a sym-link to:\t\t\t\t#\n\t# $LTSTSTAB \t\t\t\t#\n\t# ln -s $LTSTSTAB/$PROGNAME \\\#\n\t# $PROGNAME\t\t\t\t\t#\n\t#################################################################\n\tAdd [ignore] to the end of your command to not see this notice\n\n$(tput sgr0)"
+    SCRPTNAME='suma-channel-mgr.sh'
+    VERNAME='suma-channel-mgr'
+		printf "$(tput setaf 4)\n\n\t#################################################################\n\t# This process is designed to always have the latest release\t#\n\t# It is recommended that your cloned repo be at ~/SUSEManager\t#\n\t# And that you create a sym-link to the Latest, as in so:\t#\n\t# 'cd ~/bin' and create a sym-link to:\t\t\t\t#\n\t# $LTSTSTAB \t\t\t\t#\n\t# ln -s $LTSTSTAB/$SCRPTNAME \\\#\n\t# $VERNAME\t\t\t\t\t#\n\t#################################################################\n\tAdd [ignore] to the end of your command to not see this notice\n\n$(tput sgr0)"
 		sleep 15
 		echo ""
 	fi
@@ -741,23 +743,24 @@ exit $?
 #         Cleaned up the Options/Usage verbage		#
 #         Next, I want to fork this script to a new 	#
 #         name, 'sumachan' is one suggestion, the other	#
-#         may require approval, incorporate it as	#
-#         'spacewalk-lifecycle'				#
-#         	!!!!!!!!!!!!!!!!!			#
+#         may require approval, incorporate it as	    #
+#         'spacewalk-lifecycle'				            #
+#         	!!!!!!!!!!!!!!!!!			                #
 #         !!! 19 December 2017- This thread will no 	#
-#         longer be maintained or supported as		#
+#         longer be maintained or supported as		    #
 #         'channellock-promote_4.n.n-nn'- I am making 	#
 #         this release the final Latest_Stable and then	#
-#         forking to a new name and revision as in	#
-#         'suma-channel-mgr_5.0.0-01'			#
-#         	Peace, C4				#
+#         forking to a new name and revision as in	    #
+#         'suma-channel-mgr_5.0.0-01'			        #
+#         	Peace, C4				                    #
 #                                                       #
-##      Forked to suma-channel-mgr 19 Dec, 2017		#
-##      Promoted script to release 5.0.0-01		#
-#         19 December 2017-				#
+##      Forked to suma-channel-mgr 19 Dec, 2017		    #
+##      Promoted script to release 5.0.0-01		        #
+#         19 December 2017-				                #
 #         General cleanup from the fork and took the 	#
 #         [-a] option out of the 'Usage' output	but 	#
-#         left the function in place for later		#
+#         left the function in place for later		    #
+#         Changed the script-path recommends output     #
 #                                                       #
 #########################################################
 # END OF CHANGELOG
