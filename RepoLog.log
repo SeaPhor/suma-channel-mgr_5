@@ -10,3 +10,7 @@ statements to 'printf' statements as per recommendations from 'real' coders 8|
 2017 23 Nov
 	4.1.4-19 - Adding check for ignoring the script path message, Added a space between 'for' & admin-name, Added printout of Activation keys if created 
 
+!!!!!!
+
+	Forked to suma-channel-mgr release 5.0.0-01 at 4.1.4-22 on 19 December 2017, 4.1.4-21 will be the LAST Latest_Stable for 'channellock-promote' script, and that thread will no longer be maintained or updated (at least not by me)
+

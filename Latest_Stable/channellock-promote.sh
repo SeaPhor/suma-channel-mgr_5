@@ -8,8 +8,8 @@
 #####   Setting Script Variables
 #####################################################################
 #
-	SCRIPT_RELEASE="4.1.4-20"
-	SCRIPT_RELEASE_DATE="16 December 2017"
+	SCRIPT_RELEASE="4.1.4-21"
+	SCRIPT_RELEASE_DATE="19 December 2017"
 	PROGNAME=$(basename $0)
 	REPOPATH=~/SUSEManager
 	LTSTSTAB=$REPOPATH/Latest_Stable
@@ -179,10 +179,10 @@ function chk_creds
 }
 #
 #####################################################################
-#####   Setting Options
+#####   Setting Options Usage Help Output
 #####################################################################
 #
-	USAGE="\n\t$YELLOW This process requires 1 (one) parameter -- [a|b|d|p|h|g|r]\nInitially, these MUST be run in the following order-$RESET\n\t$LTCYN $PROGNAME -b\n\t $PROGNAME -d\n\t $PROGNAME -p$RESET\n$YELLOW Options\n  [-b]\tBase-Pool$RESET\t$LTCYN Clones the SUSE base pool trees to 'dev' channels$RESET\n$YELLOW  [-d]\tPromote-dev$RESET\t$LTCYN Promotes the 'dev' channel to the 'test' channel$RESET\n$YELLOW  [-p]\tProduction\t$LTCYN Promotes 'test' to 'Prod'$RESET\n$YELLOW  [-a]\tALL$RESET\t\t$LTCYN Does all the Options$RESET\n$YELLOW  [-h]\tHelp$RESET\t\t$LTCYN Prints this list and exits$RESET\n$YELLOW  [-g]\tGPL$RESET\t\t$LTCYN Prints the GPL info and exits$RESET\n$YELLOW  [-r]\tRelease$RESET\t\t$LTCYN Prints the Current Release Version and exits$RESET\n\n\t$LTMAG This Clone/Promote process requires the SUMA Admin account username\n\tand password to be issued, for security and portability purposes this\n\trequires a local credentials file [Default = /root/bin/.creds.sh], this file is \n\t'sourced' for the user/pass required VARIABLES and has the following\n\tstructure with NO empty lines or white-space--$RESET\n$LTCYN MY_ADMIN='suma-admin-username'\n MY_CREDS='suma-admin-password'\n EMAILG=email-or-group,additional-email-or-group$RESET $LTRED [Separated by commas and NO spaces]$RESET\n\n\t$YELLOW This file can also be used to add Custom function calls to\n\tadd custom repositories and packages.$RESET\n\n"
+	USAGE="\n\t$YELLOW This process requires 1 (one) parameter -- [a|b|d|p|h|g|r]\nInitially, these MUST be run in the following order-$RESET\n\t$LTCYN $PROGNAME -b\n\t $PROGNAME -d\n\t $PROGNAME -p$RESET\n$YELLOW Options\n  [-b]\tBase-Pool$RESET\t$LTCYN Clones the SUSE base pool trees to 'dev' channels$RESET\n$YELLOW  [-d]\tpromote-Dev$RESET\t$LTCYN Promotes the 'dev' channel to the 'test' channel$RESET\n$YELLOW  [-p]\tProduction\t$LTCYN Promotes 'test' to 'Prod'$RESET\n$YELLOW  [-a]\tALL$RESET\t\t$LTCYN Does all the Cloning and Promoting Options in order$RESET\n$YELLOW  [-h]\tHelp$RESET\t\t$LTCYN Prints this list and exits$RESET\n$YELLOW  [-g]\tGPL$RESET\t\t$LTCYN Prints the GPL info and exits$RESET\n$YELLOW  [-r]\tRelease$RESET\t\t$LTCYN Prints the Current Release Version and exits$RESET\n\t$LTMAG  This Clone/Promote process requires the SUMA Admin account username\n\tand password to be issued, for security and portability purposes this\n\trequires a local credentials file [Default = /root/bin/.creds.sh], this file is \n\t'sourced' for the user/pass required VARIABLES- Like so...$RESET\n$LTCYN MY_ADMIN='suma-admin-username'\n MY_CREDS='suma-admin-password'\n EMAILG=email-or-group,additional-email-or-group$RESET $LTRED [Separated by commas and NO spaces]$RESET\n$YELLOW   This file can also be used to add Custom function calls to add custom repositories and packages.$RESET\n"
 #
 #####################################################################
 ###	Begin logging
@@ -735,6 +735,24 @@ exit $?
 #         Removed the '-n' option from the Usage to	#
 #         simplify the options, I never used it anyway	#
 #         Also found a typo in parms- s/s/r		#
+##      Promoted script to release 4.1.4-21		#
+#         16 December 2017-				#
+#         For fixing issues found in 20			#
+#         Cleaned up the Options/Usage verbage		#
+#         Next, I want to fork this script to a new 	#
+#         name, 'sumachan' is one suggestion, the other	#
+#         may require approval, incorporate it as	#
+#         'spacewalk-lifecycle'				#
+#         	!!!!!!!!!!!!!!!!!			#
+#         !!! 19 December 2017- This thread will no 	#
+#         longer be maintained or supported as		#
+#         'channellock-promote_4.n.n-nn'- I am making 	#
+#         this release the final Latest_Stable and then	#
+#         forking to a new name and revision as in	#
+#         'suma-channel-mgr_5.0.0-01'			#
+#         	Peace, C4				#
 #                                                       #
 #########################################################
 # END OF CHANGELOG
+
+
