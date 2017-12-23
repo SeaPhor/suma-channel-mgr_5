@@ -9,7 +9,7 @@
 #####################################################################
 #
 	SCRIPT_RELEASE="5.0.0-02"
-	SCRIPT_RELEASE_DATE="?? ??? 201?"
+	SCRIPT_RELEASE_DATE="23 December 2017"
 	PROGNAME=$(basename $0)
 	REPOPATH=~/SUSEManager
 	LTSTSTAB=$REPOPATH/Latest_Stable

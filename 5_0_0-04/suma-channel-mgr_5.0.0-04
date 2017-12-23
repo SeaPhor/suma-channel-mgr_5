@@ -8,8 +8,8 @@
 #####   Setting Script Variables
 #####################################################################
 #
-	SCRIPT_RELEASE="4.1.4-21"
-	SCRIPT_RELEASE_DATE="19 December 2017"
+	SCRIPT_RELEASE="5.0.0-04"
+	SCRIPT_RELEASE_DATE="23 December 2017"
 	PROGNAME=$(basename $0)
 	REPOPATH=~/SUSEManager
 	LTSTSTAB=$REPOPATH/Latest_Stable
@@ -46,6 +46,7 @@ printf "\n$(tput setaf 14)
 ###                                                                             ###
 ##                      GNU/GPL Info                                             ##
 ##              channellock-promote.sh ver-4.1                                   ##
+##      Forked to suma-channel-mgr.sh ver-5.0 on 19 December 2017                ##
 ##      Released under GPL v2.0, See www.gnu.org for full license info           ##
 ##      Copyright (C) 2015  Shawn Miller                                         ##
 ##              EMAIL- shawn@woodbeeco.com                                       ##
@@ -110,12 +111,13 @@ function chk_path
 	if [[ ! -L $PROGPATH/$PROGNAME ]]; then
 		BADPATH=true
 #	Adding check for ignoring the script path message
-		printf "$(tput setaf 4)\n\n\t#################################################################\n\t# This process is designed to always have the latest release\t#\n\t# It is recommended that your cloned repo be at ~/SUSEManager\t#\n\t# And that you create a sym-link to the Latest, as in so:\t#\n\t# 'cd ~/bin' and create a sym-link to:\t\t\t\t#\n\t# $LTSTSTAB \t\t\t\t#\n\t# ln -s $LTSTSTAB/channellock-promote.sh \\\#\n\t# channellock-promote.sh\t\t\t\t\t#\n\t#################################################################\n\tAdd [ignore] to the end of your command to not see this notice\n\n$(tput sgr0)"
+    SCRPTNAME='suma-channel-mgr.sh'
+    VERNAME='suma-channel-mgr'
+		printf "$(tput setaf 4)\n\n\t#################################################################\n\t# This process is designed to always have the latest release\t#\n\t# It is recommended that your cloned repo be at ~/SUSEManager\t#\n\t# And that you create a sym-link to the Latest, as in so:\t#\n\t# 'cd ~/bin' and create a sym-link to:\t\t\t\t#\n\t# $LTSTSTAB \t\t\t\t#\n\t# ln -s $LTSTSTAB/$SCRPTNAME \\\#\n\t# $VERNAME\t\t\t\t\t#\n\t#################################################################\n\tAdd [ignore] to the end of your command to not see this notice\n\n$(tput sgr0)"
 		sleep 15
 		echo ""
 	fi
 }
-###	END 4.1.4-13 need for making symlink NOT static
 #
 #####################################################################
 #####   Adjusted for portability, check for required spacewalk-utils
@@ -182,7 +184,7 @@ function chk_creds
 #####   Setting Options Usage Help Output
 #####################################################################
 #
-	USAGE="\n\t$YELLOW This process requires 1 (one) parameter -- [a|b|d|p|h|g|r]\nInitially, these MUST be run in the following order-$RESET\n\t$LTCYN $PROGNAME -b\n\t $PROGNAME -d\n\t $PROGNAME -p$RESET\n$YELLOW Options\n  [-b]\tBase-Pool$RESET\t$LTCYN Clones the SUSE base pool trees to 'dev' channels$RESET\n$YELLOW  [-d]\tpromote-Dev$RESET\t$LTCYN Promotes the 'dev' channel to the 'test' channel$RESET\n$YELLOW  [-p]\tProduction\t$LTCYN Promotes 'test' to 'Prod'$RESET\n$YELLOW  [-a]\tALL$RESET\t\t$LTCYN Does all the Cloning and Promoting Options in order$RESET\n$YELLOW  [-h]\tHelp$RESET\t\t$LTCYN Prints this list and exits$RESET\n$YELLOW  [-g]\tGPL$RESET\t\t$LTCYN Prints the GPL info and exits$RESET\n$YELLOW  [-r]\tRelease$RESET\t\t$LTCYN Prints the Current Release Version and exits$RESET\n\t$LTMAG  This Clone/Promote process requires the SUMA Admin account username\n\tand password to be issued, for security and portability purposes this\n\trequires a local credentials file [Default = /root/bin/.creds.sh], this file is \n\t'sourced' for the user/pass required VARIABLES- Like so...$RESET\n$LTCYN MY_ADMIN='suma-admin-username'\n MY_CREDS='suma-admin-password'\n EMAILG=email-or-group,additional-email-or-group$RESET $LTRED [Separated by commas and NO spaces]$RESET\n$YELLOW   This file can also be used to add Custom function calls to add custom repositories and packages.$RESET\n"
+	USAGE="\n $MAGENTA $PROGNAME Rev $SCRIPT_RELEASE Released $SCRIPT_RELEASE_DATE $RESET\n\t$YELLOW This process requires 1 (one) parameter -- [b|d|p|h|g|r]\nInitially, these MUST be run in the following order-$RESET\n\t$LTCYN $PROGNAME -b\n\t $PROGNAME -d\n\t $PROGNAME -p$RESET\n$YELLOW Options\n  [-b]\tBase-Pool$RESET\t$LTCYN Clones the SUSE base pool trees to 'dev' channels$RESET\n$YELLOW  [-d]\tpromote-Dev$RESET\t$LTCYN Promotes the 'dev' channel to the 'test' channel$RESET\n$YELLOW  [-p]\tProduction\t$LTCYN Promotes 'test' to 'Prod'$RESET\n$YELLOW  [-h]\tHelp$RESET\t\t$LTCYN Prints this list and exits$RESET\n$YELLOW  [-g]\tGPL$RESET\t\t$LTCYN Prints the GPL info and exits [and 'disclaimer']$RESET\n$YELLOW  [-r]\tRelease$RESET\t\t$LTCYN Prints the Current Release Version and exits$RESET\n\t$LTMAG  This Clone/Promote process requires the SUMA Admin account username\n\tand password to be issued, for security and portability purposes this\n\trequires a local credentials file [Default = /root/bin/.creds.sh], this file is \n\t'sourced' for the user/pass required VARIABLES- Like so...$RESET\n$LTCYN MY_ADMIN='suma-admin-username'\n MY_CREDS='suma-admin-password'\n EMAILG=email-or-group,additional-email-or-group$RESET $LTRED [Separated by commas and NO spaces]$RESET\n$YELLOW   This file can also be used to add Custom function calls to add custom repositories and packages.\n$RESET"
 #
 #####################################################################
 ###	Begin logging
@@ -229,7 +231,7 @@ fi
 }
 function snd_mail
 {
-        SUBJECT="$HOSTA -- sync-channels script $RDATE"
+        SUBJECT="$HOSTA -- $PROGNAME script $RDATE"
         FROMA=$MY_ADMIN@$HOST
         /usr/bin/mailx -s "$SUBJECT" "$EMAILG" -f $FROMA < $EMAILMSGZ
 }
@@ -493,7 +495,6 @@ case "$1" in
 #
 "-h")
   printf "$USAGE" 
-  printf "$USAGE"
   exit $?
   ;;
 #
@@ -561,7 +562,8 @@ exit $?
 #####			to make it portable for any SUMA Server
 #####   		Added 'source' for suma-admin credentials
 #####   All Objectives Completed-- (except... 42...)
-#####   
+#####    - I only have 22 days remaining on my 60-day free trial, and my 'server' is actually my old desktop gaming machine
+#####    - I hope to be finishe with this script before it expires, and I will try to get another one but on a VirtualBox VM instead. 08 July, 2014
 #####           Shawn Miller
 #####   
 #####################################################################
@@ -741,16 +743,38 @@ exit $?
 #         Cleaned up the Options/Usage verbage		#
 #         Next, I want to fork this script to a new 	#
 #         name, 'sumachan' is one suggestion, the other	#
-#         may require approval, incorporate it as	#
-#         'spacewalk-lifecycle'				#
-#         	!!!!!!!!!!!!!!!!!			#
+#         may require approval, incorporate it as	    #
+#         'spacewalk-lifecycle'				            #
+#         	!!!!!!!!!!!!!!!!!			                #
 #         !!! 19 December 2017- This thread will no 	#
-#         longer be maintained or supported as		#
+#         longer be maintained or supported as		    #
 #         'channellock-promote_4.n.n-nn'- I am making 	#
 #         this release the final Latest_Stable and then	#
-#         forking to a new name and revision as in	#
-#         'suma-channel-mgr_5.0.0-01'			#
-#         	Peace, C4				#
+#         forking to a new name and revision as in	    #
+#         'suma-channel-mgr_5.0.0-01'			        #
+#         	Peace, C4				                    #
+#                                                       #
+##      Forked to suma-channel-mgr 19 Dec, 2017		#
+##      Promoted script to release 5.0.0-01		#
+#         19 December 2017-				#
+#         General cleanup from the fork and took the 	#
+#         [-a] option out of the 'Usage' output	but 	#
+#         left the function in place for later		#
+#         Changed the script-path recommends output     #
+#         23 December 2017- Forked and changed names	#
+##      Promoted script to release 5.0.0-02		#
+#         23 December 2017-				#
+#         Structuring new repos with new names for	#
+#         future dev. Forked on github to new name	#
+#         suma-channel-mgr_5, the SUSEManager repo 	#
+#         will be Archived				#
+##      Promoted script to release 5.0.0-03		#
+#         23 December 2017-				#
+#         Structuring new repos with names and path	#
+#         testing new auto promote script		#
+##      Promoted script to release 5.0.0-04		#
+#         23 December 2017-				#
+#         Final fork testing and promotions complete	#
 #                                                       #
 #########################################################
 # END OF CHANGELOG
