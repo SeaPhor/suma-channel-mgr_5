@@ -60,6 +60,9 @@ printf "\n$(tput setaf 14)
 ##    but WITHOUT ANY WARRANTY; without even the implied warranty of             ##
 ##    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the              ##
 ##    GNU General Public License for more details.                               ##
+##                                                                               ##
+##    See this complete License at:                                              ##
+##    https://github.com/SeaPhor/suma-channel-mgr_5/blob/master/LICENSE          ##
 ###                                                                             ###
 ####w#################################b######################################c#####$(tput sgr0)\n"
 }
@@ -775,6 +778,7 @@ exit $?
 ##      Promoted script to release 5.0.0-04		#
 #         23 December 2017-				#
 #         Final fork testing and promotions complete	#
+#         Added link to full GPL to the GNU/GPL		#
 #                                                       #
 #########################################################
 # END OF CHANGELOG
