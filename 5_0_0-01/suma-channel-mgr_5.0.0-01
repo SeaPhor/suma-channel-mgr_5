@@ -9,7 +9,7 @@
 #####################################################################
 #
 	SCRIPT_RELEASE="5.0.0-01"
-	SCRIPT_RELEASE_DATE="?? ??? 201?"
+	SCRIPT_RELEASE_DATE="23 December 2017"
 	PROGNAME=$(basename $0)
 	REPOPATH=~/SUSEManager
 	LTSTSTAB=$REPOPATH/Latest_Stable
@@ -754,13 +754,20 @@ exit $?
 #         'suma-channel-mgr_5.0.0-01'			        #
 #         	Peace, C4				                    #
 #                                                       #
-##      Forked to suma-channel-mgr 19 Dec, 2017		    #
-##      Promoted script to release 5.0.0-01		        #
-#         19 December 2017-				                #
+##      Forked to suma-channel-mgr 19 Dec, 2017		#
+##      Promoted script to release 5.0.0-01		#
+#         19 December 2017-				#
 #         General cleanup from the fork and took the 	#
 #         [-a] option out of the 'Usage' output	but 	#
-#         left the function in place for later		    #
+#         left the function in place for later		#
 #         Changed the script-path recommends output     #
+#         23 December 2017- Forked and changed names	#
+##      Promoted script to release 5.0.0-02		#
+#         23 December 2017-				#
+#         Structuring new repos with new names for	#
+#         future dev. Forked on github to new name	#
+#         suma-channel-mgr_5, the SUSEManager repo 	#
+#         will be Archived				#
 #                                                       #
 #########################################################
 # END OF CHANGELOG
