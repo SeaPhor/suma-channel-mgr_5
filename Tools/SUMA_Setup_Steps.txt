@@ -161,6 +161,9 @@ Lifecycle-Management
 - - - - - - - This will clone the SUSE Channel Tree/s into "dev-..." trees as in "sles12-sp3-pool-x86_64" => "dev-sles12-sp3-pool-x86_64" and all child channels accordingly.
 - - - - - - If not present it will create an "Activation Key" for each "dev-..." pool.
 - - - - - - If not present it will create a "Bootstrap Script" with it's activation key for each "dev-..." pool.
+
+Editor's NOTE- the 'dev', 'test', and 'prod' channel trees are created separately with different options to the command issued, so for example, you could run the dev every week, the test only every month, and the prod every quarter- depending on your use-case for each of those environments.
+
 - - - - - Check for the "test-..." channel tree to determine first-run or not
 - - - - - - Run the "spacewalk-manage-channel-lifecycle" command with the "--promote" option.
 - - - - - - - This will Promote (clone) the "dev-..." Channel Trees into "test-..." as in "dev-sles12-sp3-pool-x86_64" => "test-sles12-sp3-pool-x86_64" and all child channels accordingly.
