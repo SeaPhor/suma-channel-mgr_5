@@ -113,7 +113,7 @@ function chk_path
 #	Adding check for ignoring the script path message
     SCRPTNAME='suma-channel-mgr.sh'
     VERNAME='suma-channel-mgr'
-		printf "$(tput setaf 4)\n\n\t#################################################################\n\t# This process is designed to always have the latest release\t#\n\t# It is recommended that your cloned repo be at ~/SUSEManager\t#\n\t# And that you create a sym-link to the Latest, as in so:\t#\n\t# 'cd ~/bin' and create a sym-link to:\t\t\t\t#\n\t# $LTSTSTAB \t\t\t\t#\n\t# ln -s $LTSTSTAB/$SCRPTNAME \\\#\n\t# $VERNAME\t\t\t\t\t#\n\t#################################################################\n\tAdd [ignore] to the end of your command to not see this notice\n\n$(tput sgr0)"
+		printf "$(tput setaf 4)\n\n\t#################################################################\n\t# This process is designed to always have the latest release\t#\n\t# It is recommended that your cloned repo be at ~/$VERNAME\t#\n\t# And that you create a sym-link to the Latest, as in so:\t#\n\t# 'cd ~/bin' and create a sym-link to:\t\t\t\t#\n\t# $LTSTSTAB \t\t\t\t#\n\t# ln -s $LTSTSTAB/$SCRPTNAME \\\#\n\t# $VERNAME\t\t\t\t\t#\n\t#################################################################\n\tAdd [ignore] to the end of your command to not see this notice\n\n$(tput sgr0)"
 		sleep 15
 		echo ""
 	fi
