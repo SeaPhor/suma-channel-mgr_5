@@ -104,7 +104,6 @@ function error_exit
 ###
 [[ "$UID" == "0" ]] && : || error_exit
 #
-###	BEGIN 4.1.4-13 need for making symlink NOT static
 if [[ ! -L $PROGPATH/$PROGNAME ]]; then
 	BADPATH=true
 	printf "$(tput setaf 3)Script PATH Not Recommended$(tput sgr0)" >> $EMAILMSGZ
@@ -113,7 +112,6 @@ function chk_path
 {
 	if [[ ! -L $PROGPATH/$PROGNAME ]]; then
 		BADPATH=true
-#	Adding check for ignoring the script path message
     SCRPTNAME='suma-channel-mgr.sh'
     VERNAME='suma-channel-mgr'
 		printf "$(tput setaf 4)\n\n\t#################################################################\n\t# This process is designed to always have the latest release\t#\n\t# It is recommended that your cloned repo be at ~/suma-channel-mgr_5\t#\n\t# And that you create a sym-link to the Latest, as in so:\t#\n\t# 'cd ~/bin' and create a sym-link to:\t\t\t\t#\n\t# $LTSTSTAB \t\t\t\t#\n\t# ln -s $LTSTSTAB/$SCRPTNAME \\\#\n\t# $VERNAME\t\t\t\t\t#\n\t#################################################################\n\tAdd [ignore] to the end of your command to not see this notice\n\n$(tput sgr0)"
@@ -130,26 +128,21 @@ function chk_sutils
 {
 #
 	if [[ "`rpm -qa | grep spacewalk-utils`" == "" ]]; then
-		zypper se spacewalk-utils
-		printf "$(tput setaf 14)\n\tThis process requires the 'spacewalk-utils' package and is not installed...$(tput sgr0)\n\t$(tput setaf 3)Would you like to install it now?\n\t[y/n]\n$(tput sgr0)"
-		read INSTCHOICE
-		if [[ "`echo $INSTCHOICE`" == "n" ]]; then
-			printf "$(tput setaf 1)\nexiting...\n$(tput sgr0)"
+		printf "\n\t$(tput setaf 3)This seems to be the first time executing $PROGNAME,\n\tDependancies = >\n\t\t1- Installation of spacewalk-utils\n\t\t2- Creation of a sourced local credentials file to pass to commands- ~/bin/.creds.sh\n\t\t3- Creation of local .mgr-sync file to pass to commands- ~/.mgr-sync\n\tIf you choose to continue you will be required to input that\n\tinformation when prompted to do so but ONLY on the first run, it can be\n\tcompletely automated after that.\n\n\tDo you agree with this installation and credental files generation and wish to continue?$(tput sgr0) \n[Y|n]\n"
+		read SUMADOIT
+		if [[ "`echo $SUMADOIT`" == "n" ]]; then
+			printf $USAGE
 			exit $?
 		else
 			zypper in -y spacewalk-utils
 			printf "$(tput setaf 14)Installed spacewalk-utils$(tput sgr0)" >> $EMAILMSGZ
 		fi
 	fi
-}
 #
 #####################################################################
 #####   Adjusted for portability, source the local credentials
 #####################################################################
 #
-function chk_creds
-{
-
 	if [[ ! -f ~/.mgr-sync ]]; then
 		printf "\n\t$(tput setaf 3)Enter the SUSE Manager Admin credentials when prompted...$(tput sgr0)\n"
 		mgr-sync -s refresh
@@ -157,72 +150,22 @@ function chk_creds
 	if [[ -f $MYCREDFIL ]]; then
 		source $MYCREDFIL
 	else
-		echo ""
-		printf "$(tput setaf 3)\n\tYou need a LOCAL CREDENTIALS FILE!!!\n\tThe default is ~/bin/.creds.sh --\n\tCreate that file, or edit this script to remove the chk_creds funtion call\n\tfrom the Case Statement sections and pass your credentials\n\tdirectly in the clone/promote functions$(tput sgr0) $(tput setaf 1)[NOT RECOMMENDED!!!]$(tput sgr0)\n\t$(tput setaf 3)The creds.sh file should look like the following--$(tput sgr0)\n$(tput setaf 14)MY_ADMIN='suma-admin-username'\nMY_CREDS='suma-admin-password'\nEMAILG='email-or-group,additional-email-or-group' [Separated by commas and NO spaces]\n$(tput sgr0)"
-		echo ""
-		printf "$(tput setaf 3)\n\n... You don't seem to have a credentials file,$(tput sgr0) $(tput setaf 4)do you want to do that now?$(tput sgr0)\n\t$(tput setaf 14)$(tput sgr0)[${GREEN}y$(tput sgr0)$(tput setaf 14)/$(tput sgr0)$(tput setaf 9)n$(tput sgr0)]\n"
-		read SETNOW
-		if [[ "`echo $SETNOW`" != "y" ]]; then
-        		printf "$USAGE"
-		        exit $?
-		fi
 ###	Changing the way this generates the file/s
-		if [[ "`echo $SETNOW`" == "y" ]]; then
-###	Beginning edit for using the .mgr-sync file for the creds info
-			if [[ -f ~/.mgr-sync ]]; then
-				my_user=`cat ~/.mgr-sync | grep mgrsync.user | sed -e 's/mgrsync.user\ \=\ //'`
-				my_pass=`cat ~/.mgr-sync | grep mgrsync.password | sed -e 's/mgrsync.password\ \=\ //'`
-				printf "\n$(tput setaf 5)Type the emailaddress for notifications$(tput sgr0)\n"
-				read MYMAIL
-				my_mail="EMAILG='$MYMAIL'"
-				touch $MYCREDFIL
-				my_ucred="MY_ADMIN='$my_user'"
-				my_pcred="MY_CREDS='$my_pass'"
-				echo $my_ucred >> $MYCREDFIL
-				echo $my_pcred >> $MYCREDFIL
-				echo $my_mail >> $MYCREDFIL
-				chmod 700 $MYCREDFIL
-				source $MYCREDFIL
-				printf "\n\t$(tput setaf 14)Your new credentials file has been successfully created...\n\tIf you mis-typed or need to change the password, \n\tit can be found at $MYCREDFIL$(tput sgr0)\n"
-				echo "Credentials file created" >> $EMAILMSGZ
-			else
-				printf "\n\t$(tput setaf 3)Enter the SUSE Manager Admin credentials when prompted...$(tput sgr0)\n"
-				mgr-sync -s refresh
-				my_user=`cat ~/.mgr-sync | grep mgrsync.user | sed -e 's/mgrsync.user\ \=\ //'`
-				my_pass=`cat ~/.mgr-sync | grep mgrsync.password | sed -e 's/mgrsync.password\ \=\ //'`
-				printf "\n$(tput setaf 5)Type the emailaddress for notifications$(tput sgr0)\n"
-				read MYMAIL
-				my_mail="EMAILG='$MYMAIL'"
-				touch $MYCREDFIL
-				my_ucred="MY_ADMIN='$my_user'"
-				my_pcred="MY_CREDS='$my_pass'"
-				echo $my_ucred >> $MYCREDFIL
-				echo $my_pcred >> $MYCREDFIL
-				echo $my_mail >> $MYCREDFIL
-				chmod 700 $MYCREDFIL
-				source $MYCREDFIL
-				printf "\n\t$(tput setaf 14)Your new credentials file has been successfully created...\n\tIf you mis-typed or need to change the password, \n\tit can be found at $MYCREDFIL$(tput sgr0)\n"
-				echo "Credentials file created" >> $EMAILMSGZ
-			fi
-###	Ending edit for using the .mgr-sync file for the creds info
-#			printf "\n$(tput setaf 5)Type the username of the SUMA Administrator$(tput sgr0)\n"
-#			read MYADMIN
-#			my_user="MY_ADMIN='$MYADMIN'"
-#			printf "\n$(tput setaf 5)Type the password for $(tput sgr0)$(tput setaf 14)$MYADMIN$(tput sgr0)\n"
-#		        read -s MYPASS
-#			my_pass="MY_CREDS='$MYPASS'"
-#			printf "\n$(tput setaf 5)Type the emailaddress for notifications$(tput sgr0)\n"
-#			read MYMAIL
-#			my_mail="EMAILG='$MYMAIL'"
-#			touch $MYCREDFIL
-#			echo $my_user >> $MYCREDFIL
-#			echo $my_pass >> $MYCREDFIL
-#			echo $my_mail >> $MYCREDFIL
-#			chmod 700 $MYCREDFIL
-#			source $MYCREDFIL
-#			printf "\n\t$(tput setaf 14)Your new credentials file has been successfully created...\n\tIf you mis-typed or need to change the password, \n\tit can be found at $MYCREDFIL$(tput sgr0)\n"
-#			echo "Credentials file created" >> $EMAILMSGZ
-		fi
+		my_user=`cat ~/.mgr-sync | grep mgrsync.user | sed -e 's/mgrsync.user\ \=\ //'`
+		my_pass=`cat ~/.mgr-sync | grep mgrsync.password | sed -e 's/mgrsync.password\ \=\ //'`
+		printf "\n$(tput setaf 5)Type the emailaddress for notifications$(tput sgr0)\n"
+		read MYMAIL
+		my_mail="EMAILG='$MYMAIL'"
+		touch $MYCREDFIL
+		my_ucred="MY_ADMIN='$my_user'"
+		my_pcred="MY_CREDS='$my_pass'"
+		echo $my_ucred >> $MYCREDFIL
+		echo $my_pcred >> $MYCREDFIL
+		echo $my_mail >> $MYCREDFIL
+		chmod 700 $MYCREDFIL
+		source $MYCREDFIL
+		printf "\n\t$(tput setaf 14)Your new credentials file has been successfully created...\n\tIf you mis-typed or need to change the password, \n\tit can be found at $MYCREDFIL$(tput sgr0)\n"
+		echo "Credentials file created" >> $EMAILMSGZ
 	fi
 }
 #
@@ -251,8 +194,6 @@ spacecmd -u $MY_ADMIN -p $MY_CREDS softwarechannel_listbasechannels | grep ^rhe 
 	MY_BASELIST=/tmp/mybaselist.sumatmp
 spacecmd -u $MY_ADMIN -p $MY_CREDS softwarechannel_listbasechannels | grep -v ^sle | grep -v ^suse | grep -v ^rhe > /tmp/mychanlist.sumatmp
 	MY_CHANLIST=/tmp/mychanlist.sumatmp
-###	MOVE Section to susetrees
-###	END of MOVE Section to susetrees
 #####################################################################
 #####	Check for bootstrap repo/s - this will only create the 
 #####	initial repos, manual creation for new OSs/releases [at this rv]
@@ -271,23 +212,10 @@ function snd_mail
 #
 function susetrees_clone
 {
-###	MOVED From Check
-#if [[ ! -f ~/.mgr-sync ]]; then
-#	printf "First run- Please enter the credentials again when prompted..."
-	#mgr-sync -s refresh
-	#sed -i "s/mgrsync.user \= \"\"/mgrsync.user \= $MY_ADMIN/" ~/.mgr-sync
-	#sed -i "s/mgrsync.password \= \"\"/mgrsync.password \= $MY_CREDS/" ~/.mgr-sync
-#else
-#	if [[ "`cat ~/.mgr-sync | grep $MY_ADMIN`" == "" ]]; then
-#		sed -i "s/mgrsync.user \= \"\"/mgrsync.user \= $MY_ADMIN/" ~/.mgr-sync
-#		sed -i "s/mgrsync.password \= \"\"/mgrsync.password \= $MY_CREDS/" ~/.mgr-sync
-#	fi
-#fi
 mgr-sync -s refresh 2>&1 >> $EMAILMSGZ
 for i in `cat $MY_BASELIST`; do
 	/usr/bin/python -u /usr/bin/spacewalk-repo-sync --channel $i --type yum --non-interactive
 done
-###	END of MOVED From Check
 for i in `cat $MY_BASELIST`; do
 	if [[ "`grep 'dev' $MY_CHANLIST`" == "" ]]; then
 		INITRUN=true
