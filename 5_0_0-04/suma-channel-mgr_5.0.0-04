@@ -780,6 +780,9 @@ exit $?
 #         Final fork testing and promotions complete	#
 #         Added link to full GPL to the GNU/GPL		#
 #         Changed variable for REPOPATH	for namechange	#
+#         - Next major change => Move the mgr-sync and  #
+#         - repo-sync to the susetrees function, it     #
+#         - does not need to run for test/prod.         #
 #                                                       #
 #########################################################
 # END OF CHANGELOG
