@@ -176,8 +176,10 @@ function chk_creds
 				read MYMAIL
 				my_mail="EMAILG='$MYMAIL'"
 				touch $MYCREDFIL
-				echo $my_user >> $MYCREDFIL
-				echo $my_pass >> $MYCREDFIL
+				my_ucred="MY_ADMIN='$my_user'"
+				my_pcred="MY_CREDS='$my_pass'"
+				echo $my_ucred >> $MYCREDFIL
+				echo $my_pcred >> $MYCREDFIL
 				echo $my_mail >> $MYCREDFIL
 				chmod 700 $MYCREDFIL
 				source $MYCREDFIL
@@ -192,8 +194,10 @@ function chk_creds
 				read MYMAIL
 				my_mail="EMAILG='$MYMAIL'"
 				touch $MYCREDFIL
-				echo $my_user >> $MYCREDFIL
-				echo $my_pass >> $MYCREDFIL
+				my_ucred="MY_ADMIN='$my_user'"
+				my_pcred="MY_CREDS='$my_pass'"
+				echo $my_ucred >> $MYCREDFIL
+				echo $my_pcred >> $MYCREDFIL
 				echo $my_mail >> $MYCREDFIL
 				chmod 700 $MYCREDFIL
 				source $MYCREDFIL
