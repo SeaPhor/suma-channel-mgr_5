@@ -8,7 +8,7 @@
 #####   Setting Script Variables
 #####################################################################
 #
-	SCRIPT_RELEASE="5.0.0-05"
+	SCRIPT_RELEASE="5.0.1-01"
 	SCRIPT_RELEASE_DATE="04 January 2018"
 	PROGNAME=$(basename $0)
 	REPOPATH=~/suma-channel-mgr_5
@@ -138,11 +138,6 @@ function chk_sutils
 			printf "$(tput setaf 14)Installed spacewalk-utils$(tput sgr0)" >> $EMAILMSGZ
 		fi
 	fi
-#
-#####################################################################
-#####   Adjusted for portability, source the local credentials
-#####################################################################
-#
 	if [[ ! -f ~/.mgr-sync ]]; then
 		printf "\n\t$(tput setaf 3)Enter the SUSE Manager Admin credentials when prompted...$(tput sgr0)\n"
 		mgr-sync -s refresh
@@ -150,7 +145,6 @@ function chk_sutils
 	if [[ -f $MYCREDFIL ]]; then
 		source $MYCREDFIL
 	else
-###	Changing the way this generates the file/s
 		my_user=`cat ~/.mgr-sync | grep mgrsync.user | sed -e 's/mgrsync.user\ \=\ //'`
 		my_pass=`cat ~/.mgr-sync | grep mgrsync.password | sed -e 's/mgrsync.password\ \=\ //'`
 		printf "\n\t$(tput setaf 3)Type the emailaddress for notifications$(tput sgr0)\n"
@@ -439,7 +433,6 @@ sleep 5
 case "$1" in
 "-a")
   chk_sutils
-#  chk_creds
   no_opts
   susetrees_clone 2>&1 >> $EMAILMSGZ
   promote_dev 2>&1 >> $EMAILMSGZ
@@ -447,26 +440,22 @@ case "$1" in
   ;;
 "-n")
   chk_sutils
-#  chk_creds
   no_opts
   susetrees_clone 2>&1 >> $EMAILMSGZ
   promote_dev 2>&1 >> $EMAILMSGZ
   ;;
 "-p")
   chk_sutils
-#  chk_creds
   no_opts
   promote_test 2>&1 >> $EMAILMSGZ
   ;;
 "-d")
   chk_sutils
-#  chk_creds
   no_opts
   promote_dev 2>&1 >> $EMAILMSGZ
   ;;
 "-b")
   chk_sutils
-#  chk_creds
   no_opts
   susetrees_clone 2>&1 >> $EMAILMSGZ
   ;;
@@ -770,7 +759,7 @@ exit $?
 #         going to optimize the cred file create for	#
 #         a simpler code in 06				#
 #         tested, corrected, and retested- success	#
-##      Promoted script to release 5.0.0-05		#
+##      Promoted script to release 5.0.1-01		#
 #         04 January 2018-				#
 #                                                       #
 #########################################################
