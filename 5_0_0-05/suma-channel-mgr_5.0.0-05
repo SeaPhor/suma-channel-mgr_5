@@ -8,8 +8,8 @@
 #####   Setting Script Variables
 #####################################################################
 #
-	SCRIPT_RELEASE="5.0.0-04"
-	SCRIPT_RELEASE_DATE="23 December 2017"
+	SCRIPT_RELEASE="5.0.0-05"
+	SCRIPT_RELEASE_DATE="04 January 2018"
 	PROGNAME=$(basename $0)
 	REPOPATH=~/suma-channel-mgr_5
 	LTSTSTAB=$REPOPATH/Latest_Stable
@@ -104,7 +104,6 @@ function error_exit
 ###
 [[ "$UID" == "0" ]] && : || error_exit
 #
-###	BEGIN 4.1.4-13 need for making symlink NOT static
 if [[ ! -L $PROGPATH/$PROGNAME ]]; then
 	BADPATH=true
 	printf "$(tput setaf 3)Script PATH Not Recommended$(tput sgr0)" >> $EMAILMSGZ
@@ -113,10 +112,9 @@ function chk_path
 {
 	if [[ ! -L $PROGPATH/$PROGNAME ]]; then
 		BADPATH=true
-#	Adding check for ignoring the script path message
     SCRPTNAME='suma-channel-mgr.sh'
     VERNAME='suma-channel-mgr'
-		printf "$(tput setaf 4)\n\n\t#################################################################\n\t# This process is designed to always have the latest release\t#\n\t# It is recommended that your cloned repo be at ~/suma-channel-mgr_5\t#\n\t# And that you create a sym-link to the Latest, as in so:\t#\n\t# 'cd ~/bin' and create a sym-link to:\t\t\t\t#\n\t# $LTSTSTAB \t\t\t\t#\n\t# ln -s $LTSTSTAB/$SCRPTNAME \\\#\n\t# $VERNAME\t\t\t\t\t#\n\t#################################################################\n\tAdd [ignore] to the end of your command to not see this notice\n\n$(tput sgr0)"
+		printf "$(tput setaf 4)\n\n\t#################################################################\n\t  This process is designed to always have the latest release\n\t  It is best that your cloned repo be at ~/suma-channel-mgr_5\n\t  And that you create a sym-link to the Latest, as in so:\n\t  'cd ~/bin' and create a sym-link to:\n\t  ~/suma-channel-mgr_5/Latest_Stable/suma-channel-mgr.sh\n\t#################################################################\n\tAdd [ignore] to the end of your command to not see this notice\n\n$(tput sgr0)"
 		sleep 15
 		echo ""
 	fi
@@ -130,56 +128,44 @@ function chk_sutils
 {
 #
 	if [[ "`rpm -qa | grep spacewalk-utils`" == "" ]]; then
-		zypper se spacewalk-utils
-		printf "$(tput setaf 14)\n\tThis process requires the 'spacewalk-utils' package and is not installed...$(tput sgr0)\n\t$(tput setaf 3)Would you like to install it now?\n\t[y/n]\n$(tput sgr0)"
-		read INSTCHOICE
-		if [[ "`echo $INSTCHOICE`" == "n" ]]; then
-			printf "$(tput setaf 1)\nexiting...\n$(tput sgr0)"
+		printf "\n\t$(tput setaf 3)This seems to be the first time executing $PROGNAME,\n\tDependancies = >\n\t\t1- Installation of spacewalk-utils\n\t\t2- Creation of a sourced local credentials file to pass to commands- ~/bin/.creds.sh\n\t\t3- Creation of local .mgr-sync file to pass to commands- ~/.mgr-sync\n\tIf you choose to continue you will be required to input that\n\tinformation when prompted to do so but ONLY on the first run, it can be\n\tcompletely automated after that.\n\n\tDo you agree with this installation and credental files generation and wish to continue?$(tput sgr0) \n[Y|n]\n"
+		read SUMADOIT
+		if [[ "`echo $SUMADOIT`" == "n" ]]; then
+			printf $USAGE
 			exit $?
 		else
 			zypper in -y spacewalk-utils
 			printf "$(tput setaf 14)Installed spacewalk-utils$(tput sgr0)" >> $EMAILMSGZ
 		fi
 	fi
-}
 #
 #####################################################################
 #####   Adjusted for portability, source the local credentials
 #####################################################################
 #
-function chk_creds
-{
+	if [[ ! -f ~/.mgr-sync ]]; then
+		printf "\n\t$(tput setaf 3)Enter the SUSE Manager Admin credentials when prompted...$(tput sgr0)\n"
+		mgr-sync -s refresh
+	fi
 	if [[ -f $MYCREDFIL ]]; then
 		source $MYCREDFIL
 	else
-		echo ""
-		printf "$(tput setaf 3)\n\tYou need a LOCAL CREDENTIALS FILE!!!\n\tThe default is ~/bin/.creds.sh --\n\tCreate that file, or edit this script to remove the chk_creds funtion call\n\tfrom the Case Statement sections and pass your credentials\n\tdirectly in the clone/promote functions$(tput sgr0) $(tput setaf 1)[NOT RECOMMENDED!!!]$(tput sgr0)\n\t$(tput setaf 3)The creds.sh file should look like the following--$(tput sgr0)\n$(tput setaf 14)MY_ADMIN='suma-admin-username'\nMY_CREDS='suma-admin-password'\nEMAILG='email-or-group,additional-email-or-group' [Separated by commas and NO spaces]\n$(tput sgr0)"
-		echo ""
-		printf "$(tput setaf 3)\n\n... You don't seem to have a credentials file,$(tput sgr0) $(tput setaf 4)do you want to do that now?$(tput sgr0)\n\t$(tput setaf 14)$(tput sgr0)[${GREEN}y$(tput sgr0)$(tput setaf 14)/$(tput sgr0)$(tput setaf 9)n$(tput sgr0)]\n"
-		read SETNOW
-		if [[ "`echo $SETNOW`" != "y" ]]; then
-        		printf "$USAGE"
-		        exit $?
-		fi
-		if [[ "`echo $SETNOW`" == "y" ]]; then
-			printf "\n$(tput setaf 5)Type the username of the SUMA Administrator$(tput sgr0)\n"
-			read MYADMIN
-			my_user="MY_ADMIN='$MYADMIN'"
-			printf "\n$(tput setaf 5)Type the password for $(tput sgr0)$(tput setaf 14)$MYADMIN$(tput sgr0)\n"
-		        read -s MYPASS
-			my_pass="MY_CREDS='$MYPASS'"
-			printf "\n$(tput setaf 5)Type the emailaddress for notifications$(tput sgr0)\n"
-			read MYMAIL
-			my_mail="EMAILG='$MYMAIL'"
-			touch $MYCREDFIL
-			echo $my_user >> $MYCREDFIL
-			echo $my_pass >> $MYCREDFIL
-			echo $my_mail >> $MYCREDFIL
-			chmod 700 $MYCREDFIL
-			source $MYCREDFIL
-			printf "\n\t$(tput setaf 14)Your new credentials file has been successfully created...\n\tIf you mis-typed or need to change the password, \n\tit can be found at $MYCREDFIL$(tput sgr0)\n"
-			echo "Credentials file created" >> $EMAILMSGZ
-		fi
+###	Changing the way this generates the file/s
+		my_user=`cat ~/.mgr-sync | grep mgrsync.user | sed -e 's/mgrsync.user\ \=\ //'`
+		my_pass=`cat ~/.mgr-sync | grep mgrsync.password | sed -e 's/mgrsync.password\ \=\ //'`
+		printf "\n\t$(tput setaf 3)Type the emailaddress for notifications$(tput sgr0)\n"
+		read MYMAIL
+		my_mail="EMAILG='$MYMAIL'"
+		touch $MYCREDFIL
+		my_ucred="MY_ADMIN='$my_user'"
+		my_pcred="MY_CREDS='$my_pass'"
+		echo $my_ucred >> $MYCREDFIL
+		echo $my_pcred >> $MYCREDFIL
+		echo $my_mail >> $MYCREDFIL
+		chmod 700 $MYCREDFIL
+		source $MYCREDFIL
+		printf "\n\t$(tput setaf 14)Your new credentials file has been successfully created...\n\tIf you mis-typed or need to change the password, \n\tit can be found at $MYCREDFIL$(tput sgr0)\n"
+		echo "Credentials file created" >> $EMAILMSGZ
 	fi
 }
 #
@@ -187,7 +173,7 @@ function chk_creds
 #####   Setting Options Usage Help Output
 #####################################################################
 #
-	USAGE="\n $MAGENTA $PROGNAME Rev $SCRIPT_RELEASE Released $SCRIPT_RELEASE_DATE $RESET\n\t$YELLOW This process requires 1 (one) parameter -- [b|d|p|h|g|r]\nInitially, these MUST be run in the following order-$RESET\n\t$LTCYN $PROGNAME -b\n\t $PROGNAME -d\n\t $PROGNAME -p$RESET\n$YELLOW Options\n  [-b]\tBase-Pool$RESET\t$LTCYN Clones the SUSE base pool trees to 'dev' channels$RESET\n$YELLOW  [-d]\tpromote-Dev$RESET\t$LTCYN Promotes the 'dev' channel to the 'test' channel$RESET\n$YELLOW  [-p]\tProduction\t$LTCYN Promotes 'test' to 'Prod'$RESET\n$YELLOW  [-h]\tHelp$RESET\t\t$LTCYN Prints this list and exits$RESET\n$YELLOW  [-g]\tGPL$RESET\t\t$LTCYN Prints the GPL info and exits [and 'disclaimer']$RESET\n$YELLOW  [-r]\tRelease$RESET\t\t$LTCYN Prints the Current Release Version and exits$RESET\n\t$LTMAG  This Clone/Promote process requires the SUMA Admin account username\n\tand password to be issued, for security and portability purposes this\n\trequires a local credentials file [Default = /root/bin/.creds.sh], this file is \n\t'sourced' for the user/pass required VARIABLES- Like so...$RESET\n$LTCYN MY_ADMIN='suma-admin-username'\n MY_CREDS='suma-admin-password'\n EMAILG=email-or-group,additional-email-or-group$RESET $LTRED [Separated by commas and NO spaces]$RESET\n$YELLOW   This file can also be used to add Custom function calls to add custom repositories and packages.\n$RESET"
+	USAGE=`clear`"\n $MAGENTA $PROGNAME Rev $SCRIPT_RELEASE Released $SCRIPT_RELEASE_DATE $RESET\n$YELLOW Usage$RESET\n\t$YELLOW This process requires 1 (one) parameter -- [b|d|p|h|g|r]\n\tInitially, these MUST be run in the following order-$RESET\n\t$LTCYN $PROGNAME -b\n\t $PROGNAME -d\n\t $PROGNAME -p$RESET\n$YELLOW Options\n  [-b]\tBase-Pool$RESET\t$LTCYN Clones the SUSE base pool trees to 'dev' channels$RESET\n$YELLOW  [-d]\tpromote-Dev$RESET\t$LTCYN Promotes the 'dev' channel to the 'test' channel$RESET\n$YELLOW  [-p]\tProduction\t$LTCYN Promotes 'test' to 'Prod'$RESET\n$YELLOW  [-h]\tHelp$RESET\t\t$LTCYN Prints this list and exits$RESET\n$YELLOW  [-g]\tGPL$RESET\t\t$LTCYN Prints the GPL info and exits [and 'disclaimer']$RESET\n$YELLOW  [-r]\tRelease$RESET\t\t$LTCYN Prints the Current Release Version and exits$RESET\n$YELLOW \n Decription$RESET\n\t$LTBLU  This LifeCycleManagement process requires the SUMA Admin account username\n\tand password to be issued, for security and portability purposes this\n\trequires a local credentials file [Default = ~/bin/.creds.sh], this file is \n\t'sourced' for the user/pass required VARIABLES-\n\tThe 'spacecmd' call also requires it's own credentials file in ~/.mgr-sync-\n\t  There is also a package dependancy 'spacewalk-utils' to be istalled from\n\tyour SUSE Manager Server repositories.$RESET \n"
 #
 #####################################################################
 ###	Begin logging
@@ -208,21 +194,6 @@ spacecmd -u $MY_ADMIN -p $MY_CREDS softwarechannel_listbasechannels | grep ^rhe 
 	MY_BASELIST=/tmp/mybaselist.sumatmp
 spacecmd -u $MY_ADMIN -p $MY_CREDS softwarechannel_listbasechannels | grep -v ^sle | grep -v ^suse | grep -v ^rhe > /tmp/mychanlist.sumatmp
 	MY_CHANLIST=/tmp/mychanlist.sumatmp
-if [[ ! -f ~/.mgr-sync ]]; then
-	mgr-sync -s refresh
-	sed -i "s/mgrsync.user \= \"\"/mgrsync.user \= $MY_ADMIN/" ~/.mgr-sync
-	sed -i "s/mgrsync.password \= \"\"/mgrsync.password \= $MY_CREDS/" ~/.mgr-sync
-else
-	if [[ "`cat ~/.mgr-sync | grep $MY_ADMIN`" == "" ]]; then
-		sed -i "s/mgrsync.user \= \"\"/mgrsync.user \= $MY_ADMIN/" ~/.mgr-sync
-		sed -i "s/mgrsync.password \= \"\"/mgrsync.password \= $MY_CREDS/" ~/.mgr-sync
-	fi
-fi
-mgr-sync -s refresh 2>&1 >> $EMAILMSGZ
-for i in `cat $MY_BASELIST`; do
-	#spacewalk-repo-sync --channel $i
-	/usr/bin/python -u /usr/bin/spacewalk-repo-sync --channel $i --type yum --non-interactive
-done
 #####################################################################
 #####	Check for bootstrap repo/s - this will only create the 
 #####	initial repos, manual creation for new OSs/releases [at this rv]
@@ -241,6 +212,10 @@ function snd_mail
 #
 function susetrees_clone
 {
+mgr-sync -s refresh 2>&1 >> $EMAILMSGZ
+for i in `cat $MY_BASELIST`; do
+	/usr/bin/python -u /usr/bin/spacewalk-repo-sync --channel $i --type yum --non-interactive
+done
 for i in `cat $MY_BASELIST`; do
 	if [[ "`grep 'dev' $MY_CHANLIST`" == "" ]]; then
 		INITRUN=true
@@ -464,7 +439,7 @@ sleep 5
 case "$1" in
 "-a")
   chk_sutils
-  chk_creds
+#  chk_creds
   no_opts
   susetrees_clone 2>&1 >> $EMAILMSGZ
   promote_dev 2>&1 >> $EMAILMSGZ
@@ -472,26 +447,26 @@ case "$1" in
   ;;
 "-n")
   chk_sutils
-  chk_creds
+#  chk_creds
   no_opts
   susetrees_clone 2>&1 >> $EMAILMSGZ
   promote_dev 2>&1 >> $EMAILMSGZ
   ;;
 "-p")
   chk_sutils
-  chk_creds
+#  chk_creds
   no_opts
   promote_test 2>&1 >> $EMAILMSGZ
   ;;
 "-d")
   chk_sutils
-  chk_creds
+#  chk_creds
   no_opts
   promote_dev 2>&1 >> $EMAILMSGZ
   ;;
 "-b")
   chk_sutils
-  chk_creds
+#  chk_creds
   no_opts
   susetrees_clone 2>&1 >> $EMAILMSGZ
   ;;
@@ -783,6 +758,20 @@ exit $?
 #         - Next major change => Move the mgr-sync and  #
 #         - repo-sync to the susetrees function, it     #
 #         - does not need to run for test/prod.         #
+#         Moved the checks to the susetrees, now need	#
+#         to change how the creds file is generated	#
+#         since it prompts for mgr-sync any way.	#
+#         - Moved mgr-sync and reposync to susetrees	#
+#         only, And changed how the creds file is gen-	#
+#         erated, from the .mgr-sync file creation	#
+#         Testing and will promote if successful	#
+#         Added 'clear' to USAGE variable		#
+#         going to test as-is and then promote 05 but	#
+#         going to optimize the cred file create for	#
+#         a simpler code in 06				#
+#         tested, corrected, and retested- success	#
+##      Promoted script to release 5.0.0-05		#
+#         04 January 2018-				#
 #                                                       #
 #########################################################
 # END OF CHANGELOG
