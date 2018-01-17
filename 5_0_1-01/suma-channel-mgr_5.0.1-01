@@ -147,7 +147,7 @@ function chk_sutils
 	else
 		my_user=`cat ~/.mgr-sync | grep mgrsync.user | sed -e 's/mgrsync.user\ \=\ //'`
 		my_pass=`cat ~/.mgr-sync | grep mgrsync.password | sed -e 's/mgrsync.password\ \=\ //'`
-		printf "\n\t$(tput setaf 3)Type the emailaddress for notifications$(tput sgr0)\n"
+		printf "\n\t$(tput setaf 3)Type the email address for notifications$(tput sgr0)\n"
 		read MYMAIL
 		my_mail="EMAILG='$MYMAIL'"
 		touch $MYCREDFIL
@@ -488,7 +488,8 @@ printf "\n\tThe following Failure/s occured:\n" >> $EMAILMSGZ
 grep -i 'error' $EMAILMSGZ >> $EMAILMSGZ
 if $INITRUN; then
 	printf "\n\t$(tput setaf 4)Thank you for using the $PROGNAME script, Release $SCRIPT_RELEASE\n\tThis will require maually adding Child Channels to your Activation Keys in the WebUI$(tput sgr0)\n"
-	printf "$(tput setaf 3)Your activation keys are `spacecmd activationkey_list`$(tput sgr0)"
+	sleep 3
+	printf "$(tput setaf 3)Your activation keys are\n `spacecmd activationkey_list`$(tput sgr0)"
 	tail -n 12 $SYNCLOG
 	if $BADPATH; then
 #	Adding check for ignoring the script path message
@@ -496,7 +497,7 @@ if $INITRUN; then
 			chk_path
 		fi
 	fi
-	printf "\n\t$(tput setaf 4)The log for this process can be found at $SYNCLOG$(tput sgr0)\n"
+	printf "\n\t$(tput setaf 4)The log for this process can be found at\n $SYNCLOG$(tput sgr0)\n"
 else
 	if $BADPATH; then
 #	Adding check for ignoring the script path message
@@ -761,6 +762,8 @@ exit $?
 #         tested, corrected, and retested- success	#
 ##      Promoted script to release 5.0.1-01		#
 #         04 January 2018-				#
+#         17 Jan 2018- changed emailaddress to 2 words	#
+#         added sleep 3 after WebUI notification	#
 #                                                       #
 #########################################################
 # END OF CHANGELOG
