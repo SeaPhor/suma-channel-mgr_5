@@ -167,7 +167,7 @@ function chk_sutils
 #####   Setting Options Usage Help Output
 #####################################################################
 #
-	USAGE=`clear`"\n $MAGENTA $PROGNAME Rev $SCRIPT_RELEASE Released $SCRIPT_RELEASE_DATE $RESET\n$YELLOW Usage$RESET\n\t$YELLOW This process requires 1 (one) parameter -- [b|d|p|h|g|r]\n\tInitially, these MUST be run in the following order-$RESET\n\t$LTCYN $PROGNAME -b\n\t $PROGNAME -d\n\t $PROGNAME -p$RESET\n$YELLOW Options\n  [-b]\tBase-Pool$RESET\t$LTCYN Clones the SUSE base pool trees to 'dev' channels$RESET\n$YELLOW  [-d]\tpromote-Dev$RESET\t$LTCYN Promotes the 'dev' channel to the 'test' channel$RESET\n$YELLOW  [-p]\tProduction\t$LTCYN Promotes 'test' to 'Prod'$RESET\n$YELLOW  [-h]\tHelp$RESET\t\t$LTCYN Prints this list and exits$RESET\n$YELLOW  [-g]\tGPL$RESET\t\t$LTCYN Prints the GPL info and exits [and 'disclaimer']$RESET\n$YELLOW  [-r]\tRelease$RESET\t\t$LTCYN Prints the Current Release Version and exits$RESET\n$YELLOW \n Decription$RESET\n\t$LTBLU  This LifeCycleManagement process requires the SUMA Admin account username\n\tand password to be issued, for security and portability purposes this\n\trequires a local credentials file [Default = ~/bin/.creds.sh], this file is \n\t'sourced' for the user/pass required VARIABLES-\n\tThe 'spacecmd' call also requires it's own credentials file in ~/.mgr-sync-\n\t  There is also a package dependancy 'spacewalk-utils' to be istalled from\n\tyour SUSE Manager Server repositories.$RESET \n"
+	USAGE=`clear`"\n $MAGENTA $PROGNAME Rev $SCRIPT_RELEASE Released $SCRIPT_RELEASE_DATE $RESET\n$YELLOW Usage$RESET\n\t$YELLOW This process requires 1 (one) parameter -- [b|d|p|h|g|r]\n\tInitially, these MUST be run in the following order-$RESET\n\t$LTCYN $PROGNAME -b\n\t $PROGNAME -d\n\t $PROGNAME -p$RESET\n$YELLOW Options\n  [-b]\tBase-Pool$RESET\t$LTCYN Clones the SUSE base pool trees to 'dev' channels$RESET\n$YELLOW  [-d]\tpromote-Dev$RESET\t$LTCYN Promotes the 'dev' channel to the 'test' channel$RESET\n$YELLOW  [-p]\tProduction\t$LTCYN Promotes 'test' to 'Prod'$RESET\n$YELLOW  [-h]\tHelp$RESET\t\t$LTCYN Prints this list and exits$RESET\n$YELLOW  [-g]\tGPL$RESET\t\t$LTCYN Prints the GPL info and exits [and 'disclaimer']$RESET\n$YELLOW  [-r]\tRelease$RESET\t\t$LTCYN Prints the Current Release Version and exits$RESET\n$YELLOW \n Decription$RESET\n\t$LTBLU  This LifeCycleManagement process requires the SUMA Admin account username\n\tand password to be issued, for security and portability purposes this\n\trequires a local credentials file [Default = ~/bin/.creds.sh], this file is \n\t'sourced' for the user/pass required VARIABLES-\n\tThe 'spacecmd' call also requires it's own credentials file in ~/.mgr-sync-\n\t  There is also a package dependancy 'spacewalk-utils' to be installed from\n\tyour SUSE Manager Server repositories.$RESET \n"
 #
 #####################################################################
 ###	Begin logging
@@ -489,7 +489,7 @@ grep -i 'error' $EMAILMSGZ >> $EMAILMSGZ
 if $INITRUN; then
 	printf "\n\t$(tput setaf 4)Thank you for using the $PROGNAME script, Release $SCRIPT_RELEASE\n\tThis will require maually adding Child Channels to your Activation Keys in the WebUI$(tput sgr0)\n"
 	sleep 3
-	printf "$(tput setaf 3)Your activation keys are\n `spacecmd activationkey_list`$(tput sgr0)"
+	printf "$(tput setaf 3)Your activation keys are\n `spacecmd activationkey_list`$(tput sgr0)\n"
 	tail -n 12 $SYNCLOG
 	if $BADPATH; then
 #	Adding check for ignoring the script path message
@@ -764,6 +764,7 @@ exit $?
 #         04 January 2018-				#
 #         17 Jan 2018- changed emailaddress to 2 words	#
 #         added sleep 3 after WebUI notification	#
+#         Corrected typo 'istalled' to installed	#
 #                                                       #
 #########################################################
 # END OF CHANGELOG
