@@ -8,8 +8,8 @@
 #####   Setting Script Variables
 #####################################################################
 #
-	SCRIPT_RELEASE="5.0.0-04"
-	SCRIPT_RELEASE_DATE="04 January 2018"
+	SCRIPT_RELEASE="5.0.1-01"
+	SCRIPT_RELEASE_DATE="20 January 2018"
 	PROGNAME=$(basename $0)
 	REPOPATH=~/suma-channel-mgr_5
 	LTSTSTAB=$REPOPATH/Latest_Stable
@@ -138,11 +138,6 @@ function chk_sutils
 			printf "$(tput setaf 14)Installed spacewalk-utils$(tput sgr0)" >> $EMAILMSGZ
 		fi
 	fi
-#
-#####################################################################
-#####   Adjusted for portability, source the local credentials
-#####################################################################
-#
 	if [[ ! -f ~/.mgr-sync ]]; then
 		printf "\n\t$(tput setaf 3)Enter the SUSE Manager Admin credentials when prompted...$(tput sgr0)\n"
 		mgr-sync -s refresh
@@ -150,10 +145,9 @@ function chk_sutils
 	if [[ -f $MYCREDFIL ]]; then
 		source $MYCREDFIL
 	else
-###	Changing the way this generates the file/s
 		my_user=`cat ~/.mgr-sync | grep mgrsync.user | sed -e 's/mgrsync.user\ \=\ //'`
 		my_pass=`cat ~/.mgr-sync | grep mgrsync.password | sed -e 's/mgrsync.password\ \=\ //'`
-		printf "\n\t$(tput setaf 3)Type the emailaddress for notifications$(tput sgr0)\n"
+		printf "\n\t$(tput setaf 3)Type the email address for notifications$(tput sgr0)\n"
 		read MYMAIL
 		my_mail="EMAILG='$MYMAIL'"
 		touch $MYCREDFIL
@@ -173,7 +167,7 @@ function chk_sutils
 #####   Setting Options Usage Help Output
 #####################################################################
 #
-	USAGE=`clear`"\n $MAGENTA $PROGNAME Rev $SCRIPT_RELEASE Released $SCRIPT_RELEASE_DATE $RESET\n$YELLOW Usage$RESET\n\t$YELLOW This process requires 1 (one) parameter -- [b|d|p|h|g|r]\n\tInitially, these MUST be run in the following order-$RESET\n\t$LTCYN $PROGNAME -b\n\t $PROGNAME -d\n\t $PROGNAME -p$RESET\n$YELLOW Options\n  [-b]\tBase-Pool$RESET\t$LTCYN Clones the SUSE base pool trees to 'dev' channels$RESET\n$YELLOW  [-d]\tpromote-Dev$RESET\t$LTCYN Promotes the 'dev' channel to the 'test' channel$RESET\n$YELLOW  [-p]\tProduction\t$LTCYN Promotes 'test' to 'Prod'$RESET\n$YELLOW  [-h]\tHelp$RESET\t\t$LTCYN Prints this list and exits$RESET\n$YELLOW  [-g]\tGPL$RESET\t\t$LTCYN Prints the GPL info and exits [and 'disclaimer']$RESET\n$YELLOW  [-r]\tRelease$RESET\t\t$LTCYN Prints the Current Release Version and exits$RESET\n$YELLOW \n Decription$RESET\n\t$LTBLU  This LifeCycleManagement process requires the SUMA Admin account username\n\tand password to be issued, for security and portability purposes this\n\trequires a local credentials file [Default = ~/bin/.creds.sh], this file is \n\t'sourced' for the user/pass required VARIABLES-\n\tThe 'spacecmd' call also requires it's own credentials file in ~/.mgr-sync-\n\t  There is also a package dependancy 'spacewalk-utils' to be istalled from\n\tyour SUSE Manager Server repositories.$RESET \n"
+	USAGE=`clear`"\n $MAGENTA $PROGNAME Rev $SCRIPT_RELEASE Released $SCRIPT_RELEASE_DATE $RESET\n$YELLOW Usage$RESET\n\t$YELLOW This process requires 1 (one) parameter -- [b|d|p|h|g|r|c]\n\tInitially, these MUST be run in the following order-$RESET\n\t$LTCYN $PROGNAME -b\n\t $PROGNAME -d\n\t $PROGNAME -p$RESET\n$YELLOW Options\n  [-b]\tBase-Pool$RESET\t$LTCYN Clones the SUSE base pool trees to 'dev' channels$RESET\n$YELLOW  [-d]\tpromote-Dev$RESET\t$LTCYN Promotes the 'dev' channel to the 'test' channel$RESET\n$YELLOW  [-p]\tProduction\t$LTCYN Promotes 'test' to 'Prod'$RESET\n$YELLOW  [-h]\tHelp$RESET\t\t$LTCYN Prints this list and exits$RESET\n$YELLOW  [-g]\tGPL$RESET\t\t$LTCYN Prints the GPL info and exits [and 'disclaimer']$RESET\n$YELLOW  [-r]\tRelease$RESET\t\t$LTCYN Prints the Current Release Version and exits$RESET\n$YELLOW  [-c]\tCHANGE$RESET\t\t$LTCYN Prints the last 30 lines of the Change-Log and exits$RESET\n$YELLOW \n Decription$RESET\n\t$LTBLU  This LifeCycleManagement process requires the SUMA Admin account username\n\tand password to be issued, for security and portability purposes this\n\trequires a local credentials file [Default = ~/bin/.creds.sh], this file is \n\t'sourced' for the user/pass required VARIABLES-\n\tThe 'spacecmd' call also requires it's own credentials file in ~/.mgr-sync-\n\t  There is also a package dependancy 'spacewalk-utils' to be installed from\n\tyour SUSE Manager Server repositories.$RESET \n"
 #
 #####################################################################
 ###	Begin logging
@@ -285,6 +279,16 @@ for t in `grep 'test' $MY_CHANLIST`; do
 done
 }
 #
+function change_log
+{
+	if [[ "`find ~/* -name $PROGNAME`" != "" ]]; then
+		CPPATH="`find ~/* -name $PROGNAME`"
+		clear
+		cat $CPPATH | tail -n 30
+	else
+		printf "\n\tThe $PROGNAME was not found in your PATH [~/*] => It is recommended to have the sym-link to $PROGNAME in [~/bin/]\n"
+	fi
+}
 #####################################################################
 #####	Disclaimer Statement
 #####################################################################
@@ -438,35 +442,35 @@ sleep 5
 #
 case "$1" in
 "-a")
+  error_exit
   chk_sutils
-#  chk_creds
   no_opts
   susetrees_clone 2>&1 >> $EMAILMSGZ
   promote_dev 2>&1 >> $EMAILMSGZ
   promote_test 2>&1 >> $EMAILMSGZ
   ;;
 "-n")
+  error_exit
   chk_sutils
-#  chk_creds
   no_opts
   susetrees_clone 2>&1 >> $EMAILMSGZ
   promote_dev 2>&1 >> $EMAILMSGZ
   ;;
 "-p")
+  error_exit
   chk_sutils
-#  chk_creds
   no_opts
   promote_test 2>&1 >> $EMAILMSGZ
   ;;
 "-d")
+  error_exit
   chk_sutils
-#  chk_creds
   no_opts
   promote_dev 2>&1 >> $EMAILMSGZ
   ;;
 "-b")
+  error_exit
   chk_sutils
-#  chk_creds
   no_opts
   susetrees_clone 2>&1 >> $EMAILMSGZ
   ;;
@@ -487,6 +491,11 @@ case "$1" in
   exit $?
   ;;
 #
+"-c")
+  change_log
+  exit $?
+  ;;
+#
 *)
   printf "$USAGE"
   exit $?
@@ -499,7 +508,8 @@ printf "\n\tThe following Failure/s occured:\n" >> $EMAILMSGZ
 grep -i 'error' $EMAILMSGZ >> $EMAILMSGZ
 if $INITRUN; then
 	printf "\n\t$(tput setaf 4)Thank you for using the $PROGNAME script, Release $SCRIPT_RELEASE\n\tThis will require maually adding Child Channels to your Activation Keys in the WebUI$(tput sgr0)\n"
-	printf "$(tput setaf 3)Your activation keys are `spacecmd activationkey_list`$(tput sgr0)"
+	sleep 3
+	printf "$(tput setaf 3)Your activation keys are\n `spacecmd activationkey_list`$(tput sgr0)\n"
 	tail -n 12 $SYNCLOG
 	if $BADPATH; then
 #	Adding check for ignoring the script path message
@@ -507,7 +517,7 @@ if $INITRUN; then
 			chk_path
 		fi
 	fi
-	printf "\n\t$(tput setaf 4)The log for this process can be found at $SYNCLOG$(tput sgr0)\n"
+	printf "\n\t$(tput setaf 4)The log for this process can be found at\n $SYNCLOG$(tput sgr0)\n"
 else
 	if $BADPATH; then
 #	Adding check for ignoring the script path message
@@ -547,6 +557,29 @@ exit $?
 #####################################################################
 #
 ##
+#################################################################################################################
+# KNOWN BUGS													#
+#         20 January 2018-
+# - Found weird issue where clone/promote does NOT populate the "Patches" in the WebUI. I don't know yet	#
+#   if this is 
+#     A- Bug with SUSE Manager
+#     B- Bug with the 'spacewalk-manage-channel-lifecycle from the spacewalk-utils package.
+#     C- Most likely cause- Timing or order of the code in this script
+#   The weird part is that running the command a 2nd time DOES populate it.				
+#
+# - Steps to reproduce
+#   1- WebUI=> Notice # of Patches in the SUSE Channel	
+#   2- CLI=> Run script with [-b] option, notice the of Patches in matching 'dev' channel is same	#
+#   3- CLI=> Run script with [-d] option, notice the of Patches in matching 'test' channel is EMPTY	#
+#   4- CLI=> Run script with [-p] option, notice the of Patches in matching 'prod' channel is EMPTY, BUT
+#      the Patches in the 'test' channel are now populated???
+#   5- CLI=> Run script with [-p] option again, notice the of Patches in matching 'prod' channel is now populated
+#         						#
+#########################################################
+# END OF KNOWN BUGS
+#         						#
+#########################################################
+# CHANGELOG
 #########################################################
 #                                                       #
 ###             channellock-promote_4.1		        #
@@ -770,6 +803,17 @@ exit $?
 #         going to optimize the cred file create for	#
 #         a simpler code in 06				#
 #         tested, corrected, and retested- success	#
+##      Promoted script to release 5.0.1-01		#
+#         04 January 2018-				#
+#         17 Jan 2018- changed emailaddress to 2 words	#
+#         added sleep 3 after WebUI notification	#
+#         Corrected typo 'istalled' to installed	#
+#         Added error_exit to action items		#
+#         20 January 2018-
+# 	  - Added 'KNOWN BUGS' to before changelog	#
+# 	  - Added [-c] CHANGE Prints the last 30 lines	#
+#	   of the Change-Log and exits to Usage/Options	#
+#         20 January 2018- Promoted 5.0.1-01 to Latest	#
 #                                                       #
 #########################################################
 # END OF CHANGELOG

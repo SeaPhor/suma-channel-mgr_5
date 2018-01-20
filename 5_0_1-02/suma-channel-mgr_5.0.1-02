@@ -8,7 +8,7 @@
 #####   Setting Script Variables
 #####################################################################
 #
-	SCRIPT_RELEASE="5.0.1-01"
+	SCRIPT_RELEASE="5.0.1-02"
 	SCRIPT_RELEASE_DATE="20 January 2018"
 	PROGNAME=$(basename $0)
 	REPOPATH=~/suma-channel-mgr_5
@@ -814,6 +814,8 @@ exit $?
 # 	  - Added [-c] CHANGE Prints the last 30 lines	#
 #	   of the Change-Log and exits to Usage/Options	#
 #         20 January 2018- Promoted 5.0.1-01 to Latest	#
+##      Promoted script to release 5.0.1-02		#
+#         20 January 2018- (My 52nd Birthday)		#
 #                                                       #
 #########################################################
 # END OF CHANGELOG
