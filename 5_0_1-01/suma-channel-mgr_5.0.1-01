@@ -432,6 +432,7 @@ sleep 5
 #
 case "$1" in
 "-a")
+  error_exit
   chk_sutils
   no_opts
   susetrees_clone 2>&1 >> $EMAILMSGZ
@@ -439,22 +440,26 @@ case "$1" in
   promote_test 2>&1 >> $EMAILMSGZ
   ;;
 "-n")
+  error_exit
   chk_sutils
   no_opts
   susetrees_clone 2>&1 >> $EMAILMSGZ
   promote_dev 2>&1 >> $EMAILMSGZ
   ;;
 "-p")
+  error_exit
   chk_sutils
   no_opts
   promote_test 2>&1 >> $EMAILMSGZ
   ;;
 "-d")
+  error_exit
   chk_sutils
   no_opts
   promote_dev 2>&1 >> $EMAILMSGZ
   ;;
 "-b")
+  error_exit
   chk_sutils
   no_opts
   susetrees_clone 2>&1 >> $EMAILMSGZ
@@ -537,6 +542,29 @@ exit $?
 #####################################################################
 #
 ##
+#################################################################################################################
+# KNOWN BUGS													#
+#         20 January 2018-
+# - Found weird issue where clone/promote does NOT populate the "Patches" in the WebUI. I don't know yet	#
+#   if this is 
+#     A- Bug with SUSE Manager
+#     B- Bug with the 'spacewalk-manage-channel-lifecycle from the spacewalk-utils package.
+#     C- Most likely cause- Timing or order of the code in this script
+#   The weird part is that running the command a 2nd time DOES populate it.				
+#
+# - Steps to reproduce
+#   1- WebUI=> Notice # of Patches in the SUSE Channel	
+#   2- CLI=> Run script with [-b] option, notice the of Patches in matching 'dev' channel is same	#
+#   3- CLI=> Run script with [-d] option, notice the of Patches in matching 'test' channel is EMPTY	#
+#   4- CLI=> Run script with [-p] option, notice the of Patches in matching 'prod' channel is EMPTY, BUT
+#      the Patches in the 'test' channel are now populated???
+#   5- CLI=> Run script with [-p] option again, notice the of Patches in matching 'prod' channel is now populated
+#         						#
+#########################################################
+# END OF KNOWN BUGS
+#         						#
+#########################################################
+# CHANGELOG
 #########################################################
 #                                                       #
 ###             channellock-promote_4.1		        #
@@ -765,6 +793,9 @@ exit $?
 #         17 Jan 2018- changed emailaddress to 2 words	#
 #         added sleep 3 after WebUI notification	#
 #         Corrected typo 'istalled' to installed	#
+#         Added error_exit to action items		#
+#         20 January 2018-
+# 	  - Added 'KNOWN BUGS' to before changelog	#
 #                                                       #
 #########################################################
 # END OF CHANGELOG
