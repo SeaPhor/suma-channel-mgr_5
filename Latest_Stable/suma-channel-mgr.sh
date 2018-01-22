@@ -8,8 +8,8 @@
 #####   Setting Script Variables
 #####################################################################
 #
-	SCRIPT_RELEASE="5.0.1-01"
-	SCRIPT_RELEASE_DATE="20 January 2018"
+	SCRIPT_RELEASE="5.0.1-02"
+	SCRIPT_RELEASE_DATE="22 January 2018"
 	PROGNAME=$(basename $0)
 	REPOPATH=~/suma-channel-mgr_5
 	LTSTSTAB=$REPOPATH/Latest_Stable
@@ -183,10 +183,10 @@ function no_opts
 {
 spacecmd -u $MY_ADMIN -p $MY_CREDS softwarechannel_listbasechannels | grep ^sle > /tmp/mybaselist.sumatmp
 #	Optional- Comment/Un-Comment to disable/enable RHEL
-spacecmd -u $MY_ADMIN -p $MY_CREDS softwarechannel_listbasechannels | grep ^rhe >> /tmp/mybaselist.sumatmp
+#spacecmd -u $MY_ADMIN -p $MY_CREDS softwarechannel_listbasechannels | grep ^rhe >> /tmp/mybaselist.sumatmp
 #	END - Optional- Un-Comment to enable RHEL
 	MY_BASELIST=/tmp/mybaselist.sumatmp
-spacecmd -u $MY_ADMIN -p $MY_CREDS softwarechannel_listbasechannels | grep -v ^sle | grep -v ^suse | grep -v ^rhe > /tmp/mychanlist.sumatmp
+spacecmd -u $MY_ADMIN -p $MY_CREDS softwarechannel_listbasechannels | grep -v ^sle | grep -v ^suse | grep -v rhel > /tmp/mychanlist.sumatmp
 	MY_CHANLIST=/tmp/mychanlist.sumatmp
 #####################################################################
 #####	Check for bootstrap repo/s - this will only create the 
@@ -442,7 +442,6 @@ sleep 5
 #
 case "$1" in
 "-a")
-  error_exit
   chk_sutils
   no_opts
   susetrees_clone 2>&1 >> $EMAILMSGZ
@@ -450,26 +449,22 @@ case "$1" in
   promote_test 2>&1 >> $EMAILMSGZ
   ;;
 "-n")
-  error_exit
   chk_sutils
   no_opts
   susetrees_clone 2>&1 >> $EMAILMSGZ
   promote_dev 2>&1 >> $EMAILMSGZ
   ;;
 "-p")
-  error_exit
   chk_sutils
   no_opts
   promote_test 2>&1 >> $EMAILMSGZ
   ;;
 "-d")
-  error_exit
   chk_sutils
   no_opts
   promote_dev 2>&1 >> $EMAILMSGZ
   ;;
 "-b")
-  error_exit
   chk_sutils
   no_opts
   susetrees_clone 2>&1 >> $EMAILMSGZ
@@ -809,11 +804,17 @@ exit $?
 #         added sleep 3 after WebUI notification	#
 #         Corrected typo 'istalled' to installed	#
 #         Added error_exit to action items		#
-#         20 January 2018-
+#         20 January 2018-				#
 # 	  - Added 'KNOWN BUGS' to before changelog	#
 # 	  - Added [-c] CHANGE Prints the last 30 lines	#
 #	   of the Change-Log and exits to Usage/Options	#
 #         20 January 2018- Promoted 5.0.1-01 to Latest	#
+##      Promoted script to release 5.0.1-02		#
+#         20 January 2018- (My 52nd Birthday)		#
+#         Commented check for RHEL, not priority atm	#
+#         Found issue- mistakenly added error_exit to	#
+#         all action case statements- this breakes it!	#
+#         Fixed and promote 5.0.1-02 to Latest		#
 #                                                       #
 #########################################################
 # END OF CHANGELOG

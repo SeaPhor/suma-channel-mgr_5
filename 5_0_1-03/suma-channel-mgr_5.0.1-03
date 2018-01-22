@@ -8,7 +8,7 @@
 #####   Setting Script Variables
 #####################################################################
 #
-	SCRIPT_RELEASE="5.0.1-02"
+	SCRIPT_RELEASE="5.0.1-03"
 	SCRIPT_RELEASE_DATE="22 January 2018"
 	PROGNAME=$(basename $0)
 	REPOPATH=~/suma-channel-mgr_5
@@ -815,6 +815,8 @@ exit $?
 #         Found issue- mistakenly added error_exit to	#
 #         all action case statements- this breakes it!	#
 #         Fixed and promote 5.0.1-02 to Latest		#
+##      Promoted script to release 5.0.1-03		#
+#         22 January 2018-				#
 #                                                       #
 #########################################################
 # END OF CHANGELOG
