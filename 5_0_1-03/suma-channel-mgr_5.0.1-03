@@ -211,7 +211,7 @@ for i in `cat $MY_BASELIST`; do
 	/usr/bin/python -u /usr/bin/spacewalk-repo-sync --channel $i --type yum --non-interactive
 done
 for i in `cat $MY_BASELIST`; do
-	if [[ "`grep 'dev' $MY_CHANLIST`" == "" ]]; then
+	if [[ "`grep dev-$i $MY_CHANLIST`" == "" ]]; then
 		INITRUN=true
 		NEWNAME=`echo $i | sed -e "s/$i/dev-$i/g"`
 		spacewalk-manage-channel-lifecycle -C -c $i --init -u $MY_ADMIN -p $MY_CREDS 2>&1 >> $EMAILMSGZ
@@ -240,7 +240,7 @@ if [[ "`grep 'dev' $MY_CHANLIST`" == "" ]]; then
 	exit $?
 fi
 for d in `grep 'dev' $MY_CHANLIST`; do
-	if [[ "`grep 'test' $MY_CHANLIST`" == "" ]]; then
+	if [[ "`grep test-$d $MY_CHANLIST`" == "" ]]; then
                 INITRUN=true
 		spacewalk-manage-channel-lifecycle -C -c $d --promote -u $MY_ADMIN -p $MY_CREDS 2>&1 >> $EMAILMSGZ
 		NEWNAME="`echo $d | sed -e s/dev/test/g`"
@@ -266,7 +266,7 @@ else
 
 fi
 for t in `grep 'test' $MY_CHANLIST`; do
-	if [[ "`grep 'prod' $MY_CHANLIST`" == "" ]]; then
+	if [[ "`grep prod-$t $MY_CHANLIST`" == "" ]]; then
                 INITRUN=true
         	spacewalk-manage-channel-lifecycle -C -c $t --promote -u $MY_ADMIN -p $MY_CREDS 2>&1 >> $EMAILMSGZ
 		NEWNAME="`echo $t | sed -e s/test/prod/g`"
@@ -817,6 +817,9 @@ exit $?
 #         Fixed and promote 5.0.1-02 to Latest		#
 ##      Promoted script to release 5.0.1-03		#
 #         22 January 2018-				#
+#         KEY creation- changed grep dev to grep dev-$i	#
+#         -Tested and working- will now create new KEYS	#
+#         -as new SUSE products are added		#
 #                                                       #
 #########################################################
 # END OF CHANGELOG
