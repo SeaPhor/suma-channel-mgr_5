@@ -8,7 +8,7 @@
 #####   Setting Script Variables
 #####################################################################
 #
-	SCRIPT_RELEASE="5.0.2-01"
+	SCRIPT_RELEASE="5.0.2-02"
 	SCRIPT_RELEASE_DATE="22 January 2018"
 	PROGNAME=$(basename $0)
 	REPOPATH=~/suma-channel-mgr_5
@@ -839,6 +839,8 @@ exit $?
 #         Fully tested, and with the major changes to	#
 #         generation methods I must rev to next major	#
 #         revision- 5.0.2-01 is Latest_Stable		#
+##      Promoted script to release 5.0.2-02		#
+#         22 January 2018-				#
 #                                                       #
 #########################################################
 # END OF CHANGELOG
