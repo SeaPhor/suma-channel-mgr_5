@@ -211,11 +211,16 @@ for i in `cat $MY_BASELIST`; do
 	/usr/bin/python -u /usr/bin/spacewalk-repo-sync --channel $i --type yum --non-interactive
 done
 for i in `cat $MY_BASELIST`; do
+	#grep dev-$i $MY_CHANLIST
+	#exit $?
 	if [[ "`grep dev-$i $MY_CHANLIST`" == "" ]]; then
 		INITRUN=true
+		if $INITRUN; then
+			echo "initrun is true"
+		fi
 		NEWNAME=`echo $i | sed -e "s/$i/dev-$i/g"`
 		spacewalk-manage-channel-lifecycle -C -c $i --init -u $MY_ADMIN -p $MY_CREDS 2>&1 >> $EMAILMSGZ
-		spacecmd -u $MY_ADMIN -p $MY_CREDS activationkey_create -- -n $NEWNAME -d $NEWNAME -b $NEWNAME
+		spacecmd -u $MY_ADMIN -p $MY_CREDS activationkey_create -- -n $NEWNAME -d $NEWNAME -b $NEWNAME 2>&1 >> $EMAILMSGZ
 		if [[ -f $TMPLATFIL ]]; then
 			cat $TMPLATFIL | sed -e s/slartybartfast/$NEWNAME/g > $TMPLATDIR/$NEWNAME-bootstrap.sh
 			chmod +x $TMPLATDIR/$NEWNAME-bootstrap.sh
@@ -225,7 +230,7 @@ for i in `cat $MY_BASELIST`; do
 			cat $TMPLATFIL | sed -e s/slartybartfast/$NEWNAME/g > $TMPLATDIR/$NEWNAME-bootstrap.sh
 			chmod +x $TMPLATDIR/$NEWNAME-bootstrap.sh
 		fi
-		spacecmd -u $MY_ADMIN -p $MY_CREDS activationkey_list 2>&1 >> $EMAILMSGZ
+		spacecmd -u $MY_ADMIN -p $MY_CREDS activationkey_list 2>&1 >> $EMAILMSGZ 2>&1 >> $EMAILMSGZ
 		echo $NEWNAME >> $EMAILMSGZ
 	else
 		spacewalk-manage-channel-lifecycle -C -c $i --promote -u $MY_ADMIN -p $MY_CREDS 2>&1 >> $EMAILMSGZ
@@ -240,11 +245,13 @@ if [[ "`grep 'dev' $MY_CHANLIST`" == "" ]]; then
 	exit $?
 fi
 for d in `grep 'dev' $MY_CHANLIST`; do
-	if [[ "`grep test-$d $MY_CHANLIST`" == "" ]]; then
+	#grep test-$d $MY_CHANLIST
+	#exit $?
+	if [[ "`grep $d $MY_CHANLIST | sed -e 's/dev/test/g'`" == "" ]]; then
                 INITRUN=true
 		spacewalk-manage-channel-lifecycle -C -c $d --promote -u $MY_ADMIN -p $MY_CREDS 2>&1 >> $EMAILMSGZ
 		NEWNAME="`echo $d | sed -e s/dev/test/g`"
-		spacecmd -u $MY_ADMIN -p $MY_CREDS activationkey_create -- -n $NEWNAME -d $NEWNAME -b $NEWNAME 
+		spacecmd -u $MY_ADMIN -p $MY_CREDS activationkey_create -- -n $NEWNAME -d $NEWNAME -b $NEWNAME 2>&1 >> $EMAILMSGZ
 		cat $TMPLATFIL | sed -e s/slartybartfast/$NEWNAME/g > $TMPLATDIR/$NEWNAME-bootstrap.sh
 		chmod +x $TMPLATDIR/$NEWNAME-bootstrap.sh
 	else
@@ -267,10 +274,11 @@ else
 fi
 for t in `grep 'test' $MY_CHANLIST`; do
 	if [[ "`grep prod-$t $MY_CHANLIST`" == "" ]]; then
+	if [[ "`grep $t $MY_CHANLIST | sed -e 's/test/prod/g'`" == "" ]]; then
                 INITRUN=true
         	spacewalk-manage-channel-lifecycle -C -c $t --promote -u $MY_ADMIN -p $MY_CREDS 2>&1 >> $EMAILMSGZ
 		NEWNAME="`echo $t | sed -e s/test/prod/g`"
-		spacecmd -u $MY_ADMIN -p $MY_CREDS activationkey_create -- -n $NEWNAME -d $NEWNAME -b $NEWNAME 
+		spacecmd -u $MY_ADMIN -p $MY_CREDS activationkey_create -- -n $NEWNAME -d $NEWNAME -b $NEWNAME 2>&1 >> $EMAILMSGZ
 		cat $TMPLATFIL | sed -e s/slartybartfast/$NEWNAME/g > $TMPLATDIR/$NEWNAME-bootstrap.sh
 		chmod +x $TMPLATDIR/$NEWNAME-bootstrap.sh
 	else
@@ -499,8 +507,6 @@ esac
 #####################################################################
 ###     Email & Finalize Log
 #####################################################################
-printf "\n\tThe following Failure/s occured:\n" >> $EMAILMSGZ
-grep -i 'error' $EMAILMSGZ >> $EMAILMSGZ
 if $INITRUN; then
 	printf "\n\t$(tput setaf 4)Thank you for using the $PROGNAME script, Release $SCRIPT_RELEASE\n\tThis will require maually adding Child Channels to your Activation Keys in the WebUI$(tput sgr0)\n"
 	sleep 3
@@ -525,6 +531,8 @@ fi
 snd_mail
 echo "" >> $SYNCLOG
 cat $EMAILMSGZ >> $SYNCLOG
+printf "\n\tThe following Failure/s occured:\n" >> $SYNCLOG
+grep -i 'error' $EMAILMSGZ >> $SYNCLOG
 #####################################################################
 ###	Cleanup & Exit
 #####################################################################
@@ -820,6 +828,11 @@ exit $?
 #         KEY creation- changed grep dev to grep dev-$i	#
 #         -Tested and working- will now create new KEYS	#
 #         -as new SUSE products are added		#
+#         Changed how the errors are logged- will test	#
+#         FINALLY!!! I finally isolated that irritating	#
+#         bug where it allways runs as INITRUN is true	#
+#         but only in test and prod?? will run full 	#
+#         tests on first and continues runs tomorrow	#
 #                                                       #
 #########################################################
 # END OF CHANGELOG
