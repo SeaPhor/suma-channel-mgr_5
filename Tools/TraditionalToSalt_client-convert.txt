@@ -35,7 +35,7 @@ useGPG                   1
 2. Cleanup the client/s
   b. On SUMA Server - WebUI
     1. Systems => Find the Traditional client and open their link, Select "Delete System" and confirm with "Delete Profile"
-      a. For multiple clients add them all to the SSM, on the Overview TAB => Misc => Select "'Delete' systems from SUSE Manager" and confirm with "Confirm Deletion"
+      A. For multiple clients add them all to the SSM, on the Overview TAB => Misc => Select "'Delete' systems from SUSE Manager" and confirm with "Confirm Deletion"
 
   c. On Traditional Client/s - CLI
     1. Uninstall all Traditional Zypper/Spacewalk Components
