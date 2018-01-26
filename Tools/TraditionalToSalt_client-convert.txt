@@ -1,0 +1,91 @@
+SUMA-3.1
+This is the documentation for the only method I have found to convert Traditionally bootstrapped clients to be Salt Clients.
+If you have a better method PLEASE SHARE!!!
+  This document assumes you are using the accompanying LifeCycle Management process
+!!! IMPORTANT NOTE !!!
+  SUSE Manger uses SSL, Make SURE you are using an NTP-Client on the SUMA-Server and ALL CLients!!! 
+    If you have ANY issues, ALWAYS check `date` on both the Server and the Client!!!
+
+1. Create the Salt-Based Bootstrap script
+  a. On SUMA Server - CLI
+    # mgr-bootstrap
+    Sample Output:
+
+* bootstrap overrides (written):
+  '/srv/www/htdocs/pub/bootstrap/client-config-overrides.txt'
+
+Values written:
+enableProxy              '0'
+serverURL                'https://suma3.woodbeeco.com/XMLRPC'
+proxyPassword            ''
+proxyUser                ''
+sslCACert                '/usr/share/rhn/RHN-ORG-TRUSTED-SSL-CERT'
+httpProxy                ''
+noSSLServerURL           'http://suma3.woodbeeco.com/XMLRPC'
+enableProxyAuth          '0'
+useGPG                   1
+* boostrap script (old and new scripts identical; not written):
+    '/srv/www/htdocs/pub/bootstrap/bootstrap.sh'
+
+    1. keep this created 'bootstrap.sh' script as an original copy.
+    2. Copy the 'bootstrap.sh' to the channel name to be bootstrapped to, EXAMPLE:
+      # cp /srv/www/htdocs/pub/bootstrap/bootstrap.sh /srv/www/htdocs/pub/bootstrap/dev-sles12-sp3-pool-x86_64-bootstrap.sh
+    3. Edit the newly copied script to set ACTIVATION_KEYS value to match corresponding key/channel:
+      ACTIVATION_KEYS=1-dev-sles12-sp3-pool-x86_64
+2. Cleanup the client/s
+  b. On SUMA Server - WebUI
+    1. Systems => Find the Traditional client and open their link, Select "Delete System" and confirm with "Delete Profile"
+      a. For multiple clients add them all to the SSM, on the Overview TAB => Misc => Select "'Delete' systems from SUSE Manager" and confirm with "Confirm Deletion"
+
+  c. On Traditional Client/s - CLI
+    1. Uninstall all Traditional Zypper/Spacewalk Components
+      A. # zypper rm zypp-plugin-spacewalk spacewalk-backend-libs spacewalk-client-tools rhnlib spacewalksd spacewalk-check zypp-plugin-python suseRegisterInfo
+      B. For SLES12+ and RHEL7:
+        # rm /etc/machine-id
+        # systemd-machine-id-setup
+        # rhn-profile-sync
+         For SLES11 and RHEL5/RHEL6:
+        # rm /var/lib/dbus/machine-id
+        # dbus-uuidgen --ensure
+        # rhn-profile-sync
+      C. Remove the following files if they exist-
+        # rm /etc/sysconfig/rhn/systemid
+        # rm /etc/zypp/credentials.d/NCCcredentials
+        # rm /etc/zypp/credentials.d/SCCcredentials
+        # rm /etc/sysconfig/rhn/osad-auth.conf
+3. Bootstrap the Traditional Client/s - CLI
+  a. Get and run the bootstrap script
+    # wget http://<SUMA_FQDN>/pub/bootstrap/dev-sles12-sp3-pool-x86_64-bootstrap.sh | /bin/bash
+      Or, if the script is not executable
+    # chmod +x dev-sles12-sp3-pool-x86_64-bootstrap.sh
+    # ./dev-sles12-sp3-pool-x86_64-bootstrap.sh
+  NOTE- If you don't have 'auto accept' set in the SaltMaster's .conf file you'll need to manually accept it in the SUMA WebUI => Salt Menu
+  b. Verify that salt-minion is Installed, Enabled, and running
+    # systemctl status salt-minion
+  c. Refresh and view channels
+    # zypper ref -s
+    # zypper lr
+
+
+For New Clients you can skip the script method:
+This also works for Traditional but is a little more problematic I have found
+On SUMA-Server - CLI
+# mgr-create-bootstrap-repo 
+1. SLE-11-SP4-x86_64
+2. SLE-12-SP3-x86_64
+Enter a number 
+On New Client - CLI
+zypper ar http://SUMA_FQDN/pub/repositories/sle/12/3/bootstrap bootstraprepo
+zypper in -f salt-minion
+vi /etc/salt/grains
+susemanager:
+ activation_key: 1-dev-sles12-sp3-pool-x86_64
+vi /etc/salt/minion
+  Change-
+master: salt
+  To
+master: <SUMA_FQDN>
+systemctl start salt-minion.service
+systemctl enable salt-minion.service
+  NOTE- If you don't have 'auto accept' set in the SaltMaster's .conf file you'll need to manually accept it in the SUMA WebUI => Salt Menu
+
