@@ -297,6 +297,19 @@ function change_log
 		printf "\n\tThe $PROGNAME was not found in your PATH [~/*] => It is recommended to have the sym-link to $PROGNAME in [~/bin/]\n"
 	fi
 }
+#
+function clean_all
+{
+	if [[ -f $MYCREDFIL ]]; then
+                source $MYCREDFIL
+	fi
+	spacewalk-remove-channel -a "dev*" --unsubscribe
+	spacewalk-remove-channel -a "test*" --unsubscribe
+	spacewalk-remove-channel -a "prod*" --unsubscribe
+	spacecmd activationkey_delete 1-*
+	rm ~/.mgr-sync
+	rm ~/bin/.creds.sh
+}
 #####################################################################
 #####	Disclaimer Statement
 #####################################################################
@@ -496,6 +509,11 @@ case "$1" in
 #
 "-c")
   change_log
+  exit $?
+  ;;
+#
+"-x")
+  clean_all
   exit $?
   ;;
 #
@@ -843,6 +861,12 @@ exit $?
 #         22 January 2018-				#
 #         Added Description link to github and moved	#
 #         former to Requirements.			#
+#         Added a [-x] option to remove all cloned 	#
+#         channels, activation keys, and all creds to 	#
+#         start all over from scratch.			#
+#         Still having issue with [-b] not populating	#
+#         the "Patches" ... Very odd that it used to...	#
+#         It poulates dev only after running the [-d]	#
 #                                                       #
 #########################################################
 # END OF CHANGELOG
