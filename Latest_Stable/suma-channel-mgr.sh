@@ -8,8 +8,8 @@
 #####   Setting Script Variables
 #####################################################################
 #
-	SCRIPT_RELEASE="5.0.2-01"
-	SCRIPT_RELEASE_DATE="22 January 2018"
+	SCRIPT_RELEASE="5.0.2-02"
+	SCRIPT_RELEASE_DATE="11 Febuary 2018"
 	PROGNAME=$(basename $0)
 	REPOPATH=~/suma-channel-mgr_5
 	LTSTSTAB=$REPOPATH/Latest_Stable
@@ -139,7 +139,7 @@ function chk_sutils
 		fi
 	fi
 	if [[ ! -f ~/.mgr-sync ]]; then
-		printf "\n\t$(tput setaf 3)Enter the SUSE Manager Admin credentials when prompted...$(tput sgr0)\n"
+		printf "\n\t$(tput setaf 3)Enter the SUSE Manager Admin User credentials when prompted...$(tput sgr0)\n"
 		mgr-sync -s refresh
 	fi
 	if [[ -f $MYCREDFIL ]]; then
@@ -167,7 +167,7 @@ function chk_sutils
 #####   Setting Options Usage Help Output
 #####################################################################
 #
-	USAGE=`clear`"\n $MAGENTA $PROGNAME Rev $SCRIPT_RELEASE Released $SCRIPT_RELEASE_DATE $RESET\n$YELLOW Usage$RESET\n\t$YELLOW This process requires 1 (one) parameter -- [b|d|p|h|g|r|c]\n\tInitially, these MUST be run in the following order-$RESET\n\t$LTCYN $PROGNAME -b\n\t $PROGNAME -d\n\t $PROGNAME -p$RESET\n$YELLOW Options\n  [-b]\tBase-Pool$RESET\t$LTCYN Clones the SUSE base pool trees to 'dev' channels$RESET\n$YELLOW  [-d]\tpromote-Dev$RESET\t$LTCYN Promotes the 'dev' channel to the 'test' channel$RESET\n$YELLOW  [-p]\tProduction\t$LTCYN Promotes 'test' to 'Prod'$RESET\n$YELLOW  [-h]\tHelp$RESET\t\t$LTCYN Prints this list and exits$RESET\n$YELLOW  [-g]\tGPL$RESET\t\t$LTCYN Prints the GPL info and exits [and 'disclaimer']$RESET\n$YELLOW  [-r]\tRelease$RESET\t\t$LTCYN Prints the Current Release Version and exits$RESET\n$YELLOW  [-c]\tCHANGE$RESET\t\t$LTCYN Prints the last 30 lines of the Change-Log and exits$RESET\n$YELLOW \n Decription$RESET\n\t$LTBLU  This LifeCycleManagement process requires the SUMA Admin account username\n\tand password to be issued, for security and portability purposes this\n\trequires a local credentials file [Default = ~/bin/.creds.sh], this file is \n\t'sourced' for the user/pass required VARIABLES-\n\tThe 'spacecmd' call also requires it's own credentials file in ~/.mgr-sync-\n\t  There is also a package dependancy 'spacewalk-utils' to be installed from\n\tyour SUSE Manager Server repositories.$RESET \n"
+	USAGE=`clear`"\n $MAGENTA $PROGNAME Rev $SCRIPT_RELEASE Released $SCRIPT_RELEASE_DATE $RESET\n$YELLOW Usage$RESET\n\t$YELLOW This process requires 1 (one) parameter -- [b|d|p|h|g|r|c]\n\tInitially, these MUST be run in the following order-$RESET\n\t$LTCYN $PROGNAME -b\n\t $PROGNAME -d\n\t $PROGNAME -p$RESET\n$YELLOW Options\n  [-b]\tBase-Pool$RESET\t$LTCYN Clones the SUSE base pool trees to 'dev' channels$RESET\n$YELLOW  [-d]\tpromote-Dev$RESET\t$LTCYN Promotes the 'dev' channel to the 'test' channel$RESET\n$YELLOW  [-p]\tProduction\t$LTCYN Promotes 'test' to 'Prod'$RESET\n$YELLOW  [-h]\tHelp$RESET\t\t$LTCYN Prints this list and exits$RESET\n$YELLOW  [-g]\tGPL$RESET\t\t$LTCYN Prints the GPL info and exits [and 'disclaimer']$RESET\n$YELLOW  [-r]\tRelease$RESET\t\t$LTCYN Prints the Current Release Version and exits$RESET\n$YELLOW  [-c]\tCHANGE$RESET\t\t$LTCYN Prints the last 30 lines of the Change-Log and exits$RESET\n$YELLOW  [-x]\tCLEAN$RESET\t\t$LTCYN Removes ALL clones, keys, bootstraps, and creds files and exits\n\t\t\t To be used to start from scratch$RESET\n$YELLOW Decription$RESET\n\t$LTBLU Please see-$RESET\n$LTCYN  https://github.com/SeaPhor/suma-channel-mgr_5/blob/master/README.md$RESET\n$YELLOW Requirements$RESET\n\t$LTBLU This LifeCycleManagement process requires the SUMA Admin account username\n\tand password to be issued, for security and portability purposes this\n\trequires a local credentials file [Default = ~/bin/.creds.sh], this file is \n\t'sourced' for the user/pass required VARIABLES-\n\tThe 'spacecmd' call also requires it's own credentials file in ~/.mgr-sync-\n\t  There is also a package dependancy 'spacewalk-utils' to be installed from\n\tyour SUSE Manager Server repositories.$RESET \n"
 #
 #####################################################################
 ###	Begin logging
@@ -214,7 +214,7 @@ else
 	mgr-sync refresh 2>&1 >> $EMAILMSGZ
 fi
 for i in `cat $MY_CHILDLIST`; do
-#for i in `cat $MY_BASELIST`; do ###Leaving here in case further issues arise
+#for i in `cat $MY_BASELIST`; do ###Leaving here in case further issues arise xxyyzz
 	/usr/bin/python -u /usr/bin/spacewalk-repo-sync --channel $i --type yum --non-interactive
 done
 for i in `cat $MY_BASELIST`; do
@@ -238,6 +238,7 @@ for i in `cat $MY_BASELIST`; do
 		spacewalk-manage-channel-lifecycle -C -c $i --promote -u $MY_ADMIN -p $MY_CREDS 2>&1 >> $EMAILMSGZ
 	fi
 done
+printf "\n\t `date` \n" >> $EMAILMSGZ
 }
 #
 function promote_dev
@@ -295,6 +296,27 @@ function change_log
 		cat $CPPATH | tail -n 30
 	else
 		printf "\n\tThe $PROGNAME was not found in your PATH [~/*] => It is recommended to have the sym-link to $PROGNAME in [~/bin/]\n"
+	fi
+}
+#
+function clean_all
+{
+	printf "\n$LTRED $BOLD !!!! WARNING !!!! \n This will remove ALL cloned channels!\n This will remove ALL activation keys!\n This will remove ALL bootstrap scripts!\n This will remove ALL generated credentials files!\n\t Do you really want to do this?\n [y|N]\n $RESET"
+	read CLEANALL
+	if [[ $CLEANALL == "y" ]]; then
+		if [[ -f $MYCREDFIL ]]; then
+        	        source $MYCREDFIL
+		fi
+		spacewalk-remove-channel -a "dev*" --unsubscribe
+		spacewalk-remove-channel -a "test*" --unsubscribe
+		spacewalk-remove-channel -a "prod*" --unsubscribe
+		spacecmd activationkey_delete 1-*
+		rm /srv/www/htdocs/pub/bootstrap/*-bootstrap.sh
+		rm ~/.mgr-sync
+		rm ~/bin/.creds.sh
+	else
+		printf "\n $LTCYN Action canceled by user... Exiting $RESET \n"
+		exit $?
 	fi
 }
 #####################################################################
@@ -476,6 +498,9 @@ case "$1" in
   chk_sutils
   no_opts
   susetrees_clone 2>&1 >> $EMAILMSGZ
+#  if ! $INITRUN; then
+#    susetrees_clone 2>&1 >> $EMAILMSGZ
+#  fi
   ;;
 #
 "-h")
@@ -496,6 +521,11 @@ case "$1" in
 #
 "-c")
   change_log
+  exit $?
+  ;;
+#
+"-x")
+  clean_all
   exit $?
   ;;
 #
@@ -839,6 +869,30 @@ exit $?
 #         Fully tested, and with the major changes to	#
 #         generation methods I must rev to next major	#
 #         revision- 5.0.2-01 is Latest_Stable		#
+##      Promoted script to release 5.0.2-02		#
+#         22 January 2018-				#
+#         Added Description link to github and moved	#
+#         former to Requirements.			#
+#         Added a [-x] option to remove all cloned 	#
+#         channels, activation keys, and all creds to 	#
+#         start all over from scratch.			#
+#         Still having issue with [-b] not populating	#
+#         the "Patches" ... Very odd that it used to...	#
+#         It populates dev only after running the [-d]	#
+#         -OK, discovered that starting from scratch 	#
+#         does populate the patches, the next run does 	#
+#         not, but running same again does- weird...	#
+#         - - adding 2nd run to temp resolve this...	#
+#         Added a new file to the repo to track details	#
+#         of Bugs- ~/Tools/Bugs.txt- Added confirmation	#
+#         to the [-x] option before wiping all- I may 	#
+#         change that to each individual in future	#
+#         -I am considering that this 'Bug' is a SUSE 	#
+#	  Manager or a spacewalk-manage-channel-	#
+#	  lifecycle issue and NOT my script or code 	#
+#	  within it- I may submit a bugzilla to SUSE 	#
+#	  for this.					#
+#         Promoting 5.0.2-02 to Latest			#
 #                                                       #
 #########################################################
 # END OF CHANGELOG

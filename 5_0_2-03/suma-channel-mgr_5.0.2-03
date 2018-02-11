@@ -8,7 +8,7 @@
 #####   Setting Script Variables
 #####################################################################
 #
-	SCRIPT_RELEASE="5.0.2-02"
+	SCRIPT_RELEASE="5.0.2-03"
 	SCRIPT_RELEASE_DATE="11 Febuary 2018"
 	PROGNAME=$(basename $0)
 	REPOPATH=~/suma-channel-mgr_5
@@ -893,6 +893,8 @@ exit $?
 #	  within it- I may submit a bugzilla to SUSE 	#
 #	  for this.					#
 #         Promoting 5.0.2-02 to Latest			#
+##      Promoted script to release 5.0.2-03		#
+#         11 Febuary 2018-				#
 #                                                       #
 #########################################################
 # END OF CHANGELOG

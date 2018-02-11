@@ -1,0 +1,37 @@
+#################################################################	
+Sun Feb 11 08:03:56 CST 2018
+#################################################################	
+
+	[Patches not populating]
+Upon initial run [-b] the 'Patches' [errata] does get populated
+Running the next time [-b] the 'Patches' [errata] is empty
+Running [-d] Does populate the 'Patches' [errata] in the 'dev' channels- but NOT the 'test'
+
+I did a [watch --interval 2 --differences "spacecmd softwarechannel_listerrata"] while tailing the log file and see the following as they disappear from the watch command-
+INFO: Clearing all errata from dev-sles12-sp3-updates-x86_64
+INFO: Clearing all packages from dev-sles12-sp3-updates-x86_64
+INFO: Merging packages from sles12-sp3-updates-x86_64 into dev-sles12-sp3-updates-x86_64
+INFO: Added 1408 packages
+INFO: Merging errata into dev-sles12-sp3-updates-x86_64
+INFO: Added 307 errata
+
+but, those 307 errata were NOT added???
+
+I went back to the latest 4x seriies revisions and it exists there as well, so its not related to the code changes in 5x.
+
+STR =>
+  Scenario A-
+  1. Clean All [-x]
+  2. Run [-b] Initial run and input credentials
+    Status - Patches/errata Populated
+  3. Run [-b] again at a later time
+    Status - Patches/errata NOT Populated
+  4. Run [-b] again 
+    Status - Patches/errata Populated, but then is removed at some point before the end of the script run...
+  5. Run [-b] again at a later time
+    Status - Patches/errata Populates, but then is removed at some point before the end of the script run...
+
+WEIRD!!! Now- after about 10 - 15 minutes, doung NOTHING but running the "watch..." command and reviewing the logs,,, The Patches/errata suddenly just 'show up'... I didn't do ANYTHING ????I will do ONE more time (ok, maybe two) just to VERIFY...
+
+I did twice more- run [-b] and do NOTHING else- errata disappeared [As expected], did NOT re-appear [IS expected], script ends without error- still NO errata, about 6 minutes later 'Magically' appears...
+I am considering that this 'Bug' is a SUSE Manager or a spacewalk-manage-channel-lifecycle issue and NOT my script or code within it- I may submit a bugzilla to SUSE for this.
