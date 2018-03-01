@@ -29,11 +29,11 @@
 	EMAILMSGZ=/tmp/tmp.sumatmp
 	echo "Running $PROGNAME $1 Initial Process for $RDATE $2" > $EMAILMSGZ
 ###	Cleanup logs
-	if [[ "`find /root/reposync.log -size +1M`" != "" ]]; then
-		mv $SYNCLOG /root/reposync_$LDATE-log.log
+	if [[ "`find ~/reposync.log -size +1M`" != "" ]]; then
+		mv $SYNCLOG ~/reposync_$LDATE-log.log
 		touch $SYNCLOG
 	fi
-	find /root/reposync_*-log.log -mtime +90 -exec rm {} \; 2>/dev/null
+	find ~/reposync_*-log.log -mtime +90 -exec rm {} \; 2>/dev/null
 #
 #####################################################################
 #####                   GNU/GPL Info                                
@@ -895,6 +895,9 @@ exit $?
 #         Promoting 5.0.2-02 to Latest			#
 ##      Promoted script to release 5.0.2-03		#
 #         11 Febuary 2018-				#
+#         01 March 2018- replaced /root	with ~/ in the 	#
+#         logging section for the path			#
+#         DD Month 2018-				#
 #                                                       #
 #########################################################
 # END OF CHANGELOG
