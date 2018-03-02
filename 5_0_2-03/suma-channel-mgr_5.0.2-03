@@ -310,10 +310,15 @@ function clean_all
 		spacewalk-remove-channel -a "dev*" --unsubscribe
 		spacewalk-remove-channel -a "test*" --unsubscribe
 		spacewalk-remove-channel -a "prod*" --unsubscribe
-		spacecmd activationkey_delete 1-*
-		rm /srv/www/htdocs/pub/bootstrap/*-bootstrap.sh
+		spacecmd activationkey_delete 1-dev*
+		spacecmd activationkey_delete 1-test*
+		spacecmd activationkey_delete 1-prod*
+		rm /srv/www/htdocs/pub/bootstrap/dev*-bootstrap.sh
+		rm /srv/www/htdocs/pub/bootstrap/test*-bootstrap.sh
+		rm /srv/www/htdocs/pub/bootstrap/prod*-bootstrap.sh
 		rm ~/.mgr-sync
 		rm ~/bin/.creds.sh
+		exit $?
 	else
 		printf "\n $LTCYN Action canceled by user... Exiting $RESET \n"
 		exit $?
