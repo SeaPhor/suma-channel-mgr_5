@@ -9,7 +9,7 @@
 #####################################################################
 #
 	SCRIPT_RELEASE="5.0.2-03"
-	SCRIPT_RELEASE_DATE="28 April 2018"
+	SCRIPT_RELEASE_DATE="11 Febuary 2018"
 	PROGNAME=$(basename $0)
 	REPOPATH=~/suma-channel-mgr_5
 	LTSTSTAB=$REPOPATH/Latest_Stable
