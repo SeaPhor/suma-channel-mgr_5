@@ -1,4 +1,6 @@
-# suma3
+# suma5
+
+In 2017 I was asked to give a presentation and speech at SUSECon-2017 based on the process and execution for automating Patch LifeCycle Management through this scripted portable, scaleable, and automate-able set of commands and API calls on SUSE-Manager. I was not able to attend due to an employer conflict, but, it was an honor just to be asked.
 
 Lifecycle-Management
 - According to "SUSE Manager Best Practices" and "Advanced Patch Lifecycle Management with SUSE Manager" [By Jeff Price, SUSE] ... "SUSE provided channels should NEVER be assigned to managed systems. One reason is that you do not have control over when the content is updated and made available." [Chapter 5-1 of the Administration guide for SUSE Manager and is also in the 2 titles mentioned above.]
