@@ -45,7 +45,8 @@ printf "\n$(tput setaf 14)
 ####c4#############################################################################
 ###                                                                             ###
 ##                      GNU/GPL Info                                             ##
-##              channellock-promote.sh ver-4.1                                   ##
+##        channellock-promote.sh ver-1.1 - Alpha/Beta begun 15 March 2015	 ##
+##        channellock-promote.sh ver-4.1 - Production release 11 December 2015	 ##
 ##      Forked to suma-channel-mgr.sh ver-5.0 on 19 December 2017                ##
 ##      Released under GPL v2.0, See www.gnu.org for full license info           ##
 ##      Copyright (C) 2015  Shawn Miller                                         ##
@@ -902,6 +903,8 @@ exit $?
 #         11 Febuary 2018-				#
 #         01 March 2018- replaced /root	with ~/ in the 	#
 #         logging section for the path			#
+#         27 May 2018- Added Alpha/Beta/Prod dates	#
+#         to the GPL 					#
 #         DD Month 2018-				#
 #                                                       #
 #########################################################
