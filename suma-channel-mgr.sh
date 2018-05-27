@@ -8,8 +8,8 @@
 #####   Setting Script Variables
 #####################################################################
 #
-	SCRIPT_RELEASE="5.0.2-03"
-	SCRIPT_RELEASE_DATE="28 April 2018"
+	SCRIPT_RELEASE="5.0.2-04"
+	SCRIPT_RELEASE_DATE="27 May 2018"
 	PROGNAME=$(basename $0)
 	REPOPATH=~/suma-channel-mgr_5
 	LTSTSTAB=$REPOPATH/Latest_Stable
@@ -195,6 +195,14 @@ spacecmd -u $MY_ADMIN -p $MY_CREDS softwarechannel_listbasechannels | grep -v ^s
 #####################################################################
 if [[ ! -d /srv/www/htdocs/pub/repositories ]]; then
 	for b in `mgr-create-bootstrap-repo --list | awk '{print $2}'`; do mgr-create-bootstrap-repo --create=$b ; done
+else
+	for m in `mgr-create-bootstrap-repo --list | awk '{print $2}' | grep -i ^s | awk -F- '{print $2"/"$3}' | sed -e 's/[A-Z]//g'`
+	do if [[ ! -d /srv/www/htdocs/pub/repositories/$m ]]; then
+		for b in `mgr-create-bootstrap-repo --list | awk '{print $2}'`
+		do mgr-create-bootstrap-repo --create=$b 
+		done
+	   fi
+	done
 fi
 
 }
@@ -284,7 +292,7 @@ for i in `cat $MY_BASELIST`; do
 		cat $TMPLATFIL | sed -e s/slartybartfast/$NEWNAME/g > $TMPLATDIR/$NEWNAME-bootstrap.sh
 		chmod +x $TMPLATDIR/$NEWNAME-bootstrap.sh
 	else
-        	spacewalk-manage-channel-lifecycle -C -c $t --promote -u $MY_ADMIN -p $MY_CREDS 2>&1 >> $EMAILMSGZ
+        	spacewalk-manage-channel-lifecycle -C -c test-$i --promote -u $MY_ADMIN -p $MY_CREDS 2>&1 >> $EMAILMSGZ
 	fi
 done
 }
@@ -903,9 +911,17 @@ exit $?
 #         11 Febuary 2018-				#
 #         01 March 2018- replaced /root	with ~/ in the 	#
 #         logging section for the path			#
+#         27 May 2018- 					#
 #         27 May 2018- Added Alpha/Beta/Prod dates	#
 #         to the GPL 					#
-#         DD Month 2018-				#
+#         27 May 2018-					#
+#         Added logic to check for new bootstrap	#
+#         Repos and create if missing- needs testing	#
+#         Also- Found NEW error in the promote test to	#
+#         prod- mistyped variable????			#
+##      Promoted script to release 5.0.2-04		#
+#         27 May 2018-					#
+#         27 May 2018-					#
 #                                                       #
 #########################################################
 # END OF CHANGELOG
