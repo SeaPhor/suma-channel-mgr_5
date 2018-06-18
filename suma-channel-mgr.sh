@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 #
 #####################################################################
 #####	Full changelog and revision history at bottom of script
