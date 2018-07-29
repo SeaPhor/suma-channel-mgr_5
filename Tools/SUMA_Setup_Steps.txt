@@ -33,7 +33,7 @@ Initial System Configuration
 - - Run ntpdate -u <ntp-server-fqdn>
 
 Inital SUSE Manager Setup
-- Run yast2-susemanager-setup
+- Run yast2 susemanager_setup
 - - For SCC Credentials section use the ID & Password from https://scc.suse.com/subscriptions => Organization => Organizational Credentials
 
 Initial SUSE Manager Configuration
