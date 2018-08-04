@@ -8,8 +8,8 @@
 #####   Setting Script Variables
 #####################################################################
 #
-	SCRIPT_RELEASE="5.0.2-04"
-	SCRIPT_RELEASE_DATE="27 May 2018"
+	SCRIPT_RELEASE="5.0.2-05"
+	SCRIPT_RELEASE_DATE="04 Aug 2018"
 	PROGNAME=$(basename $0)
 	REPOPATH=~/suma-channel-mgr_5
 	LTSTSTAB=$REPOPATH/Latest_Stable
@@ -29,7 +29,7 @@
 	EMAILMSGZ=/tmp/tmp.sumatmp
 	echo "Running $PROGNAME $1 Initial Process for $RDATE $2" > $EMAILMSGZ
 ###	Cleanup logs
-	if [[ "`find ~/reposync.log -size +1M`" != "" ]]; then
+	if [[ "`find ~/reposync.log -size +1M` 2>/dev/null" != "" ]]; then
 		mv $SYNCLOG ~/reposync_$LDATE-log.log
 		touch $SYNCLOG
 	fi
@@ -39,9 +39,8 @@
 #####                   GNU/GPL Info                                
 #####################################################################
 #
-function gpl_info
-{
-printf "\n$(tput setaf 14)
+gpl_info () {
+printf "\n${LTCYN}
 ####c4#############################################################################
 ###                                                                             ###
 ##                      GNU/GPL Info                                             ##
@@ -65,7 +64,7 @@ printf "\n$(tput setaf 14)
 ##    See this complete License at:                                              ##
 ##    https://github.com/SeaPhor/suma-channel-mgr_5/blob/master/LICENSE          ##
 ###                                                                             ###
-####w#################################b######################################c#####$(tput sgr0)\n"
+####w#################################b######################################c#####${RESET}\n"
 }
 #
 #####################################################################
@@ -96,25 +95,17 @@ RESET=`tput sgr0`
 #####	Checking for root, setting error exit
 #####################################################################
 #
-function error_exit
-{
-	printf "$(tput setaf 9) ${PROGNAME}: ${1:-"you are not root, please run as root"}$(tput sgr0)" >&2
-    echo ""
-	exit 1
-}
-###
-[[ "$UID" == "0" ]] && : || error_exit
+[[ $UID == 0 ]] && : || { echo -e "${BOLD}${RED}You MUST run this as root, exiting...$RESET"; exit 1; }
 #
 if [[ ! -L $PROGPATH/$PROGNAME ]]; then
 	BADPATH=true
 	printf "$(tput setaf 3)Script PATH Not Recommended$(tput sgr0)" >> $EMAILMSGZ
 fi
-function chk_path
-{
+chk_path () {
 	if [[ ! -L $PROGPATH/$PROGNAME ]]; then
 		BADPATH=true
-    SCRPTNAME='suma-channel-mgr.sh'
-    VERNAME='suma-channel-mgr'
+    		SCRPTNAME='suma-channel-mgr.sh'
+    		VERNAME='suma-channel-mgr'
 		printf "$(tput setaf 4)\n\n\t#################################################################\n\t  This process is designed to always have the latest release\n\t  It is best that your cloned repo be at ~/suma-channel-mgr_5\n\t  And that you create a sym-link to the Latest, as in so:\n\t  'cd ~/bin' and create a sym-link to:\n\t  ~/suma-channel-mgr_5/Latest_Stable/suma-channel-mgr.sh\n\t#################################################################\n\tAdd [ignore] to the end of your command to not see this notice\n\n$(tput sgr0)"
 		sleep 15
 		echo ""
@@ -125,14 +116,13 @@ function chk_path
 #####   Adjusted for portability, check for required spacewalk-utils
 #####################################################################
 #
-function chk_sutils
-{
+chk_sutils () {
 #
 	if [[ "`rpm -qa | grep spacewalk-utils`" == "" ]]; then
 		printf "\n\t$(tput setaf 3)This seems to be the first time executing $PROGNAME,\n\tDependancies = >\n\t\t1- Installation of spacewalk-utils\n\t\t2- Creation of a sourced local credentials file to pass to commands- ~/bin/.creds.sh\n\t\t3- Creation of local .mgr-sync file to pass to commands- ~/.mgr-sync\n\tIf you choose to continue you will be required to input that\n\tinformation when prompted to do so but ONLY on the first run, it can be\n\tcompletely automated after that.\n\n\tDo you agree with this installation and credental files generation and wish to continue?$(tput sgr0) \n[Y|n]\n"
 		read SUMADOIT
 		if [[ "`echo $SUMADOIT`" == "n" ]]; then
-			printf $USAGE
+			usage
 			exit $?
 		else
 			zypper in -y spacewalk-utils
@@ -168,7 +158,39 @@ function chk_sutils
 #####   Setting Options Usage Help Output
 #####################################################################
 #
-	USAGE=`clear`"\n $MAGENTA $PROGNAME Rev $SCRIPT_RELEASE Released $SCRIPT_RELEASE_DATE $RESET\n$YELLOW Usage$RESET\n\t$YELLOW This process requires 1 (one) parameter -- [b|d|p|h|g|r|c]\n\tInitially, these MUST be run in the following order-$RESET\n\t$LTCYN $PROGNAME -b\n\t $PROGNAME -d\n\t $PROGNAME -p$RESET\n$YELLOW Options\n  [-b]\tBase-Pool$RESET\t$LTCYN Clones the SUSE base pool trees to 'dev' channels$RESET\n$YELLOW  [-d]\tpromote-Dev$RESET\t$LTCYN Promotes the 'dev' channel to the 'test' channel$RESET\n$YELLOW  [-p]\tProduction\t$LTCYN Promotes 'test' to 'Prod'$RESET\n$YELLOW  [-h]\tHelp$RESET\t\t$LTCYN Prints this list and exits$RESET\n$YELLOW  [-g]\tGPL$RESET\t\t$LTCYN Prints the GPL info and exits [and 'disclaimer']$RESET\n$YELLOW  [-r]\tRelease$RESET\t\t$LTCYN Prints the Current Release Version and exits$RESET\n$YELLOW  [-c]\tCHANGE$RESET\t\t$LTCYN Prints the last 30 lines of the Change-Log and exits$RESET\n$YELLOW  [-x]\tCLEAN$RESET\t\t$LTCYN Removes ALL clones, keys, bootstraps, and creds files and exits\n\t\t\t To be used to start from scratch$RESET\n$YELLOW Decription$RESET\n\t$LTBLU Please see-$RESET\n$LTCYN  https://github.com/SeaPhor/suma-channel-mgr_5/blob/master/README.md$RESET\n$YELLOW Requirements$RESET\n\t$LTBLU This LifeCycleManagement process requires the SUMA Admin account username\n\tand password to be issued, for security and portability purposes this\n\trequires a local credentials file [Default = ~/bin/.creds.sh], this file is \n\t'sourced' for the user/pass required VARIABLES-\n\tThe 'spacecmd' call also requires it's own credentials file in ~/.mgr-sync-\n\t  There is also a package dependancy 'spacewalk-utils' to be installed from\n\tyour SUSE Manager Server repositories.$RESET \n"
+usage () {
+	clear
+	cat <<EOT
+ $MAGENTA $PROGNAME Rev $SCRIPT_RELEASE Released $SCRIPT_RELEASE_DATE
+$BOLD$YELLOW Usage$RESET
+    ${YELLOW}This process requires 1 (one) parameter -- [b|d|p|h|g|r|c]
+    Initially, these MUST be run in the following order-
+     ${LTCYN}${PROGNAME} -b
+     $PROGNAME -d
+     $PROGNAME -p$BOLD$YELLOW
+ Options$RESET$YELLOW
+  [-b]    Base-Pool      $LTCYN Clones the SUSE base pool trees to 'dev' channels$YELLOW
+  [-d]    promote-Dev    $LTCYN Promotes the 'dev' channel to the 'test' channel$YELLOW
+  [-p]    Production     $LTCYN Promotes 'test' to 'Prod'$YELLOW
+  [-h]    Help           $LTCYN Prints this list and exits$YELLOW
+  [-g]    GPLt$LTCYN            Prints the GPL info and exits [and 'disclaimer']$YELLOW
+  [-r]    Release$LTCYN         Prints the Current Release Version and exits$YELLOW
+  [-c]    CHANGE$LTCYN          Prints the last 30 lines of the Change-Log and exits$YELLOW
+  [-x]    CLEAN$LTCYN           Removes ALL clones, keys, bootstraps, and creds files and exits
+                                 To be used to start from scratch$BOLD$YELLOW
+ Decription$RESET$LTBLU
+ Please see-$LTCYN
+  https://github.com/SeaPhor/suma-channel-mgr_5/blob/master/README.md$BOLD$YELLOW
+ Requirements$RESET$LTBLU
+    This LifeCycleManagement process requires the SUMA Admin account username
+    and password to be issued, for security and portability purposes this
+    requires a local credentials file [Default = ~/bin/.creds.sh], this file is 
+    'sourced' for the user/pass required VARIABLES-
+    The 'spacecmd' call also requires it's own credentials file in ~/.mgr-sync-
+    There is also a package dependancy 'spacewalk-utils' to be installed from
+    your SUSE Manager Server repositories.$RESET
+EOT
+}
 #
 #####################################################################
 ###	Begin logging
@@ -180,8 +202,7 @@ printf "\n#########################################################\n#\n# $LDATE
 #####   Setting Functions
 #####################################################################
 #
-function no_opts
-{
+no_opts () {
 spacecmd -u $MY_ADMIN -p $MY_CREDS softwarechannel_listbasechannels | grep ^sle > /tmp/mybaselist.sumatmp
 #	Optional- Comment/Un-Comment to disable/enable RHEL
 #spacecmd -u $MY_ADMIN -p $MY_CREDS softwarechannel_listbasechannels | grep ^rhe >> /tmp/mybaselist.sumatmp
@@ -206,15 +227,13 @@ else
 fi
 
 }
-function snd_mail
-{
+snd_mail () {
         SUBJECT="$HOSTA -- $PROGNAME script $RDATE"
         FROMA=$MY_ADMIN@$HOST
         /usr/bin/mailx -s "$SUBJECT" "$EMAILG" -f $FROMA < $EMAILMSGZ
 }
 #
-function susetrees_clone
-{
+susetrees_clone () {
 spacecmd -u $MY_ADMIN -p $MY_CREDS softwarechannel_listchildchannels | grep ^sle > /tmp/mychildlist.sumatmp
 MY_CHILDLIST=/tmp/mychildlist.sumatmp
 if [[ ! -f ~/.mgr-sync ]]; then
@@ -250,10 +269,10 @@ done
 printf "\n\t `date` \n" >> $EMAILMSGZ
 }
 #
-function promote_dev
-{
+promote_dev () {
 if [[ "`grep 'dev' $MY_CHANLIST`" == "" ]]; then
-	printf "$USAGE\n\n\t$(tput setaf 9)The '-b' Option MUST be run before any other\n\tthen the '-d'\n\tand then the -p$(tput sgr0)\n"
+	usage
+	printf "\n\n\t$(tput setaf 9)The '-b' Option MUST be run before any other\n\tthen the '-d'\n\tand then the -p$(tput sgr0)\n"
 	exit $?
 fi
 for i in `cat $MY_BASELIST`; do
@@ -271,14 +290,15 @@ for i in `cat $MY_BASELIST`; do
 done
 }
 #
-function promote_test
-{
+promote_test () {
 if [[ "`grep 'dev' $MY_CHANLIST`" == "" ]]; then
-	printf "$USAGE\n\n\t$(tput setaf 9)The '-b' Option MUST be run before any other\n\tthen the '-d'\n\tand then the -p$(tput sgr0)\n"
+	usage
+	printf "\n\n\t$(tput setaf 9)The '-b' Option MUST be run before any other\n\tthen the '-d'\n\tand then the -p$(tput sgr0)\n"
 	exit $?
 else
 	if [[ "`grep 'test' $MY_CHANLIST`" == "" ]]; then
-        	printf "$USAGE\n\n\t$(tput setaf 9)The '-d' Option MUST be run before using the '-p'$(tput sgr0)"
+		usage
+        	printf "\n\n\t$(tput setaf 9)The '-d' Option MUST be run before using the '-p'$(tput sgr0)"
 	        exit $?
 	fi
 
@@ -297,8 +317,7 @@ for i in `cat $MY_BASELIST`; do
 done
 }
 #
-function change_log
-{
+change_log () {
 	if [[ "`find ~/* -name $PROGNAME`" != "" ]]; then
 		CPPATH="`find ~/* -name $PROGNAME`"
 		clear
@@ -308,8 +327,7 @@ function change_log
 	fi
 }
 #
-function clean_all
-{
+clean_all () {
 	printf "\n$LTRED $BOLD !!!! WARNING !!!! \n This will remove ALL cloned channels!\n This will remove ALL activation keys!\n This will remove ALL bootstrap scripts!\n This will remove ALL generated credentials files!\n\t Do you really want to do this?\n [y|N]\n $RESET"
 	read CLEANALL
 	if [[ $CLEANALL == "y" ]]; then
@@ -337,8 +355,7 @@ function clean_all
 #####	Disclaimer Statement
 #####################################################################
 #
-function dis_claimer
-{
+dis_claimer () {
 clear
 printf "$(tput setaf 9)
 \n\t\t\t\t\t\t\t=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
@@ -518,7 +535,7 @@ case "$1" in
   ;;
 #
 "-h")
-  printf "$USAGE" 
+  usage
   exit $?
   ;;
 #
@@ -544,7 +561,7 @@ case "$1" in
   ;;
 #
 *)
-  printf "$USAGE"
+  usage
   exit $?
   ;;
 esac
@@ -920,8 +937,13 @@ exit $?
 #         Also- Found NEW error in the promote test to	#
 #         prod- mistyped variable????			#
 ##      Promoted script to release 5.0.2-04		#
-#         27 May 2018-					#
-#         27 May 2018-					#
+#         27 May 2018-	Minor adj			#
+##      Promoted script to release 5.0.2-05		#
+#         04 Aug 2018- Beginning full conversion of	#
+#         Variable formats, funtion format, and print	#
+#         of menus, and all output info to the user.	#
+#	  Tested with suma 3.2, works but more to do	#
+#	  - will do all and then promote to 5.0.1-01	#
 #                                                       #
 #########################################################
 # END OF CHANGELOG
