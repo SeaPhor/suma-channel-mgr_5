@@ -943,7 +943,7 @@ exit $?
 #         Variable formats, funtion format, and print	#
 #         of menus, and all output info to the user.	#
 #	  Tested with suma 3.2, works but more to do	#
-#	  - will do all and then promote to 5.0.1-01	#
+#	  - will do all and then promote to 5.0.3-01	#
 #                                                       #
 #########################################################
 # END OF CHANGELOG
