@@ -96,6 +96,44 @@ RESET=`tput sgr0`
 #####	Checking for root, setting error exit
 #####################################################################
 #
+nusage () {
+	cat <<EOT
+${BOLD}${LTMAG}
+  suma-channel-mgr.sh Rev 5.0.2-04 Released 27 May 2018${YELLOW}
+ Usage${RESET}${YELLOW}
+	 This process requires 1 (one) parameter -- [${LTCYN}b|d|p|h|g|r|c${YELLOW}]
+	Initially, these MUST be run in the following order-${LTMAG}
+	 suma-channel-mgr.sh -b
+	 suma-channel-mgr.sh -d
+	 suma-channel-mgr.sh -p${BOLD}${YELLOW}
+ Options${LTCYN}
+  [-b]	Base-Pool	 Clones the SUSE base pool trees to 'dev' channels
+  [-d]	promote-Dev	 Promotes the 'dev' channel to the 'test' channel
+  [-p]	Production	 Promotes 'test' to 'Prod'
+  [-h]	Help		 Prints this list and exits
+  [-g]	GPL		 Prints the GPL info and exits [and 'disclaimer']
+  [-r]	Release		 Prints the Current Release Version and exits
+  [-c]	CHANGE		 Prints the last 30 lines of the Change-Log and exits
+  [-x]	CLEAN		 Removes ALL clones, keys, bootstraps, and creds files and exits
+			 To be used to start from scratch${BOLD}${YELLOW}
+ Decription${RESET}${YELLOW}
+	 Please see-${CYAN}
+  https://github.com/SeaPhor/suma-channel-mgr_5/blob/master/README.md${BOLD}${YELLOW}
+ Requirements${RESET}${YELLOW}
+	  This LifeCycleManagement process requires the SUMA Admin account username
+	and password to be issued, for security and portability purposes this
+	requires a local credentials file [Default =${LTYLLW} ~/bin/.creds.sh${YELLOW}], this file is 
+	'sourced' for the user/pass required VARIABLES-
+	The '${LTMAG}spacecmd${YELLOW}' call also requires it's own credentials file in ~/.mgr-sync-
+	  There is also a package dependancy '${LTMAG}spacewalk-utils${YELLOW}' to be installed from
+	your SUSE Manager Server repositories.${RESET}
+
+EOT
+}
+${clear}
+nusage
+exit 0
+
 function error_exit
 {
 	printf "$(tput setaf 9) ${PROGNAME}: ${1:-"you are not root, please run as root! or do 'sudo !!'"}$(tput sgr0)" >&2
