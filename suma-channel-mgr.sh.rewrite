@@ -133,6 +133,18 @@ EOT
 #####   Adjusted for portability, check for required spacewalk-utils
 #####################################################################
 #
+req_depends () {
+    cat <<EOT
+${BOLD}${YELLOW}    Requirements-${RESET}${LTCYN}
+    This LifeCycleManagement process requires the SUMA Admin account username
+  and password to be issued, for security and portability purposes this
+  requires a local credentials file [Default = ~/bin/.creds.sh], this file is
+  'sourced' for the user/pass required VARIABLES-
+  The 'spacecmd' call also requires it's own credentials file in ~/.mgr-sync-
+    There is also a package dependancy 'spacewalk-utils' to be installed from
+  your SUSE Manager Server repositories.${RESET}
+EOT
+}
 chk_sutils () {
     if [[ "`rpm -qa | grep spacewalk-utils`" == "" ]]; then
         cat <<EOT
@@ -204,20 +216,13 @@ Options-${RESET}${LTCYN}
   [-h]${CYAN}    Help${LTYLLW}           Prints this list and exits${LTCYN}
   [-g]${CYAN}    GPL${LTYLLW}            Prints the GPL info and exits [and 'disclaimer']${LTCYN}
   [-r]${CYAN}    Release${LTYLLW}        Prints the Current Release Version and exits${LTCYN}
+  [-R]${CYAN}    Requirements${LTYLLW}   Prints the Requirements and Dependencies for this process${LTCYN}
   [-c]${CYAN}    Change${LTYLLW}         Prints the last 30 lines of the Change-Log and exits${LTCYN}
   [-x]${CYAN}    Clean${LTYLLW}          Removes ALL clones, keys, bootstraps, and creds files and exits
                          To be used to start from scratch${BOLD}${YELLOW}
 Description-
     ${LTBLU}Please see-${LTCYN}
-https://github.com/SeaPhor/suma-channel-mgr_5/blob/master/README.md${YELLOW}
-Requirements-${LTBLU}
-    This LifeCycleManagement process requires the SUMA Admin account username
-  and password to be issued, for security and portability purposes this
-  requires a local credentials file [Default = ~/bin/.creds.sh], this file is
-  'sourced' for the user/pass required VARIABLES-
-  The 'spacecmd' call also requires it's own credentials file in ~/.mgr-sync-
-    There is also a package dependancy 'spacewalk-utils' to be installed from
-  your SUSE Manager Server repositories.${RESET}
+https://github.com/SeaPhor/suma-channel-mgr_5/blob/master/README.md${RESET}
 EOT
 }
 #
@@ -587,6 +592,11 @@ case "$1" in
 #
 "-r")
   printf "$(tput setaf 3)The $PROGNAME version is $SCRIPT_RELEASE -\n\treleased on $SCRIPT_RELEASE_DATE $(tput sgr0)\n"
+  exit $?
+  ;;
+#
+"-R")
+  req_depends
   exit $?
   ;;
 #
@@ -979,7 +989,11 @@ exit $?
 #         prod- mistyped variable????			#
 ##      Promoted script to release 5.0.2-04		#
 #         27 May 2018-					#
-#         27 May 2018-					#
+##      Promoted script to release 5.1.0-01		#
+#         02 Sep 2018- Begin total re-write		#
+#         Changing format of functions, Variable, etc.	#
+#         Re-Writing for clean script witing and	#
+#         efficiency, Re-Do-ing EVERYTHING.		#
 #                                                       #
 #########################################################
 # END OF CHANGELOG
