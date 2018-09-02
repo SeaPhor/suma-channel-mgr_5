@@ -135,7 +135,7 @@ EOT
 #
 req_depends () {
     cat <<EOT
-${BOLD}${YELLOW}    Requirements-${RESET}${LTCYN}
+${BOLD}${YELLOW}Requirements-${RESET}${LTCYN}
     This LifeCycleManagement process requires the SUMA Admin account username
   and password to be issued, for security and portability purposes this
   requires a local credentials file [Default = ~/bin/.creds.sh], this file is
@@ -150,12 +150,12 @@ chk_sutils () {
         cat <<EOT
 ${LTYLLW}    This seems to be the first time executing ${PROGNAME},
     Dependancies = >
-        1- Installation of spacewalk-utils
-        2- Creation of a sourced local credentials file to pass to commands- ~/bin/.creds.sh
-        3- Creation of local .mgr-sync file to pass to commands- ~/.mgr-sync
+        1-${LTCYN} Installation of spacewalk-utils${LTYLLW}
+        2-${LTCYN} Creation of a sourced local credentials file to pass to commands- ~/bin/.creds.sh${LTYLLW}
+        3-${LTCYN} Creation of local .mgr-sync file to pass to commands- ~/.mgr-sync${LTYLLW}
         If you choose to continue you will be required to input that
-    tinformation when prompted to do so but ONLY on the first run, it can be
-    completely automated after that.
+    information when prompted to do so but ONLY on the first run, it can be
+    completely automated after that.${BOLD}
 
     Do you agree with this installation and credental files generation and wish to continue?${RESET}
 [Y|n]
@@ -204,22 +204,25 @@ usage () {
     cat <<EOT
 ${MAGENTA}${PROGNAME} Rev ${SCRIPT_RELEASE} Released ${SCRIPT_RELEASE_DATE}${BOLD}${YELLOW}
 Usage-${RESET}${LTYLLW}
-    This process requires 1 (one) parameter -- ${LTCYN}[b|d|p|h|g|r|c]${LTYLLW}
+    This process requires 1 (one) parameter -- ${LTCYN}[b|d|p|h|g|r|R|c|x]${LTYLLW}
     Initially, these MUST be run in the following order-${LTCYN}
-    ${PROGNAME} -b
-    ${PROGNAME} -d
-    ${PROGNAME} -p${BOLD}${YELLOW}
+  ${PROGNAME} -b
+  ${PROGNAME} -d
+  ${PROGNAME} -p${BOLD}${YELLOW}
 Options-${RESET}${LTCYN}
-  [-b]${CYAN}    Base-Pool${LTYLLW}      Clones the SUSE base pool trees to 'dev' channels${LTCYN}
-  [-d]${CYAN}    promote-Dev${LTYLLW}    Promotes the 'dev' channel to the 'test' channel${LTCYN}
-  [-p]${CYAN}    Production${LTYLLW}     Promotes 'test' to 'Prod'${LTCYN}
-  [-h]${CYAN}    Help${LTYLLW}           Prints this list and exits${LTCYN}
-  [-g]${CYAN}    GPL${LTYLLW}            Prints the GPL info and exits [and 'disclaimer']${LTCYN}
-  [-r]${CYAN}    Release${LTYLLW}        Prints the Current Release Version and exits${LTCYN}
-  [-R]${CYAN}    Requirements${LTYLLW}   Prints the Requirements and Dependencies for this process${LTCYN}
-  [-c]${CYAN}    Change${LTYLLW}         Prints the last 30 lines of the Change-Log and exits${LTCYN}
-  [-x]${CYAN}    Clean${LTYLLW}          Removes ALL clones, keys, bootstraps, and creds files and exits
+  [-b]${BOLD}${CYAN}    Base-Pool${RESET}${LTYLLW}      Clones the SUSE base pool trees to 'dev' channels${LTCYN}
+  [-d]${BOLD}${CYAN}    promote-Dev${RESET}${LTYLLW}    Promotes the 'dev' channel to the 'test' channel${LTCYN}
+  [-p]${BOLD}${BOLD}${CYAN}    Production${RESET}${LTYLLW}     Promotes 'test' to 'Prod'${LTCYN}
+  [-h]${BOLD}${CYAN}    Help${RESET}${LTYLLW}           Prints this list and exits${LTCYN}
+  [-g]${BOLD}${CYAN}    GPL${RESET}${LTYLLW}            Prints the GPL info and exits [and 'disclaimer']${LTCYN}
+  [-r]${BOLD}${CYAN}    Release${RESET}${LTYLLW}        Prints the Current Release Version and exits${LTCYN}
+  [-R]${BOLD}${CYAN}    Requirements${RESET}${LTYLLW}   Prints the Requirements and Dependencies for this process${LTCYN}
+  [-c]${BOLD}${CYAN}    Change${RESET}${LTYLLW}         Prints the last 30 lines of the Change-Log and exits${LTCYN}
+  [-x]${BOLD}${CYAN}    Clean${RESET}${LTYLLW}          Removes ALL clones, keys, bootstraps, and creds files and exits
                          To be used to start from scratch${BOLD}${YELLOW}
+    If you have never run this script before, and have not 
+    configured your SUMA-Server for its use, please use the initial [${LTCYN}config${YELLOW}] Option=${RESET}${LTCYN}
+  ${PROGNAME} config${BOLD}${YELLOW}
 Description-
     ${LTBLU}Please see-${LTCYN}
 https://github.com/SeaPhor/suma-channel-mgr_5/blob/master/README.md${RESET}
@@ -237,8 +240,7 @@ printf "\n#########################################################\n#\n# ${LDAT
 #####   Setting Functions
 #####################################################################
 #
-function no_opts
-{
+no_opts () {
 spacecmd -u $MY_ADMIN -p $MY_CREDS softwarechannel_listbasechannels | grep ^sle > /tmp/mybaselist.sumatmp
 #	Optional- Comment/Un-Comment to disable/enable RHEL
 #spacecmd -u $MY_ADMIN -p $MY_CREDS softwarechannel_listbasechannels | grep ^rhe >> /tmp/mybaselist.sumatmp
@@ -261,17 +263,14 @@ else
 	   fi
 	done
 fi
-
 }
-function snd_mail
-{
+snd_mail () {
         SUBJECT="$HOSTA -- $PROGNAME script $RDATE"
         FROMA=$MY_ADMIN@$HOST
         /usr/bin/mailx -s "$SUBJECT" "$EMAILG" -f $FROMA < $EMAILMSGZ
 }
 #
-function susetrees_clone
-{
+susetrees_clone () {
 spacecmd -u $MY_ADMIN -p $MY_CREDS softwarechannel_listchildchannels | grep ^sle > /tmp/mychildlist.sumatmp
 MY_CHILDLIST=/tmp/mychildlist.sumatmp
 if [[ ! -f ~/.mgr-sync ]]; then
@@ -298,7 +297,7 @@ for i in `cat $MY_BASELIST`; do
 			cat $TMPLATFIL | sed -e s/slartybartfast/$NEWNAME/g > $TMPLATDIR/$NEWNAME-bootstrap.sh
 			chmod +x $TMPLATDIR/$NEWNAME-bootstrap.sh
 		fi
-		spacecmd -u $MY_ADMIN -p $MY_CREDS activationkey_list 2>&1 >> $EMAILMSGZ 2>&1 >> $EMAILMSGZ
+		spacecmd -u $MY_ADMIN -p $MY_CREDS activationkey_list 2>&1 >> $EMAILMSGZ #2>&1 >> $EMAILMSGZ
 		echo $NEWNAME >> $EMAILMSGZ
 	else
 		spacewalk-manage-channel-lifecycle -C -c $i --promote -u $MY_ADMIN -p $MY_CREDS 2>&1 >> $EMAILMSGZ
@@ -307,8 +306,7 @@ done
 printf "\n\t `date` \n" >> $EMAILMSGZ
 }
 #
-function promote_dev
-{
+promote_dev () {
 if [[ "`grep 'dev' $MY_CHANLIST`" == "" ]]; then
 	clear
 	printf "$USAGE\n\n\t$(tput setaf 9)The '-b' Option MUST be run before any other\n\tthen the '-d'\n\tand then the -p$(tput sgr0)\n"
@@ -329,8 +327,7 @@ for i in `cat $MY_BASELIST`; do
 done
 }
 #
-function promote_test
-{
+promote_test () {
 if [[ "`grep 'dev' $MY_CHANLIST`" == "" ]]; then
 	clear
 	printf "$USAGE\n\n\t$(tput setaf 9)The '-b' Option MUST be run before any other\n\tthen the '-d'\n\tand then the -p$(tput sgr0)\n"
@@ -357,8 +354,7 @@ for i in `cat $MY_BASELIST`; do
 done
 }
 #
-function change_log
-{
+change_log () {
 	if [[ "`find ~/* -name $PROGNAME`" != "" ]]; then
 		CPPATH="`find ~/* -name $PROGNAME`"
 		clear
@@ -368,8 +364,7 @@ function change_log
 	fi
 }
 #
-function clean_all
-{
+clean_all () {
 	printf "\n$LTRED $BOLD !!!! WARNING !!!! \n This will remove ALL cloned channels!\n This will remove ALL activation keys!\n This will remove ALL bootstrap scripts!\n This will remove ALL generated credentials files!\n\t Do you really want to do this?\n [y|N]\n $RESET"
 	read CLEANALL
 	if [[ $CLEANALL == "y" ]]; then
@@ -397,8 +392,7 @@ function clean_all
 #####	Disclaimer Statement
 #####################################################################
 #
-function dis_claimer
-{
+dis_claimer () {
 clear
 printf "$(tput setaf 9)
 \n\t\t\t\t\t\t\t=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
@@ -610,9 +604,15 @@ case "$1" in
   exit $?
   ;;
 #
+"config")
+  chk_sutils
+  usage
+  exit $?
+  ;;
+#
 *)
   clear
-  printf "$USAGE"
+  usage
   exit $?
   ;;
 esac
@@ -994,6 +994,7 @@ exit $?
 #         Changing format of functions, Variable, etc.	#
 #         Re-Writing for clean script witing and	#
 #         efficiency, Re-Do-ing EVERYTHING.		#
+#         Added a 'config' option for initial setup	#
 #                                                       #
 #########################################################
 # END OF CHANGELOG
