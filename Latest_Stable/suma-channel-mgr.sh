@@ -5,43 +5,12 @@
 #####################################################################
 #
 #####################################################################
-#####   Setting Script Variables
-#####################################################################
-#
-	SCRIPT_RELEASE="5.0.2-04"
-	SCRIPT_RELEASE_DATE="27 May 2018"
-	PROGNAME=$(basename $0)
-	REPOPATH=~/suma-channel-mgr_5
-	LTSTSTAB=$REPOPATH/Latest_Stable
-	PROGPATH=~/bin
-	BADPATH=false
-	MYCREDFIL=$PROGPATH/.creds.sh
-	SYNCLOG=~/reposync.log
-	TDATE=`date +%Y-%m-%d`
-	RDATE=`date +%Y%m%d`
-	LDATE=`date +%d-%b-%Y`
-	MDATE=`date +%H:%M`
-	HOSTA=`hostname`
-	INITRUN=false
-	TMPLATDIR=/srv/www/htdocs/pub/bootstrap
-	TMPLATFIL=/srv/www/htdocs/pub/bootstrap/template.sh
-	touch /tmp/tmp.sumatmp
-	EMAILMSGZ=/tmp/tmp.sumatmp
-	echo "Running $PROGNAME $1 Initial Process for $RDATE $2" > $EMAILMSGZ
-###	Cleanup logs
-	if [[ "`find ~/reposync.log -size +1M`" != "" ]]; then
-		mv $SYNCLOG ~/reposync_$LDATE-log.log
-		touch $SYNCLOG
-	fi
-	find ~/reposync_*-log.log -mtime +90 -exec rm {} \; 2>/dev/null
-#
-#####################################################################
 #####                   GNU/GPL Info                                
 #####################################################################
 #
-function gpl_info
-{
-printf "\n$(tput setaf 14)
+gpl_info () {
+    cat <<EOT
+${LTCYN}
 ####c4#############################################################################
 ###                                                                             ###
 ##                      GNU/GPL Info                                             ##
@@ -65,8 +34,41 @@ printf "\n$(tput setaf 14)
 ##    See this complete License at:                                              ##
 ##    https://github.com/SeaPhor/suma-channel-mgr_5/blob/master/LICENSE          ##
 ###                                                                             ###
-####w#################################b######################################c#####$(tput sgr0)\n"
+####w#################################b######################################c#####${RESET}
+EOT
 }
+#
+#####################################################################
+#####   Setting Script Variables
+#####################################################################
+#
+    SCRIPT_RELEASE="5.1.0-01"
+    SCRIPT_RELEASE_DATE="03 Sep 2018"
+    PROGNAME=$(basename $0)
+    MYOPT="$1"
+    REPOPATH=${HOME}/suma-channel-mgr_5
+    LTSTSTAB=$REPOPATH/Latest_Stable
+    PROGPATH=${HOME}/bin
+    BADPATH=false
+    MYCREDFIL=$PROGPATH/.creds.sh
+    SYNCLOG=${HOME}/reposync.log
+    TDATE=`date +%Y-%m-%d`
+    RDATE=`date +%Y%m%d`
+    LDATE=`date +%d-%b-%Y`
+    MDATE=`date +%H:%M`
+    HOSTA=`hostname`
+    INITRUN=false
+    TMPLATDIR=/srv/www/htdocs/pub/bootstrap
+    TMPLATFIL=/srv/www/htdocs/pub/bootstrap/template.sh
+    touch /tmp/tmp.sumatmp
+    EMAILMSGZ=/tmp/tmp.sumatmp
+    echo "Running $PROGNAME $1 Initial Process for $RDATE $2" > $EMAILMSGZ
+###	Cleanup logs
+    if [[ "`find ~/reposync.log -size +1M`" != "" ]]; then
+        mv $SYNCLOG ${HOME}/reposync_$LDATE-log.log
+        touch $SYNCLOG
+    fi
+    find ${HOME}/reposync_*-log.log -mtime +90 -exec rm {} \; 2>/dev/null
 #
 #####################################################################
 #####	Setting color variables
@@ -88,7 +90,11 @@ LTBLU=`tput setaf 12`
 LTMAG=`tput setaf 13`   
 LTCYN=`tput setaf 14`   
 LTWHT=`tput setaf 15`   
-
+ULINE=`tput smul`
+NULINE=`tput rmul`
+BGBLU=`tput setab 4`
+BGYLLW=`tput setab 3`
+BGLYLLW=`tput setab 11`
 BOLD=`tput bold`
 RESET=`tput sgr0`
 #
@@ -96,388 +102,298 @@ RESET=`tput sgr0`
 #####	Checking for root, setting error exit
 #####################################################################
 #
-function error_exit
-{
-	printf "$(tput setaf 9) ${PROGNAME}: ${1:-"you are not root, please run as root"}$(tput sgr0)" >&2
-    echo ""
-	exit 1
-}
-###
-[[ "$UID" == "0" ]] && : || error_exit
+[[ "$UID" == "0" ]] && : || { echo -e "\n${BOLD}${LTRED}  ${PROGNAME} - you are not root, please run as root! or do 'sudo !!'\n${RESET}"; exit 1; }
+#
+#####################################################################
+#####	Checking for PATH
+#####################################################################
 #
 if [[ ! -L $PROGPATH/$PROGNAME ]]; then
-	BADPATH=true
-	printf "$(tput setaf 3)Script PATH Not Recommended$(tput sgr0)" >> $EMAILMSGZ
+    BADPATH=true
+    printf "Script PATH Not Recommended" >> $EMAILMSGZ
 fi
-function chk_path
-{
-	if [[ ! -L $PROGPATH/$PROGNAME ]]; then
-		BADPATH=true
-    SCRPTNAME='suma-channel-mgr.sh'
-    VERNAME='suma-channel-mgr'
-		printf "$(tput setaf 4)\n\n\t#################################################################\n\t  This process is designed to always have the latest release\n\t  It is best that your cloned repo be at ~/suma-channel-mgr_5\n\t  And that you create a sym-link to the Latest, as in so:\n\t  'cd ~/bin' and create a sym-link to:\n\t  ~/suma-channel-mgr_5/Latest_Stable/suma-channel-mgr.sh\n\t#################################################################\n\tAdd [ignore] to the end of your command to not see this notice\n\n$(tput sgr0)"
-		sleep 15
-		echo ""
-	fi
+chk_path () {
+    if [[ ! -L $PROGPATH/$PROGNAME ]]; then
+        BADPATH=true
+        SCRPTNAME='suma-channel-mgr.sh'
+        VERNAME='suma-channel-mgr'
+    cat <<EOT
+${LTBLU}
+    #################################################################
+      This process is designed to always have the latest release
+      It is best that your cloned repo be at ~/suma-channel-mgr_5
+      And that you create a sym-link to the Latest, as in so:
+      'cd ~/bin' and create a sym-link to:
+      ~/suma-channel-mgr_5/Latest_Stable/suma-channel-mgr.sh
+    #################################################################
+    Add [ignore] to the end of your command to not see this notice${RESET}
+EOT
+    sleep 15
+    echo ""
+    fi
 }
 #
 #####################################################################
 #####   Adjusted for portability, check for required spacewalk-utils
 #####################################################################
 #
-function chk_sutils
-{
-#
-	if [[ "`rpm -qa | grep spacewalk-utils`" == "" ]]; then
-		printf "\n\t$(tput setaf 3)This seems to be the first time executing $PROGNAME,\n\tDependancies = >\n\t\t1- Installation of spacewalk-utils\n\t\t2- Creation of a sourced local credentials file to pass to commands- ~/bin/.creds.sh\n\t\t3- Creation of local .mgr-sync file to pass to commands- ~/.mgr-sync\n\tIf you choose to continue you will be required to input that\n\tinformation when prompted to do so but ONLY on the first run, it can be\n\tcompletely automated after that.\n\n\tDo you agree with this installation and credental files generation and wish to continue?$(tput sgr0) \n[Y|n]\n"
-		read SUMADOIT
-		if [[ "`echo $SUMADOIT`" == "n" ]]; then
-			printf $USAGE
-			exit $?
-		else
-			zypper in -y spacewalk-utils
-			printf "$(tput setaf 14)Installed spacewalk-utils$(tput sgr0)" >> $EMAILMSGZ
-		fi
-	fi
-	if [[ ! -f ~/.mgr-sync ]]; then
-		printf "\n\t$(tput setaf 3)Enter the SUSE Manager Admin User credentials when prompted...$(tput sgr0)\n"
-		mgr-sync -s refresh
-	fi
-	if [[ -f $MYCREDFIL ]]; then
-		source $MYCREDFIL
-	else
-		my_user=`cat ~/.mgr-sync | grep mgrsync.user | sed -e 's/mgrsync.user\ \=\ //'`
-		my_pass=`cat ~/.mgr-sync | grep mgrsync.password | sed -e 's/mgrsync.password\ \=\ //'`
-		printf "\n\t$(tput setaf 3)Type the email address for notifications$(tput sgr0)\n"
-		read MYMAIL
-		my_mail="EMAILG='$MYMAIL'"
-		touch $MYCREDFIL
-		my_ucred="MY_ADMIN='$my_user'"
-		my_pcred="MY_CREDS='$my_pass'"
-		echo $my_ucred >> $MYCREDFIL
-		echo $my_pcred >> $MYCREDFIL
-		echo $my_mail >> $MYCREDFIL
-		chmod 700 $MYCREDFIL
-		source $MYCREDFIL
-		printf "\n\t$(tput setaf 14)Your new credentials file has been successfully created...\n\tIf you mis-typed or need to change the password, \n\tit can be found at $MYCREDFIL$(tput sgr0)\n"
-		echo "Credentials file created" >> $EMAILMSGZ
-	fi
+req_depends () {
+    cat <<EOT
+${BOLD}${YELLOW}Requirements-${RESET}${LTCYN}
+    This LifeCycleManagement process requires the SUMA Admin account username
+  and password to be issued, for security and portability purposes this
+  requires a local credentials file [Default = ~/bin/.creds.sh], this file is
+  'sourced' for the user/pass required VARIABLES-
+  The 'spacecmd' call also requires it's own credentials file in ~/.mgr-sync-
+    There is also a package dependancy 'spacewalk-utils' to be installed from
+  your SUSE Manager Server repositories.${RESET}
+EOT
+}
+chk_sutils () {
+    if [[ "`rpm -qa | grep spacewalk-utils`" == "" ]]; then
+        cat <<EOT
+${LTYLLW}    This seems to be the first time executing ${PROGNAME},
+    Dependancies = >
+        1-${LTCYN} Installation of spacewalk-utils${LTYLLW}
+        2-${LTCYN} Creation of a sourced local credentials file to pass to commands- ~/bin/.creds.sh${LTYLLW}
+        3-${LTCYN} Creation of local .mgr-sync file to pass to commands- ~/.mgr-sync${LTYLLW}
+        If you choose to continue you will be required to input that
+    information when prompted to do so but ONLY on the first run, it can be
+    completely automated after that.${BOLD}
+
+    Do you agree with this installation and credental files generation and wish to continue?${RESET}
+[Y|n]
+
+EOT
+    read SUMADOIT
+    if [[ "`echo $SUMADOIT`" == "n" ]]; then
+        usage
+        exit $?
+    else
+        zypper in -y spacewalk-utils
+        printf "Installed spacewalk-utils" >> $EMAILMSGZ
+    fi
+fi
+if [[ ! -f ~/.mgr-sync ]]; then
+    printf "\n\t${LTYLLW}Enter the SUSE Manager Admin User credentials when prompted...${RESET}\n"
+    mgr-sync -s refresh
+fi
+if [[ -f $MYCREDFIL ]]; then
+    source $MYCREDFIL
+else
+    my_user=`cat ~/.mgr-sync | grep mgrsync.user | sed -e 's/mgrsync.user\ \=\ //'`
+    my_pass=`cat ~/.mgr-sync | grep mgrsync.password | sed -e 's/mgrsync.password\ \=\ //'`
+    printf "\n\t${LTYLLW}Type the email address for notifications${RESET}\n"
+    read MYMAIL
+    my_mail="EMAILG='$MYMAIL'"
+    touch $MYCREDFIL
+    my_ucred="MY_ADMIN='$my_user'"
+    my_pcred="MY_CREDS='$my_pass'"
+    echo $my_ucred >> $MYCREDFIL
+    echo $my_pcred >> $MYCREDFIL
+    echo $my_mail >> $MYCREDFIL
+    chmod 700 $MYCREDFIL
+    source $MYCREDFIL
+    printf "\n\t${LTCYN}Your new credentials file has been successfully created...\n\tIf you mis-typed or need to change the password, \n\tit can be found at ${MYCREDFIL}${RESET}\n"
+    echo "Credentials file created" >> ${EMAILMSGZ}
+fi
 }
 #
 #####################################################################
 #####   Setting Options Usage Help Output
 #####################################################################
 #
-	USAGE=`clear`"\n $MAGENTA $PROGNAME Rev $SCRIPT_RELEASE Released $SCRIPT_RELEASE_DATE $RESET\n$YELLOW Usage$RESET\n\t$YELLOW This process requires 1 (one) parameter -- [b|d|p|h|g|r|c]\n\tInitially, these MUST be run in the following order-$RESET\n\t$LTCYN $PROGNAME -b\n\t $PROGNAME -d\n\t $PROGNAME -p$RESET\n$YELLOW Options\n  [-b]\tBase-Pool$RESET\t$LTCYN Clones the SUSE base pool trees to 'dev' channels$RESET\n$YELLOW  [-d]\tpromote-Dev$RESET\t$LTCYN Promotes the 'dev' channel to the 'test' channel$RESET\n$YELLOW  [-p]\tProduction\t$LTCYN Promotes 'test' to 'Prod'$RESET\n$YELLOW  [-h]\tHelp$RESET\t\t$LTCYN Prints this list and exits$RESET\n$YELLOW  [-g]\tGPL$RESET\t\t$LTCYN Prints the GPL info and exits [and 'disclaimer']$RESET\n$YELLOW  [-r]\tRelease$RESET\t\t$LTCYN Prints the Current Release Version and exits$RESET\n$YELLOW  [-c]\tCHANGE$RESET\t\t$LTCYN Prints the last 30 lines of the Change-Log and exits$RESET\n$YELLOW  [-x]\tCLEAN$RESET\t\t$LTCYN Removes ALL clones, keys, bootstraps, and creds files and exits\n\t\t\t To be used to start from scratch$RESET\n$YELLOW Decription$RESET\n\t$LTBLU Please see-$RESET\n$LTCYN  https://github.com/SeaPhor/suma-channel-mgr_5/blob/master/README.md$RESET\n$YELLOW Requirements$RESET\n\t$LTBLU This LifeCycleManagement process requires the SUMA Admin account username\n\tand password to be issued, for security and portability purposes this\n\trequires a local credentials file [Default = ~/bin/.creds.sh], this file is \n\t'sourced' for the user/pass required VARIABLES-\n\tThe 'spacecmd' call also requires it's own credentials file in ~/.mgr-sync-\n\t  There is also a package dependancy 'spacewalk-utils' to be installed from\n\tyour SUSE Manager Server repositories.$RESET \n"
+usage () {
+    clear
+    cat <<EOT
+${BOLD}${MAGENTA}${PROGNAME} Rev ${SCRIPT_RELEASE} Released ${SCRIPT_RELEASE_DATE}${BOLD}${YELLOW}
+Usage-${RESET}${LTYLLW}
+    This process requires 1 (one) parameter -- ${LTCYN}[b|d|p|h|g|r|R|c|x]${LTYLLW}
+    Initially, these MUST be run in the following order-${LTCYN}
+  ${PROGNAME} -b
+  ${PROGNAME} -d
+  ${PROGNAME} -p${BOLD}${YELLOW}
+Options-${RESET}${LTCYN}
+  [-b]${BOLD}${CYAN}    Base-Pool${RESET}${LTYLLW}      Clones the SUSE base pool trees to 'dev' channels${LTCYN}
+  [-d]${BOLD}${CYAN}    promote-Dev${RESET}${LTYLLW}    Promotes the 'dev' channel to the 'test' channel${LTCYN}
+  [-p]${BOLD}${BOLD}${CYAN}    Production${RESET}${LTYLLW}     Promotes 'test' to 'Prod'${LTCYN}
+  [-h]${BOLD}${CYAN}    Help${RESET}${LTYLLW}           Prints this list and exits${LTCYN}
+  [-g]${BOLD}${CYAN}    GPL${RESET}${LTYLLW}            Prints the GPL info and exits${LTCYN}
+  [-r]${BOLD}${CYAN}    Release${RESET}${LTYLLW}        Prints the Current Release Version and exits${LTCYN}
+  [-R]${BOLD}${CYAN}    Requirements${RESET}${LTYLLW}   Prints the Requirements and Dependencies for this process${LTCYN}
+  [-c]${BOLD}${CYAN}    Change${RESET}${LTYLLW}         Prints the last 30 lines of the Change-Log and exits${LTCYN}
+  [-x]${BOLD}${CYAN}    Clean${RESET}${LTYLLW}          Removes ALL clones, keys, bootstraps, and creds files and exits
+                         To be used to start from scratch${BOLD}${YELLOW}
+    ${ULINE}${BGBLU}If you have never run this script before${NULINE}${RESET}${BOLD}${YELLOW}, and have not yet configured your
+    SUMA-Server for its use, please use the initial [${LTCYN}config${YELLOW}] Option=${RESET}${LTCYN}
+  ${PROGNAME} config${RESET}${BOLD}${YELLOW}
+Description-
+    ${LTBLU}Please see-${LTCYN}
+https://github.com/SeaPhor/suma-channel-mgr_5/blob/master/README.md${RESET}
+EOT
+}
 #
 #####################################################################
 ###	Begin logging
 #####################################################################
 #
-printf "\n#########################################################\n#\n# $LDATE $MDATE -- Executing $PROGNAME Script\n#\n#########################################################\n" >> $EMAILMSGZ
+printf "\n#########################################################\n#\n# ${LDATE}${MDATE} -- Executing ${PROGNAME} Script\n#\n#########################################################\n" >> ${EMAILMSGZ}
 #
+####  COMPLETETOHERE
 #####################################################################
 #####   Setting Functions
 #####################################################################
 #
-function no_opts
-{
+no_opts () {
 spacecmd -u $MY_ADMIN -p $MY_CREDS softwarechannel_listbasechannels | grep ^sle > /tmp/mybaselist.sumatmp
 #	Optional- Comment/Un-Comment to disable/enable RHEL
 #spacecmd -u $MY_ADMIN -p $MY_CREDS softwarechannel_listbasechannels | grep ^rhe >> /tmp/mybaselist.sumatmp
 #	END - Optional- Un-Comment to enable RHEL
-	MY_BASELIST=/tmp/mybaselist.sumatmp
+    MY_BASELIST=/tmp/mybaselist.sumatmp
 spacecmd -u $MY_ADMIN -p $MY_CREDS softwarechannel_listbasechannels | grep -v ^sle | grep -v ^suse | grep -v rhel > /tmp/mychanlist.sumatmp
-	MY_CHANLIST=/tmp/mychanlist.sumatmp
+    MY_CHANLIST=/tmp/mychanlist.sumatmp
 #####################################################################
 #####	Check for bootstrap repo/s - this will only create the 
 #####	initial repos, manual creation for new OSs/releases [at this rv]
 #####################################################################
 if [[ ! -d /srv/www/htdocs/pub/repositories ]]; then
-	for b in `mgr-create-bootstrap-repo --list | awk '{print $2}'`; do mgr-create-bootstrap-repo --create=$b ; done
+    for b in `mgr-create-bootstrap-repo --list | awk '{print $2}'`; do mgr-create-bootstrap-repo --create=$b ; done
 else
-	for m in `mgr-create-bootstrap-repo --list | awk '{print $2}' | grep -i ^s | awk -F- '{print $2"/"$3}' | sed -e 's/[A-Z]//g'`
-	do if [[ ! -d /srv/www/htdocs/pub/repositories/$m ]]; then
-		for b in `mgr-create-bootstrap-repo --list | awk '{print $2}'`
-		do mgr-create-bootstrap-repo --create=$b 
-		done
-	   fi
-	done
+    for m in `mgr-create-bootstrap-repo --list | awk '{print $2}' | grep -i ^s | awk -F- '{print $2"/"$3}' | sed -e 's/[A-Z]//g'`
+    do if [[ ! -d /srv/www/htdocs/pub/repositories/$m ]]; then
+        for b in `mgr-create-bootstrap-repo --list | awk '{print $2}'`
+        do mgr-create-bootstrap-repo --create=$b 
+        done
+       fi
+    done
 fi
-
 }
-function snd_mail
-{
+snd_mail () {
         SUBJECT="$HOSTA -- $PROGNAME script $RDATE"
         FROMA=$MY_ADMIN@$HOST
         /usr/bin/mailx -s "$SUBJECT" "$EMAILG" -f $FROMA < $EMAILMSGZ
 }
 #
-function susetrees_clone
-{
+susetrees_clone () {
 spacecmd -u $MY_ADMIN -p $MY_CREDS softwarechannel_listchildchannels | grep ^sle > /tmp/mychildlist.sumatmp
 MY_CHILDLIST=/tmp/mychildlist.sumatmp
 if [[ ! -f ~/.mgr-sync ]]; then
-	mgr-sync -s refresh 2>&1 >> $EMAILMSGZ
+    mgr-sync -s refresh 2>&1 >> $EMAILMSGZ
 else
-	mgr-sync refresh 2>&1 >> $EMAILMSGZ
+    mgr-sync refresh 2>&1 >> $EMAILMSGZ
 fi
 for i in `cat $MY_CHILDLIST`; do
 #for i in `cat $MY_BASELIST`; do ###Leaving here in case further issues arise xxyyzz
-	/usr/bin/python -u /usr/bin/spacewalk-repo-sync --channel $i --type yum --non-interactive
+    /usr/bin/python -u /usr/bin/spacewalk-repo-sync --channel $i --type yum --non-interactive
 done
 for i in `cat $MY_BASELIST`; do
-	if [[ "`grep dev-$i $MY_CHANLIST`" == "" ]]; then
-		INITRUN=true
-		NEWNAME=`echo $i | sed -e "s/$i/dev-$i/g"`
-		spacewalk-manage-channel-lifecycle -C -c $i --init -u $MY_ADMIN -p $MY_CREDS 2>&1 >> $EMAILMSGZ
-		spacecmd -u $MY_ADMIN -p $MY_CREDS activationkey_create -- -n $NEWNAME -d $NEWNAME -b $NEWNAME 2>&1 >> $EMAILMSGZ
-		if [[ -f $TMPLATFIL ]]; then
-			cat $TMPLATFIL | sed -e s/slartybartfast/$NEWNAME/g > $TMPLATDIR/$NEWNAME-bootstrap.sh
-			chmod +x $TMPLATDIR/$NEWNAME-bootstrap.sh
-		else
-			mgr-bootstrap
-			cat $TMPLATDIR/bootstrap.sh | sed -e 's/^ACTIVATION_KEYS\=/ACTIVATION_KEYS\=1-slartybartfast/g' > $TMPLATFIL
-			cat $TMPLATFIL | sed -e s/slartybartfast/$NEWNAME/g > $TMPLATDIR/$NEWNAME-bootstrap.sh
-			chmod +x $TMPLATDIR/$NEWNAME-bootstrap.sh
-		fi
-		spacecmd -u $MY_ADMIN -p $MY_CREDS activationkey_list 2>&1 >> $EMAILMSGZ 2>&1 >> $EMAILMSGZ
-		echo $NEWNAME >> $EMAILMSGZ
-	else
-		spacewalk-manage-channel-lifecycle -C -c $i --promote -u $MY_ADMIN -p $MY_CREDS 2>&1 >> $EMAILMSGZ
-	fi
+    if [[ "`grep dev-$i $MY_CHANLIST`" == "" ]]; then
+        INITRUN=true
+        NEWNAME=`echo $i | sed -e "s/$i/dev-$i/g"`
+        spacewalk-manage-channel-lifecycle -C -c $i --init -u $MY_ADMIN -p $MY_CREDS 2>&1 >> $EMAILMSGZ
+        spacecmd -u $MY_ADMIN -p $MY_CREDS activationkey_create -- -n $NEWNAME -d $NEWNAME -b $NEWNAME 2>&1 >> $EMAILMSGZ
+        if [[ -f $TMPLATFIL ]]; then
+            cat $TMPLATFIL | sed -e s/slartybartfast/$NEWNAME/g > $TMPLATDIR/$NEWNAME-bootstrap.sh
+            chmod +x $TMPLATDIR/$NEWNAME-bootstrap.sh
+        else
+            mgr-bootstrap
+            cat $TMPLATDIR/bootstrap.sh | sed -e 's/^ACTIVATION_KEYS\=/ACTIVATION_KEYS\=1-slartybartfast/g' > $TMPLATFIL
+            cat $TMPLATFIL | sed -e s/slartybartfast/$NEWNAME/g > $TMPLATDIR/$NEWNAME-bootstrap.sh
+            chmod +x $TMPLATDIR/$NEWNAME-bootstrap.sh
+        fi
+        spacecmd -u $MY_ADMIN -p $MY_CREDS activationkey_list 2>&1 >> $EMAILMSGZ #2>&1 >> $EMAILMSGZ
+        echo $NEWNAME >> $EMAILMSGZ
+    else
+        spacewalk-manage-channel-lifecycle -C -c $i --promote -u $MY_ADMIN -p $MY_CREDS 2>&1 >> $EMAILMSGZ
+    fi
 done
 printf "\n\t `date` \n" >> $EMAILMSGZ
 }
 #
-function promote_dev
-{
+promote_dev () {
 if [[ "`grep 'dev' $MY_CHANLIST`" == "" ]]; then
-	printf "$USAGE\n\n\t$(tput setaf 9)The '-b' Option MUST be run before any other\n\tthen the '-d'\n\tand then the -p$(tput sgr0)\n"
-	exit $?
+    clear
+    usage
+    printf "\n\n\t${LTRED}The '-b' Option MUST be run before any other\n\tthen the '-d'\n\tand then the -p${RESET}\n"
+    exit $?
 fi
 for i in `cat $MY_BASELIST`; do
-	if [[ "`grep test-$i $MY_CHANLIST`" == "" ]]; then
+    if [[ "`grep test-$i $MY_CHANLIST`" == "" ]]; then
                 INITRUN=true
-		spacewalk-manage-channel-lifecycle -C -c dev-$i --promote -u $MY_ADMIN -p $MY_CREDS 2>&1 >> $EMAILMSGZ
-		#NEWNAME=`echo $i | sed -e "s/$i/test-$i/g"`
-		NEWNAME="test-$i"
-		spacecmd -u $MY_ADMIN -p $MY_CREDS activationkey_create -- -n $NEWNAME -d $NEWNAME -b $NEWNAME 2>&1 >> $EMAILMSGZ
-		cat $TMPLATFIL | sed -e s/slartybartfast/$NEWNAME/g > $TMPLATDIR/$NEWNAME-bootstrap.sh
-		chmod +x $TMPLATDIR/$NEWNAME-bootstrap.sh
-	else
-		spacewalk-manage-channel-lifecycle -C -c dev-$i --promote -u $MY_ADMIN -p $MY_CREDS 2>&1 >> $EMAILMSGZ
-	fi
+        spacewalk-manage-channel-lifecycle -C -c dev-$i --promote -u $MY_ADMIN -p $MY_CREDS 2>&1 >> $EMAILMSGZ
+        #NEWNAME=`echo $i | sed -e "s/$i/test-$i/g"`
+        NEWNAME="test-$i"
+        spacecmd -u $MY_ADMIN -p $MY_CREDS activationkey_create -- -n $NEWNAME -d $NEWNAME -b $NEWNAME 2>&1 >> $EMAILMSGZ
+        cat $TMPLATFIL | sed -e s/slartybartfast/$NEWNAME/g > $TMPLATDIR/$NEWNAME-bootstrap.sh
+        chmod +x $TMPLATDIR/$NEWNAME-bootstrap.sh
+    else
+        spacewalk-manage-channel-lifecycle -C -c dev-$i --promote -u $MY_ADMIN -p $MY_CREDS 2>&1 >> $EMAILMSGZ
+    fi
 done
 }
 #
-function promote_test
-{
+promote_test () {
 if [[ "`grep 'dev' $MY_CHANLIST`" == "" ]]; then
-	printf "$USAGE\n\n\t$(tput setaf 9)The '-b' Option MUST be run before any other\n\tthen the '-d'\n\tand then the -p$(tput sgr0)\n"
-	exit $?
+    clear
+    usage
+    printf "\n\n\t${LTRED}The '-b' Option MUST be run before any other\n\tthen the '-d'\n\tand then the -p${RESET}\n"
+    exit $?
 else
-	if [[ "`grep 'test' $MY_CHANLIST`" == "" ]]; then
-        	printf "$USAGE\n\n\t$(tput setaf 9)The '-d' Option MUST be run before using the '-p'$(tput sgr0)"
-	        exit $?
-	fi
+    if [[ "`grep 'test' $MY_CHANLIST`" == "" ]]; then
+        clear
+	usage
+        printf "\n\n\t${LTRED}The '-d' Option MUST be run before using the '-p'${RESET}"
+        exit $?
+    fi
 
 fi
 for i in `cat $MY_BASELIST`; do
-	if [[ "`grep prod-$i $MY_CHANLIST`" == "" ]]; then
-                INITRUN=true
-        	spacewalk-manage-channel-lifecycle -C -c test-$i --promote -u $MY_ADMIN -p $MY_CREDS 2>&1 >> $EMAILMSGZ
-		NEWNAME="prod-$i"
-		spacecmd -u $MY_ADMIN -p $MY_CREDS activationkey_create -- -n $NEWNAME -d $NEWNAME -b $NEWNAME 2>&1 >> $EMAILMSGZ
-		cat $TMPLATFIL | sed -e s/slartybartfast/$NEWNAME/g > $TMPLATDIR/$NEWNAME-bootstrap.sh
-		chmod +x $TMPLATDIR/$NEWNAME-bootstrap.sh
-	else
-        	spacewalk-manage-channel-lifecycle -C -c test-$i --promote -u $MY_ADMIN -p $MY_CREDS 2>&1 >> $EMAILMSGZ
-	fi
+    if [[ "`grep prod-$i $MY_CHANLIST`" == "" ]]; then
+        INITRUN=true
+        spacewalk-manage-channel-lifecycle -C -c test-$i --promote -u $MY_ADMIN -p $MY_CREDS 2>&1 >> $EMAILMSGZ
+        NEWNAME="prod-$i"
+        spacecmd -u $MY_ADMIN -p $MY_CREDS activationkey_create -- -n $NEWNAME -d $NEWNAME -b $NEWNAME 2>&1 >> $EMAILMSGZ
+        cat $TMPLATFIL | sed -e s/slartybartfast/$NEWNAME/g > $TMPLATDIR/$NEWNAME-bootstrap.sh
+        chmod +x $TMPLATDIR/$NEWNAME-bootstrap.sh
+    else
+        spacewalk-manage-channel-lifecycle -C -c test-$i --promote -u $MY_ADMIN -p $MY_CREDS 2>&1 >> $EMAILMSGZ
+    fi
 done
 }
 #
-function change_log
-{
-	if [[ "`find ~/* -name $PROGNAME`" != "" ]]; then
-		CPPATH="`find ~/* -name $PROGNAME`"
-		clear
-		cat $CPPATH | tail -n 30
-	else
-		printf "\n\tThe $PROGNAME was not found in your PATH [~/*] => It is recommended to have the sym-link to $PROGNAME in [~/bin/]\n"
-	fi
+change_log () {
+    if [[ "`find ~/* -name $PROGNAME`" != "" ]]; then
+        CPPATH="`find ~/* -name $PROGNAME`"
+        clear
+        cat $CPPATH | tail -n 30
+    else
+        printf "\n\tThe $PROGNAME was not found in your PATH [~/*] => It is recommended to have the sym-link to $PROGNAME in [~/bin/]\n"
+    fi
 }
 #
-function clean_all
-{
-	printf "\n$LTRED $BOLD !!!! WARNING !!!! \n This will remove ALL cloned channels!\n This will remove ALL activation keys!\n This will remove ALL bootstrap scripts!\n This will remove ALL generated credentials files!\n\t Do you really want to do this?\n [y|N]\n $RESET"
-	read CLEANALL
-	if [[ $CLEANALL == "y" ]]; then
-		if [[ -f $MYCREDFIL ]]; then
-        	        source $MYCREDFIL
-		fi
-		spacewalk-remove-channel -a "dev*" --unsubscribe
-		spacewalk-remove-channel -a "test*" --unsubscribe
-		spacewalk-remove-channel -a "prod*" --unsubscribe
-		spacecmd activationkey_delete 1-dev*
-		spacecmd activationkey_delete 1-test*
-		spacecmd activationkey_delete 1-prod*
-		rm /srv/www/htdocs/pub/bootstrap/dev*-bootstrap.sh
-		rm /srv/www/htdocs/pub/bootstrap/test*-bootstrap.sh
-		rm /srv/www/htdocs/pub/bootstrap/prod*-bootstrap.sh
-		rm ~/.mgr-sync
-		rm ~/bin/.creds.sh
-		exit $?
-	else
-		printf "\n $LTCYN Action canceled by user... Exiting $RESET \n"
-		exit $?
-	fi
-}
-#####################################################################
-#####	Disclaimer Statement
-#####################################################################
-#
-function dis_claimer
-{
-clear
-printf "$(tput setaf 9)
-\n\t\t\t\t\t\t\t=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-\t\t\t\t\t\t\t=\tLet Me Be Perfectly Clear       =
-\t\t\t\t\t\t\t=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=\n
-$(tput sgr0)"
-sleep 1
-clear
-printf "$(tput setaf 9)
-\n\t\t\t\t\t\t=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-\t\t\t\t\t\t=\tLet Me Be Perfectly Clear       =
-\t\t\t\t\t\t=\tI do NOT claim to be a coder    =
-\t\t\t\t\t\t=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=\n
-$(tput sgr0)"
-sleep 2
-clear
-printf "$(tput setaf 9)
-\n\t\t\t\t\t=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-\t\t\t\t\t=\tLet Me Be Perfectly Clear       =
-\t\t\t\t\t=\tI do NOT claim to be a coder    =
-\t\t\t\t\t=\tI know my code is UGLY and      =
-\t\t\t\t\t=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=\n
-$(tput sgr0)"
-sleep 2
-clear
-printf "$(tput setaf 9)
-\n\t\t\t\t=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-\t\t\t\t=\tLet Me Be Perfectly Clear       =
-\t\t\t\t=\tI do NOT claim to be a coder    =
-\t\t\t\t=\tI know my code is UGLY and      =
-\t\t\t\t=\tSloppy, BUT, it WORKS as        =
-\t\t\t\t=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=\n
-$(tput sgr0)"
-sleep 2
-clear
-printf "$(tput setaf 9)
-\n\t\t\t=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-\t\t\t=\tLet Me Be Perfectly Clear       =
-\t\t\t=\tI do NOT claim to be a coder    =
-\t\t\t=\tI know my code is UGLY and      =
-\t\t\t=\tSloppy, BUT, it WORKS as        =
-\t\t\t=\tIntended! I know most of you    =
-\t\t\t=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=\n
-$(tput sgr0)"
-sleep 2
-clear
-printf "$(tput setaf 9)
-\n\t\t=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-\t\t=\tLet Me Be Perfectly Clear       =
-\t\t=\tI do NOT claim to be a coder    =
-\t\t=\tI know my code is UGLY and      =
-\t\t=\tSloppy, BUT, it WORKS as        =
-\t\t=\tIntended! I know most of you    =
-\t\t=\tThat examine it could write     =
-\t\t=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=\n
-$(tput sgr0)"
-sleep 2
-clear
-printf "$(tput setaf 9)
-\n\t=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-\t=\tLet Me Be Perfectly Clear       =
-\t=\tI do NOT claim to be a coder    =
-\t=\tI know my code is UGLY and      =
-\t=\tSloppy, BUT, it WORKS as        =
-\t=\tIntended! I know most of you    =
-\t=\tThat examine it could write     =
-\t=\tIt better and more efficient.   =
-\t=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=\n
-$(tput sgr0)"
-sleep 2
-clear
-printf "
-\n\t=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-\t=\tLet Me Be Perfectly Clear       =
-\t=\tI do NOT claim to be a coder    =
-\t=\tI know my code is UGLY and      =
-\t=\tSloppy, BUT, it WORKS as        =
-\t=\tIntended! I know most of you    =
-\t=\tThat examine it could write     =
-\t=\tIt better and more efficient.   =
-\t=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=\n
-"
-sleep .5
-clear
-sleep .5
-printf "
-\n\t=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-\t=\tLet Me Be Perfectly Clear       =
-\t=\tI do NOT claim to be a coder    =
-\t=\tI know my code is UGLY and      =
-\t=\tSloppy, BUT, it WORKS as        =
-\t=\tIntended! I know most of you    =
-\t=\tThat examine it could write     =
-\t=\tIt better and more efficient.   =
-\t=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=\n
-"
-sleep .5
-clear
-sleep .5
-printf "
-\n\t=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-\t=\tLet Me Be Perfectly Clear       =
-\t=\tI do NOT claim to be a coder    =
-\t=\tI know my code is UGLY and      =
-\t=\tSloppy, BUT, it WORKS as        =
-\t=\tIntended! I know most of you    =
-\t=\tThat examine it could write     =
-\t=\tIt better and more efficient.   =
-\t=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=\n
-"
-sleep .5
-clear
-sleep .5
-printf "
-\n\t=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-\t=\tLet Me Be Perfectly Clear       =
-\t=\tI do NOT claim to be a coder    =
-\t=\tI know my code is UGLY and      =
-\t=\tSloppy, BUT, it WORKS as        =
-\t=\tIntended! I know most of you    =
-\t=\tThat examine it could write     =
-\t=\tIt better and more efficient.   =
-\t=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=\n
-"
-sleep .5
-clear
-sleep .5
-printf "$(tput setaf 14)
-\n\t=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-\t=\tLet Me Be Perfectly Clear       =
-\t=\tI do NOT claim to be a coder    =
-\t=\tI know my code is UGLY and      =
-\t=\tSloppy, BUT, it WORKS as        =
-\t=\tIntended! I know most of you    =
-\t=\tThat examine it could write     =
-\t=\tIt better and more efficient.   =
-\t=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=\n
-$(tput sgr0)"
-sleep 5
+clean_all () {
+    printf "\n$LTRED $BOLD !!!! WARNING !!!! \n This will remove ALL cloned channels!\n This will remove ALL activation keys!\n This will remove ALL bootstrap scripts!\n This will remove ALL generated credentials files!\n\t Do you really want to do this?\n [y|N]\n $RESET"
+    read CLEANALL
+    if [[ $CLEANALL == "y" ]]; then
+        if [[ -f $MYCREDFIL ]]; then
+            source $MYCREDFIL
+        fi
+        spacewalk-remove-channel -a "dev*" --unsubscribe
+        spacewalk-remove-channel -a "test*" --unsubscribe
+        spacewalk-remove-channel -a "prod*" --unsubscribe
+        spacecmd activationkey_delete 1-dev*
+        spacecmd activationkey_delete 1-test*
+        spacecmd activationkey_delete 1-prod*
+        rm /srv/www/htdocs/pub/bootstrap/dev*-bootstrap.sh
+        rm /srv/www/htdocs/pub/bootstrap/test*-bootstrap.sh
+        rm /srv/www/htdocs/pub/bootstrap/prod*-bootstrap.sh
+        rm ~/.mgr-sync
+        rm ~/bin/.creds.sh
+        exit $?
+    else
+        printf "\n $LTCYN Action canceled by user... Exiting $RESET \n"
+        exit $?
+    fi
 }
 #
 #####################################################################
@@ -512,24 +428,26 @@ case "$1" in
   chk_sutils
   no_opts
   susetrees_clone 2>&1 >> $EMAILMSGZ
-#  if ! $INITRUN; then
-#    susetrees_clone 2>&1 >> $EMAILMSGZ
-#  fi
   ;;
 #
 "-h")
-  printf "$USAGE" 
+  clear
+  usage
   exit $?
   ;;
 #
 "-g")
-  dis_claimer
   gpl_info
   exit $?
   ;;
 #
 "-r")
-  printf "$(tput setaf 3)The $PROGNAME version is $SCRIPT_RELEASE -\n\treleased on $SCRIPT_RELEASE_DATE $(tput sgr0)\n"
+  printf "${LTYLLW}The $PROGNAME version is $SCRIPT_RELEASE -\n\treleased on $SCRIPT_RELEASE_DATE ${RESET}\n"
+  exit $?
+  ;;
+#
+"-R")
+  req_depends
   exit $?
   ;;
 #
@@ -543,8 +461,15 @@ case "$1" in
   exit $?
   ;;
 #
+"config")
+  chk_sutils
+  usage
+  exit $?
+  ;;
+#
 *)
-  printf "$USAGE"
+  clear
+  usage
   exit $?
   ;;
 esac
@@ -552,25 +477,25 @@ esac
 ###     Email & Finalize Log
 #####################################################################
 if $INITRUN; then
-	printf "\n\t$(tput setaf 4)Thank you for using the $PROGNAME script, Release $SCRIPT_RELEASE\n\tThis will require maually adding Child Channels to your Activation Keys in the WebUI$(tput sgr0)\n"
-	sleep 3
-	printf "$(tput setaf 3)Your activation keys are\n `spacecmd activationkey_list`$(tput sgr0)\n"
-	tail -n 12 $SYNCLOG
-	if $BADPATH; then
+    printf "\n\t${LTCYN}Thank you for using the $PROGNAME script, Release $SCRIPT_RELEASE\n\tThis will require maually adding Child Channels to your Activation Keys in the WebUI${RESET}\n"
+    sleep 3
+    printf "${LTYLLW}Your activation keys are\n `spacecmd activationkey_list`${RESET}\n"
+    tail -n 12 $SYNCLOG
+    if $BADPATH; then
 #	Adding check for ignoring the script path message
-		if [[ "`echo $2`" != "ignore" ]]; then
-			chk_path
-		fi
-	fi
-	printf "\n\t$(tput setaf 4)The log for this process can be found at\n $SYNCLOG$(tput sgr0)\n"
+        if [[ "`echo $2`" != "ignore" ]]; then
+            chk_path
+        fi
+    fi
+    printf "\n\t${YELLOW}The log for this process can be found at\n ${SYNCLOG}${RESET}\n"
 else
-	if $BADPATH; then
+    if $BADPATH; then
 #	Adding check for ignoring the script path message
-		if [[ "`echo $2`" != "ignore" ]]; then
-			chk_path
-		fi
-	fi
-	printf "\n\t$(tput setaf 14)Thank you for using the $PROGNAME script, Release $SCRIPT_RELEASE$(tput sgr0)\n"
+        if [[ "`echo $2`" != "ignore" ]]; then
+            chk_path
+        fi
+    fi
+    printf "\n\t${LTCYN}Thank you for using the $PROGNAME script, Release $SCRIPT_RELEASE${RESET}\n"
 fi
 snd_mail
 echo "" >> $SYNCLOG
@@ -582,7 +507,6 @@ grep -i 'error' $EMAILMSGZ >> $SYNCLOG
 #####################################################################
 rm /tmp/*.sumatmp
 exit $?
-
 #
 #####################################################################
 #####           channellock-promote.sh
@@ -921,7 +845,13 @@ exit $?
 #         prod- mistyped variable????			#
 ##      Promoted script to release 5.0.2-04		#
 #         27 May 2018-					#
-#         27 May 2018-					#
+##      Promoted script to release 5.1.0-01		#
+#         02 Sep 2018- Begin total re-write		#
+#         Changing format of functions, Variable, etc.	#
+#         Re-Writing for clean script witing and	#
+#         efficiency, Re-Do-ing EVERYTHING.		#
+#         Added a 'config' option for initial setup	#
+#         clean all functions, variables...		#
 #                                                       #
 #########################################################
 # END OF CHANGELOG
