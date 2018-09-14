@@ -42,8 +42,8 @@ EOT
 #####   Setting Script Variables
 #####################################################################
 #
-    SCRIPT_RELEASE="5.1.0-01"
-    SCRIPT_RELEASE_DATE="03 Sep 2018"
+    SCRIPT_RELEASE="5.1.0-02"
+    SCRIPT_RELEASE_DATE="13 Sep 2018"
     PROGNAME=$(basename $0)
     MYOPT="$1"
     REPOPATH=${HOME}/suma-channel-mgr_5
@@ -852,6 +852,9 @@ exit $?
 #         efficiency, Re-Do-ing EVERYTHING.		#
 #         Added a 'config' option for initial setup	#
 #         clean all functions, variables...		#
+##      Promoted script to release 5.1.0-02		#
+#         02 Sep 2018- cleanup for rpm-build		#
+#                                                       #
 #                                                       #
 #########################################################
 # END OF CHANGELOG
