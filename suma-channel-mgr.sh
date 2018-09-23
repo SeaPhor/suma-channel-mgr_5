@@ -854,7 +854,7 @@ exit $?
 #         clean all functions, variables...		#
 ##      Promoted script to release 5.1.0-02		#
 #         02 Sep 2018- cleanup for rpm-build		#
-#                                                       #
+#         Next steps- total rewrite of code syntax	#
 #                                                       #
 #########################################################
 # END OF CHANGELOG
