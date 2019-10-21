@@ -17,6 +17,7 @@ ${LTCYN}
 ##        channellock-promote.sh ver-1.1 - Alpha/Beta begun 15 March 2015	 ##
 ##        channellock-promote.sh ver-4.1 - Production release 11 December 2015	 ##
 ##      Forked to suma-channel-mgr.sh ver-5.0 on 19 December 2017                ##
+##      Forked to uyuni-channel-mgr.sh ver-5.1 on 21 October 2019                ##
 ##      Released under GPL v2.0, See www.gnu.org for full license info           ##
 ##      Copyright (C) 2015  Shawn Miller                                         ##
 ##              EMAIL- shawn@woodbeeco.com                                       ##
@@ -42,8 +43,8 @@ EOT
 #####   Setting Script Variables
 #####################################################################
 #
-    SCRIPT_RELEASE="5.1.0-02"
-    SCRIPT_RELEASE_DATE="13 Sep 2018"
+    SCRIPT_RELEASE="5.1.1-01"
+    SCRIPT_RELEASE_DATE="21 Oct 2019"
     PROGNAME=$(basename $0)
     MYOPT="$1"
     REPOPATH=${HOME}/suma-channel-mgr_5
@@ -247,10 +248,12 @@ printf "\n#########################################################\n#\n# ${LDAT
 no_opts () {
 spacecmd -u $MY_ADMIN -p $MY_CREDS softwarechannel_listbasechannels | grep ^sle > /tmp/mybaselist.sumatmp
 #	Optional- Comment/Un-Comment to disable/enable RHEL
-#spacecmd -u $MY_ADMIN -p $MY_CREDS softwarechannel_listbasechannels | grep ^rhe >> /tmp/mybaselist.sumatmp
+spacecmd -u $MY_ADMIN -p $MY_CREDS softwarechannel_listbasechannels | grep ^rhe >> /tmp/mybaselist.sumatmp
 #	END - Optional- Un-Comment to enable RHEL
+spacecmd -u $MY_ADMIN -p $MY_CREDS softwarechannel_listbasechannels | grep ^opensuse >> /tmp/mybaselist.sumatmp
+spacecmd -u $MY_ADMIN -p $MY_CREDS softwarechannel_listbasechannels | grep ^centos >> /tmp/mybaselist.sumatmp
     MY_BASELIST=/tmp/mybaselist.sumatmp
-spacecmd -u $MY_ADMIN -p $MY_CREDS softwarechannel_listbasechannels | grep -v ^sle | grep -v ^suse | grep -v rhel > /tmp/mychanlist.sumatmp
+spacecmd -u $MY_ADMIN -p $MY_CREDS softwarechannel_listbasechannels | grep -v ^sle | grep -v ^suse | grep -v ^rhel | grep -v ^opensuse | grep -v ^centos | grep -v ^epel > /tmp/mychanlist.sumatmp
     MY_CHANLIST=/tmp/mychanlist.sumatmp
 #####################################################################
 #####	Check for bootstrap repo/s - this will only create the 
@@ -275,7 +278,8 @@ snd_mail () {
 }
 #
 susetrees_clone () {
-spacecmd -u $MY_ADMIN -p $MY_CREDS softwarechannel_listchildchannels | grep ^sle > /tmp/mychildlist.sumatmp
+#spacecmd -u $MY_ADMIN -p $MY_CREDS softwarechannel_listchildchannels | grep ^sle > /tmp/mychildlist.sumatmp
+spacecmd -u $MY_ADMIN -p $MY_CREDS softwarechannel_listchildchannels | egrep '^sle|rhel|opensuse|centos|epel' > /tmp/mychildlist.sumatmp
 MY_CHILDLIST=/tmp/mychildlist.sumatmp
 if [[ ! -f ~/.mgr-sync ]]; then
     mgr-sync -s refresh 2>&1 >> $EMAILMSGZ
@@ -855,6 +859,12 @@ exit $?
 ##      Promoted script to release 5.1.0-02		#
 #         02 Sep 2018- cleanup for rpm-build		#
 #         Next steps- total rewrite of code syntax	#
+####    FORK- 21 Oct 2019                               #
+#         name-change, version change, support for      #
+#         Uyuni 4.0- OpenSUSE CentOS                    #
+#         Added scans for mew support to the base lists #
+#                                                       #
+#                                                       #
 #                                                       #
 #########################################################
 # END OF CHANGELOG
